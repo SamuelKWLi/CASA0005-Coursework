@@ -1,0 +1,41 @@
+!table
+!version 300
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 34
+    OBJECTID Decimal (10, 0) ;
+    GRIDIDEX Float ;
+    GRIDIDKM Float ;
+    REFERENCES Char (6) ;
+    X_COORD Float ;
+    Y_COORD Float ;
+    AREA Float ;
+    AREAROUND Float ;
+    BOROUGHEX Char (60) ;
+    LOCATIONEX Char (20) ;
+    BOROUGHKM Char (50) ;
+    LOCATIONKM Char (20) ;
+    SHAPE_LENG Float ;
+    SHAPE_AREA Float ;
+    CHECKTLRN Decimal (5, 0) ;
+    GridID Decimal (10, 0) ;
+    OTAviat10 Float ;
+    OTCoShip10 Float ;
+    OTFrRail10 Float ;
+    OTPaShip10 Float ;
+    OTPaRail10 Float ;
+    OTSmPrV10 Float ;
+    OTAviat13 Float ;
+    OTCoShip13 Float ;
+    OTFrRail13 Float ;
+    OTPaShip13 Float ;
+    OTPaRail13 Float ;
+    OTSmPrV13 Float ;
+    OTAviat16 Float ;
+    OTCoShip16 Float ;
+    OTFrRail16 Float ;
+    OTPaShip16 Float ;
+    OTPaRail16 Float ;
+    OTSmPrV16 Float ;

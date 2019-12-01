@@ -1,0 +1,70 @@
+!table
+!version 300
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 63
+    OBJECTID Decimal (10, 0) ;
+    TOID Char (16) ;
+    VERSION Float ;
+    VER_DATE Date ;
+    DESC_GROUP Char (24) ;
+    DESC_TERM Char (34) ;
+    ROAD_NAME Char (81) ;
+    DFT_NUMBER Char (12) ;
+    ROADNATURE Char (31) ;
+    LENGTH Float ;
+    START_NODE Char (16) ;
+    START_GS Decimal (10, 0) ;
+    END_NODE Char (16) ;
+    END_GS Decimal (10, 0) ;
+    LA_CH_DATE Date ;
+    LA_CH_REAS Char (12) ;
+    PROC_DATE Date ;
+    Shape_Leng Float ;
+    ErgLocatio Char (50) ;
+    CheckDot Decimal (10, 0) ;
+    CheckLts Decimal (10, 0) ;
+    LtsRef Decimal (5, 0) ;
+    DotRef Decimal (10, 0) ;
+    HalfTO Float ;
+    Motorc10 Float ;
+    Taxi10 Float ;
+    PetCar10 Float ;
+    DieCar10 Float ;
+    LtBus10 Float ;
+    Coach10 Float ;
+    PetLgv10 Float ;
+    DieLgv10 Float ;
+    Rigid10 Float ;
+    Artic10 Float ;
+    ECar10 Float ;
+    ELgv10 Float ;
+    Total10 Float ;
+    Motorc13 Float ;
+    Taxi13 Float ;
+    PetCar13 Float ;
+    DieCar13 Float ;
+    LtBus13 Float ;
+    Coach13 Float ;
+    PetLgv13 Float ;
+    DieLgv13 Float ;
+    Rigid13 Float ;
+    Artic13 Float ;
+    ECar13 Float ;
+    ELgv13 Float ;
+    Total13 Float ;
+    Motorc16 Float ;
+    Taxi16 Float ;
+    PetCar16 Float ;
+    DieCar16 Float ;
+    LtBus16 Float ;
+    Coach16 Float ;
+    PetLgv16 Float ;
+    DieLgv16 Float ;
+    Rigid16 Float ;
+    Artic16 Float ;
+    ECar16 Float ;
+    ELgv16 Float ;
+    Total16 Float ;
