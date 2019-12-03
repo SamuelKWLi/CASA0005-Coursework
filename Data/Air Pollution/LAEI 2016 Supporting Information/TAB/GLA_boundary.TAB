@@ -1,0 +1,38 @@
+!table
+!version 300
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 26
+    OBJECTID Decimal (9, 0) ;
+    BOROUGH Char (25) ;
+    NUMBER Char (2) ;
+    NAME Char (60) ;
+    AREA_CODE Char (3) ;
+    DESCRIPTIO Char (50) ;
+    FILE_NAME Char (50) ;
+    NUMBER0 Decimal (19, 11) ;
+    NUMBER1 Decimal (19, 11) ;
+    POLYGON_ID Decimal (19, 11) ;
+    UNIT_ID Decimal (19, 11) ;
+    CODE Char (7) ;
+    HECTARES Decimal (19, 11) ;
+    AREA Decimal (19, 11) ;
+    TYPE_CODE Char (2) ;
+    DESCRIPT0 Char (25) ;
+    Shape_Leng Decimal (19, 11) ;
+    Shape_Area Decimal (19, 11) ;
+    NUMBER_NW Char (254) ;
+    NUMBER_N Char (254) ;
+    NUMBER_NE Char (254) ;
+    NUMBER_W Char (254) ;
+    NUMBER_E Char (254) ;
+    NUMBER_SW Char (254) ;
+    NUMBER_S Char (254) ;
+    NUMBER_SE Char (254) ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "fe4dae6d-3d2d-4beb-a9d1-7d6c8c1a6810"
+end_metadata

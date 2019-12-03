@@ -1,0 +1,16 @@
+!table
+!version 300
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 4
+    LINK_ID Decimal (9, 0) ;
+    UPSTREAMPI Char (50) ;
+    DOWNSTREAM Char (50) ;
+    SHAPE_LENG Float ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "77ae929c-d48d-4bff-9d12-2e7403edee49"
+end_metadata

@@ -1,0 +1,22 @@
+!table
+!version 300
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 15
+    OBJECTID Decimal (9, 0) ;
+    GridIdEx Float Index 1 ;
+    GridIdKm Float ;
+    REFERENCES Char (6) ;
+    X_COORD Float ;
+    Y_COORD Float ;
+    Area Float Index 3 ;
+    AreaRound Float ;
+    BoroughEx Char (60) ;
+    LocationEx Char (20) Index 2 ;
+    BoroughKm Char (50) ;
+    LocationKm Char (20) ;
+    Shape_Leng Float ;
+    Shape_Area Float ;
+    CheckTLRN Decimal (1, 0) ;

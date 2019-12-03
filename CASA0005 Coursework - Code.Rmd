@@ -1,4 +1,120 @@
 ---
 title: "CASA0005 Coursework - Code"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
+### Packages
+```{r}
+library(tidyverse)
+library(raster)
+library(rgdal)
+library(sf)
+```
+
+### Read in Concentration Rasters
+```{r}
+# List the full file paths of all the raster files.
+PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations/Rasters", ".tif", full.names = TRUE)
+
+# Stack the raster files into a single stack.
+PollutionConc <- stack(PollutionFiles)
+
+# List the raster names.
+PollutionNames <- c("NO2", "PM2.5")
+
+# Rename the raster files.
+names(PollutionConc) <- PollutionNames
+
+# Set BNG coordinate system.
+BNG = "+init=epsg:27700"
+
+# Reproject raster stack into BNG.
+PollutionConc <- projectRaster(PollutionConc, crs=BNG)
+
+# Plot raster layers.
+plot(PollutionConc[[1]])
+plot(PollutionConc[[2]])
+
+```
+
+
+### Read in School, GP and Hospital Data
+
+```{r}
+# Read in School data.
+Schools <- read_csv("Data/Schools and Health/All School Locations 2016.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+
+# Select the necessary columns.
+Schools <- Schools[,c(3, 4, 5, 8)]
+
+# Rename Columns.
+colnames(Schools) <- c("School Name", "Type", "Phase", "Postcode")
+
+# Read in GP data.
+GPs <- read_csv("Data/Schools and Health/GP Locations.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+
+# Select the necessary columns.
+GPs <- GPs[,c(1, 9)]
+
+# Rename columns.
+colnames(GPs) <- c("GP Name", "Postcode")
+
+# Read in Hospital data.
+Hospitals <- read_csv("Data/Schools and Health/Hospital Locations.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+
+# Select the necessary columns.
+Hospitals <- Hospitals[,c(1, 9)]
+
+# Rename Columns.
+colnames(Hospitals) <- c("Hospital Name", "Postcode")
+```
+
+### Attach Code Points
+
+```{r}
+# List full file paths for all of the code point csv files.
+CodePointsFiles <- list.files(path = "Data/Schools and Health/OS Point Codes/Data/CSV", full.names=TRUE)
+
+# run a function for each code point file path, reading the csvs into an object.
+AllCodePoints <- lapply(CodePointsFiles,function(i){
+  read.csv(i, header=FALSE, skip=4)
+})
+
+# Convert the object into a data frame.
+AllCodePoints <- do.call(rbind.data.frame, AllCodePoints)
+
+# Rename the columns.
+colnames(AllCodePoints) <- c("Postcode",	"Positional_quality_indicator",	"Eastings",	"Northings",	"Country_code",	"NHS_regional_HA_code",	"NHS_HA_code",	"Admin_county_code",	"Admin_district_code",	"Admin_ward_code")
+
+# Specify relevent columns.
+AllCodePoints <- AllCodePoints[,c(1, 3, 4)]
+
+# Write complete dataframe into a csv file.
+write.csv(AllCodePoints,"AllCodePoints.csv", row.names=FALSE)
+
+Schools<-merge(Schools, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
+
+GPs<-merge(GPs, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
+
+Hospitals<-merge(Hospitals, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
+```
+
