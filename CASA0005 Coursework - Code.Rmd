@@ -15,13 +15,13 @@ library(sf)
 ### Read in Concentration Rasters
 ```{r}
 # List the full file paths of all the raster files.
-PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations/Rasters", ".tif", full.names = TRUE)
+PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations", ".tif", full.names = TRUE)
 
 # Stack the raster files into a single stack.
 PollutionConc <- stack(PollutionFiles)
 
 # List the raster names.
-PollutionNames <- c("NO2", "PM2.5")
+PollutionNames <- c("NO2", "NOx", "PM10", "PM10d", "PM2.5")
 
 # Rename the raster files.
 names(PollutionConc) <- PollutionNames
@@ -34,7 +34,7 @@ PollutionConc <- projectRaster(PollutionConc, crs=BNG)
 
 # Plot raster layers.
 plot(PollutionConc[[1]])
-plot(PollutionConc[[2]])
+plot(PollutionConc[[5]])
 
 ```
 
@@ -80,9 +80,9 @@ colnames(Hospitals) <- c("Hospital Name", "Postcode")
 
 ```{r}
 # List full file paths for all of the code point csv files.
-CodePointsFiles <- list.files(path = "Data/Schools and Health/OS Point Codes/Data/CSV", full.names=TRUE)
+CodePointsFiles <- list.files(path = "Data/Schools and Health/OS Point Codes/Data", full.names=TRUE)
 
-# run a function for each code point file path, reading the csvs into an object.
+# Run a function for each code point file path, reading the csvs into an object.
 AllCodePoints <- lapply(CodePointsFiles,function(i){
   read.csv(i, header=FALSE, skip=4)
 })
