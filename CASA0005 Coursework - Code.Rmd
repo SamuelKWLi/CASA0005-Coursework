@@ -13,7 +13,7 @@ library(sf)
 library(tmap)
 library(leafpop)
 library(leaflet)
-
+library(htmltools)
 ```
 
 ### Read in Concentration Rasters
@@ -31,14 +31,10 @@ PollutionNames <- c("NO2", "NOx", "PM10", "PM10d", "PM2.5")
 names(PollutionConc) <- PollutionNames
 
 # Set BNG coordinate system.
-BNG = "+init=epsg:27700"
+WGS84 = "+init=epsg:4326"
 
 # Reproject raster stack into BNG.
-PollutionConc <- projectRaster(PollutionConc, crs=BNG)
-
-# Plot raster layers.
-plot(PollutionConc[[1]])
-plot(PollutionConc[[5]])
+PollutionConc <- projectRaster(PollutionConc, crs=WGS84)
 
 ```
 
@@ -47,7 +43,7 @@ plot(PollutionConc[[5]])
 # Read in the London boundary.
 LondonOutline <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp")
 plot(LondonOutline$geometry)
-LondonOutline <- st_transform(LondonOutline, 27700)
+LondonOutline <- st_transform(LondonOutline, 4326)
 
 # Set extent to the London area.
 LondonExtent <- extent(LondonOutline)
@@ -69,6 +65,24 @@ PM2.5Mask <-  mask(PollutionConc[[5]], LondonOutline, na.rm=TRUE)
 # Stack the masked rasters.
 PollutionLon <- stack(NO2Mask, NOxMask, PM10Mask, PM10dMask, PM2.5Mask)
 ```
+
+### Read in Borough and Ward Boundaries
+```{r}
+# Read in borough boundaries.
+Boroughs <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
+Boroughs <- st_as_sf(Boroughs)
+Boroughs <- st_transform(Boroughs, crs = 4326)
+Boroughs <- Boroughs[,c(1, 2, 8)]
+colnames(Boroughs) <- c("Borough Name", "Borough Code", "geometry")
+
+# Read in ward boundaries.
+Wards <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Ward_CityMerged_Clip.shp")
+Wards <- st_as_sf(Wards)
+Wards <- st_transform(Wards, crs = 4326)
+Wards <- Wards[,c(1, 2, 6, 5, 8)]
+colnames(Wards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "geometry")
+```
+
 
 ### Read in Code Points
 ```{r}
@@ -110,14 +124,20 @@ Hospitals <- read_csv("Data/Schools and Health/Hospital Locations.csv",
                        locale = locale(encoding = "latin1"),
                        na = "n/a")
 # Select the necessary columns.
-Schools <- Schools[,c(3, 4, 5, 8)]
+Schools <- Schools[,c(3, 8)]
 GPs <- GPs[,c(1, 9)]
 Hospitals <- Hospitals[,c(1, 9)]
 
 # Rename Columns.
-colnames(Schools) <- c("School Name", "Type", "Phase", "Postcode")
-colnames(GPs) <- c("GP Name", "Postcode")
-colnames(Hospitals) <- c("Hospital Name", "Postcode")
+colnames(Schools) <- c("Name", "Postcode")
+colnames(GPs) <- c("Name", "Postcode")
+colnames(Hospitals) <- c("Name", "Postcode")
+
+# Classify data.
+Schools$Type <- "School"
+GPs$Type <- "GP"
+Hospitals$Type <- "Hospital"
+
 
 # Remove space in postcodes
 Schools$Postcode <- gsub(" ","", Schools$Postcode)
@@ -144,54 +164,47 @@ Hospitals<-merge(Hospitals,
              by.y="Postcode",
              no.dups = TRUE)
 
+
+# Merge school, GP and hospital points.
+Locations <- rbind(Schools, GPs, Hospitals)
+
+# Reorder columns
+Locations <- Locations[,c(2, 1, 3, 4, 5)]
+
 # Remove duplicates.
-Schools <- Schools[!duplicated(Schools$Postcode), ]
-GPs <- GPs[!duplicated(GPs$Postcode), ]
-Hospitals <- Hospitals[!duplicated(Hospitals$Postcode), ]
+Locations <- Locations[!duplicated(Locations$Postcode), ]
+
 ```
 
 ### Plot and identify Schools, GPs and Hospitals
 
 ```{r}
-# Read in borough boundaries.
-Boroughs <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
-Boroughs <- st_transform(Boroughs, 27700)
-
 # Convert schools, GPs and hosptial coordinates into point geometry.
-Schools <- st_as_sf(Schools, coords = c("Eastings", "Northings"), 
-                   crs = 27700)
-GPs <- st_as_sf(GPs, coords = c("Eastings", "Northings"), 
-                   crs = 27700)
-Hospitals <- st_as_sf(Hospitals, coords = c("Eastings", "Northings"), 
-                   crs = 27700)
+Locations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = 27700)
+Locations <- st_transform(Locations, crs = 4326)
 
 # Select points inside London.
-Schools <- Schools[Boroughs,]
-GPs <- GPs[Boroughs,]
-Hospitals <- Hospitals[Boroughs,]
+Locations <- Locations[Boroughs,]
+
 ```
 
 ### Extract Concentrations for Schools, GPs and Hospitals
 ```{r}
-# Extract NO2 concentrations.
-Schools$NO2<- raster::extract(PollutionConc[[1]], Schools)
-GPs$NO2<- raster::extract(PollutionConc[[1]], GPs)
-Hospitals$NO2<- raster::extract(PollutionConc[[1]], Hospitals)
+# Extract concentrations.
+Locations$`NO2 (µg/m³)`<- raster::extract(PollutionConc[[1]], Locations)
+Locations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[5]], Locations)
 
-# Extract PM2.5 concentrations.
-Schools$PM2.5<- raster::extract(PollutionConc[[5]], Schools)
-GPs$PM2.5<- raster::extract(PollutionConc[[5]], GPs)
-Hospitals$PM2.5<- raster::extract(PollutionConc[[5]], Hospitals)
+# Round concentrations to 2 d.p..
+Locations$`NO2 (µg/m³)` <- round(Locations$`NO2 (µg/m³)`, digits = 2)
+Locations$`PM2.5 (µg/m³)` <- round(Locations$`PM2.5 (µg/m³)`, digits = 2)
 
-# Extract schools, GPs and hospitals that exceed WHO NO2 guides
-SchoolsNO2 <- Schools %>% filter(NO2 > 40)
-GPsNO2 <- GPs %>% filter(NO2 > 40)
-HospitalsNO2 <- Hospitals %>% filter(NO2 > 40)
+# Rename columns.
+colnames(Locations) <- c("Building Name", "Postcode", "Building Type", "geometry", "NO2 (µg/m³)", "PM2.5 (µg/m³)")
 
-# Extract schools, GPs and hospitals that exceed WHO PM2.5 guides
-SchoolsPM2.5 <- Schools %>% filter(PM2.5 > 10)
-GPsPM2.5 <- GPs %>% filter(PM2.5 > 10)
-HospitalsPM2.5 <- Hospitals %>% filter(PM2.5 > 10)
+# Extract schools, GPs and hospitals that exceed WHO guides
+LocationsNO2 <- Locations %>% filter(`NO2 (µg/m³)` > 40)
+LocationsPM2.5 <- Locations %>% filter(`PM2.5 (µg/m³)` > 10)
+
 ```
 
 ### Plot Map using tmap
@@ -203,37 +216,162 @@ tmap_mode("view")
 Map <- tm_shape(Boroughs)+ 
   tm_fill(col = NA, alpha = 0)+ 
   tm_borders(col = "black")+
-tm_shape(Schools)+
-  tm_dots(col = "blue", size = 0.01)+
-tm_shape(GPs)+
-  tm_dots(col = "green", size = 0.01)+
-tm_shape(Hospitals)+
-  tm_dots(col = "green", size = 0.05)
+tm_shape(Wards)+ 
+  tm_fill(col = NA, alpha = 0)+ 
+  tm_borders(col = "black", alpha = 0.5)+
+tm_shape(Locations)+
+  tm_dots(title = "Building Type (All)", col = "Building Type", palette = c("lightblue", "navy", "lightgreen"))+
+tm_shape(LocationsNO2)+
+  tm_dots(title = "Building Type (NO2)", col = "Building Type", palette = c("red", "brown", "orange"))+
+tm_shape(LocationsPM2.5)+
+  tm_dots(title = "Building Type (PM2.5)", col = "Building Type", palette = c("red", "brown", "orange"))+
+tm_layout(legend.show = TRUE)
 Map
 
-# Plot map of schools, GPs and hospitals that exceed WHO NO2 guides.
-MapNO2 <- tm_shape(Boroughs)+ 
-  tm_fill(col = NA, alpha = 0)+ 
-  tm_borders(col = "black")+
-tm_shape(SchoolsNO2)+
-  tm_dots(col = "orange", size = 0.01)+
-tm_shape(GPsNO2)+
-  tm_dots(col = "red", size = 0.01)+
-tm_shape(HospitalsNO2)+
-  tm_dots(col = "red", size = 0.05)
-MapNO2
+```
 
-# Plot map of schools, GPs and hospitals that exceed WHO PM2.5 guides.
-MapPM2.5 <- tm_shape(Boroughs)+ 
-  tm_fill(col = NA, alpha = 0)+ 
-  tm_borders(col = "black")+
-tm_shape(SchoolsPM2.5)+
-  tm_dots(col = "orange", size = 0.01)+
-tm_shape(GPsPM2.5)+
-  tm_dots(col = "red", size = 0.01)+
-tm_shape(HospitalsPM2.5)+
-  tm_dots(col = "red", size = 0.05)
-MapPM2.5
+### Plot Map using leaflet
+```{r}
+# Create popup tables
+PopBoroughs <- Boroughs
+st_geometry(PopBoroughs) <- NULL
+PopBoroughs <- popupTable(PopBoroughs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Borough Name", "Borough Code"))
+
+PopWards <- Wards
+st_geometry(PopWards) <- NULL
+PopWards <- popupTable(PopWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Ward Code", "Borough Name", "Borough Code"))
+
+PopLocations <- Locations
+st_geometry(PopLocations) <- NULL
+PopLocations <- popupTable(PopLocations, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+# Create colour factors.
+PalAll <- colorFactor(c("lightblue2", "steelblue1", "palegreen3"), levels = c("GP", "Hospital", "School"))
+PalWHO <- colorFactor(c("red4", "red3", "tan1"), levels = c("GP", "Hospital", "School"))
+
+# Map using leaflet.
+leaflet() %>% 
+  addTiles(group = "OSM (default)") %>% 
+  addPolygons(data = Boroughs, 
+              fill = "transparent", 
+              color = "black",
+              stroke = "black",
+              weight = 2, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              highlightOptions = highlightOptions(color = "white", weight = 3,bringToFront = FALSE),
+              label = PopBoroughs,
+              group = "Boroughs"
+              ) %>% 
+  addPolygons(data = Wards, 
+              fill = "transparent",
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
+              popup = PopWards,
+              group = "Wards"
+              ) %>% 
+  addCircleMarkers(data =  subset(Locations, `Building Type` == "School"),
+             color = ~PalAll(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Schools (All)",
+             ) %>% 
+  addCircleMarkers(data = subset(Locations, `Building Type` == "GP"),
+             color = ~PalAll(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "GP (All)",
+             ) %>% 
+  addCircleMarkers(data = subset(Locations, `Building Type` == "Hospital"),
+             color = ~PalAll(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Hospital (All)",
+             ) %>% 
+  addCircleMarkers(data =  subset(LocationsNO2, `Building Type` == "School"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Schools (NO2)",
+             ) %>% 
+  addCircleMarkers(data = subset(LocationsNO2, `Building Type` == "GP"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "GP (NO2)",
+             ) %>% 
+  addCircleMarkers(data = subset(LocationsNO2, `Building Type` == "Hospital"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Hospital (NO2)",
+             ) %>% 
+  addCircleMarkers(data =  subset(LocationsPM2.5, `Building Type` == "School"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Schools (PM2.5)",
+             ) %>% 
+  addCircleMarkers(data = subset(LocationsPM2.5, `Building Type` == "GP"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "GP (PM2.5)",
+             ) %>% 
+  addCircleMarkers(data = subset(LocationsPM2.5, `Building Type` == "Hospital"),
+             color = ~PalWHO(`Building Type`),
+             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             opacity = 1.0,
+             weight = 0.5,
+             popup = PopLocations,
+             group = "Hospital (PM2.5)",
+             ) %>% 
+  addLayersControl(
+    baseGroups = c("OSM (default)"),
+    overlayGroups = c("Boroughs", "Wards", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)"),
+    options = layersControlOptions(collapsed = TRUE)
+    ) %>% 
+  hideGroup(c("Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)")) %>% 
+  addLegend(pal = PalAll, values = Locations$`Building Type`, title = "All Buildings") %>% 
+  addLegend(pal = PalWHO, values = LocationsNO2$`Building Type`, title = "Exceeding Limits") 
 
 ```
 
