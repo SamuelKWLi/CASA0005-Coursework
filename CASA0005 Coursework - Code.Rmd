@@ -138,35 +138,18 @@ Schools$Type <- "School"
 GPs$Type <- "GP"
 Hospitals$Type <- "Hospital"
 
-
-# Remove space in postcodes
-Schools$Postcode <- gsub(" ","", Schools$Postcode)
-GPs$Postcode <- gsub(" ","", GPs$Postcode)
-Hospitals$Postcode <- gsub(" ","", Hospitals$Postcode)
-
-
-# Attach code points.
-Schools<-merge(Schools, 
-             AllCodePoints, 
-             by.x="Postcode", 
-             by.y="Postcode",
-             no.dups = TRUE)
-
-GPs<-merge(GPs, 
-             AllCodePoints, 
-             by.x="Postcode", 
-             by.y="Postcode",
-             no.dups = TRUE)
-
-Hospitals<-merge(Hospitals, 
-             AllCodePoints, 
-             by.x="Postcode", 
-             by.y="Postcode",
-             no.dups = TRUE)
-
-
 # Merge school, GP and hospital points.
 Locations <- rbind(Schools, GPs, Hospitals)
+
+# Remove space in postcodes
+Locations$Postcode <- gsub(" ","", Locations$Postcode)
+
+# Attach code points.
+Locations<-merge(Locations, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
 
 # Reorder columns
 Locations <- Locations[,c(2, 1, 3, 4, 5)]
@@ -176,8 +159,7 @@ Locations <- Locations[!duplicated(Locations$Postcode), ]
 
 ```
 
-### Plot and identify Schools, GPs and Hospitals
-
+### Extract Concentrations for Schools, GPs and Hospitals
 ```{r}
 # Convert schools, GPs and hosptial coordinates into point geometry.
 Locations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = 27700)
@@ -186,10 +168,6 @@ Locations <- st_transform(Locations, crs = 4326)
 # Select points inside London.
 Locations <- Locations[Boroughs,]
 
-```
-
-### Extract Concentrations for Schools, GPs and Hospitals
-```{r}
 # Extract concentrations.
 Locations$`NO2 (µg/m³)`<- raster::extract(PollutionConc[[1]], Locations)
 Locations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[5]], Locations)
@@ -229,10 +207,31 @@ tm_layout(legend.show = TRUE)
 Map
 
 ```
-
-### Plot Map using leaflet
+### Subset Location Data and Set Up Popups
 ```{r}
-# Create popup tables
+Schools <- subset(Locations, `Building Type` == "School")
+
+GPs <- subset(Locations, `Building Type` == "GP")
+
+Hospitals <- subset(Locations, `Building Type` == "Hospital")
+
+SchoolsNO2 <- subset(LocationsNO2, `Building Type` == "School")
+
+GPsNO2 <- subset(LocationsNO2, `Building Type` == "GP")
+
+HospitalsNO2 <- subset(LocationsNO2, `Building Type` == "Hospital")
+
+SchoolsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "School")
+
+GPsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "GP")
+
+HospitalsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "Hospital")
+
+```
+
+### Popup Tables and Palettes
+```{r}
+# Create popup tables for boundaries
 PopBoroughs <- Boroughs
 st_geometry(PopBoroughs) <- NULL
 PopBoroughs <- popupTable(PopBoroughs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Borough Name", "Borough Code"))
@@ -241,14 +240,54 @@ PopWards <- Wards
 st_geometry(PopWards) <- NULL
 PopWards <- popupTable(PopWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Ward Code", "Borough Name", "Borough Code"))
 
-PopLocations <- Locations
-st_geometry(PopLocations) <- NULL
-PopLocations <- popupTable(PopLocations, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+# Create popup tables for locations
+PopSchools <- Schools
+st_geometry(PopSchools) <- NULL
+PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopGPs <- GPs
+st_geometry(PopGPs) <- NULL
+PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopHospitals <- Hospitals
+st_geometry(PopHospitals) <- NULL
+PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+# Create popup tables for locations exceeding NO2
+PopSchoolsNO2 <- SchoolsNO2
+st_geometry(PopSchoolsNO2) <- NULL
+PopSchoolsNO2 <- popupTable(PopSchoolsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopGPsNO2 <- GPsNO2
+st_geometry(PopGPsNO2) <- NULL
+PopGPs <- popupTable(PopGPsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopHospitalsNO2 <- HospitalsNO2
+st_geometry(PopHospitalsNO2) <- NULL
+PopHospitalsNO2 <- popupTable(PopHospitalsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+# Create popup tables for locations exceeding PM2.5
+PopSchoolsPM2.5 <- SchoolsPM2.5
+st_geometry(PopSchoolsPM2.5) <- NULL
+PopSchoolsPM2.5 <- popupTable(PopSchoolsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopGPsPM2.5 <- GPsPM2.5
+st_geometry(PopGPsPM2.5) <- NULL
+PopGPsPM2.5 <- popupTable(PopGPsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+PopHospitalsPM2.5 <- HospitalsPM2.5
+st_geometry(PopHospitalsPM2.5) <- NULL
+PopHospitalsPM2.5 <- popupTable(PopHospitalsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 
 # Create colour factors.
-PalAll <- colorFactor(c("lightblue2", "steelblue1", "palegreen3"), levels = c("GP", "Hospital", "School"))
-PalWHO <- colorFactor(c("red4", "red3", "tan1"), levels = c("GP", "Hospital", "School"))
+PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("GP", "Hospital", "School"))
+PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
 
+```
+
+
+### Plot Map using leaflet
+```{r}
 # Map using leaflet.
 leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
@@ -274,95 +313,212 @@ leaflet() %>%
               popup = PopWards,
               group = "Wards"
               ) %>% 
-  addCircleMarkers(data =  subset(Locations, `Building Type` == "School"),
+  addCircleMarkers(data = Schools,
              color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopSchools,
              group = "Schools (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'LightGreen'
+                } else if (childCount < 100) {  
+                  c = 'LightGreen'  
+                } else { 
+                  c = 'LightGreen'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(Locations, `Building Type` == "GP"),
+  addCircleMarkers(data = GPs,
              color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopGPs,
              group = "GP (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'LightSkyBlue'
+                } else if (childCount < 100) {  
+                  c = 'LightSkyBlue'  
+                } else { 
+                  c = 'LightSkyBlue'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(Locations, `Building Type` == "Hospital"),
+  addCircleMarkers(data = Hospitals,
              color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopHospitals,
              group = "Hospital (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'RoyalBlue'
+                } else if (childCount < 100) {  
+                  c = 'RoyalBlue'  
+                } else { 
+                  c = 'RoyalBlue'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data =  subset(LocationsNO2, `Building Type` == "School"),
+  addCircleMarkers(data = SchoolsNO2,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopSchoolsNO2,
              group = "Schools (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Gold'
+                } else if (childCount < 100) {  
+                  c = 'Gold'  
+                } else { 
+                  c = 'Gold'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(LocationsNO2, `Building Type` == "GP"),
+  addCircleMarkers(data = GPsNO2,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopGPsNO2,
              group = "GP (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Orange'
+                } else if (childCount < 100) {  
+                  c = 'Orange'  
+                } else { 
+                  c = 'Orange'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(LocationsNO2, `Building Type` == "Hospital"),
+  addCircleMarkers(data = HospitalsNO2,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopHospitalsNO2,
              group = "Hospital (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Red'
+                } else if (childCount < 100) {  
+                  c = 'Red'  
+                } else { 
+                  c = 'Red'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data =  subset(LocationsPM2.5, `Building Type` == "School"),
+  addCircleMarkers(data = SchoolsPM2.5,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopSchoolsPM2.5,
              group = "Schools (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Gold'
+                } else if (childCount < 100) {  
+                  c = 'Gold'  
+                } else { 
+                  c = 'Gold'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(LocationsPM2.5, `Building Type` == "GP"),
+  addCircleMarkers(data = GPsPM2.5,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopGPsPM2.5,
              group = "GP (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Orange'
+                } else if (childCount < 100) {  
+                  c = 'Orange'  
+                } else { 
+                  c = 'Orange'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
-  addCircleMarkers(data = subset(LocationsPM2.5, `Building Type` == "Hospital"),
+  addCircleMarkers(data = HospitalsPM2.5,
              color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 6, 3),
+             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
              fillOpacity = 1.0,
              stroke = TRUE,
              opacity = 1.0,
              weight = 0.5,
-             popup = PopLocations,
+             popup = PopHospitalsPM2.5,
              group = "Hospital (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Red'
+                } else if (childCount < 100) {  
+                  c = 'Red'  
+                } else { 
+                  c = 'Red'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className:  'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
              ) %>% 
   addLayersControl(
     baseGroups = c("OSM (default)"),
@@ -371,7 +527,10 @@ leaflet() %>%
     ) %>% 
   hideGroup(c("Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)")) %>% 
   addLegend(pal = PalAll, values = Locations$`Building Type`, title = "All Buildings") %>% 
-  addLegend(pal = PalWHO, values = LocationsNO2$`Building Type`, title = "Exceeding Limits") 
+  addLegend(pal = PalWHO, values = LocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
+  addEasyButton(easyButton(
+    icon="fa-globe", title="Zoom to London",
+    onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }")))
 
 ```
 
