@@ -14,6 +14,9 @@ library(tmap)
 library(leafpop)
 library(leaflet)
 library(htmltools)
+library(GISTools)
+library(RColorBrewer)
+library(BAMMtools)
 ```
 
 ### Read in Concentration Rasters
@@ -31,56 +34,66 @@ PollutionNames <- c("NO2", "NOx", "PM10", "PM10d", "PM2.5")
 names(PollutionConc) <- PollutionNames
 
 # Set BNG coordinate system.
+BNG = "+init=epsg:27700"
+
+# Set WGS84 coordinate system.
 WGS84 = "+init=epsg:4326"
 
 # Reproject raster stack into BNG.
-PollutionConc <- projectRaster(PollutionConc, crs=WGS84)
+PollutionConc <- projectRaster(PollutionConc, crs= WGS84)
 
 ```
 
 ### Crop Raster Data
 ```{r}
 # Read in the London boundary.
-LondonOutline <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp")
-plot(LondonOutline$geometry)
-LondonOutline <- st_transform(LondonOutline, 4326)
+OutlineLondon <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp")
+
+# Transform CRS into WGS84.
+OutlineLondon <- st_transform(OutlineLondon, WGS84)
 
 # Set extent to the London area.
-LondonExtent <- extent(LondonOutline)
+ExtentLondon <- extent(OutlineLondon)
 
 # Crop the rasters to the London outline.
-NO2Crop <- crop(PollutionConc[[1]], LondonOutline)
-NOxCrop <- crop(PollutionConc[[2]], LondonOutline)
-PM10Crop <- crop(PollutionConc[[3]], LondonOutline)
-PM10dCrop <- crop(PollutionConc[[4]], LondonOutline)
-PM2.5Crop <- crop(PollutionConc[[5]], LondonOutline)
+CropNO2 <- crop(PollutionConc[[1]], OutlineLondon)
+CropNOx <- crop(PollutionConc[[2]], OutlineLondon)
+CropPM10 <- crop(PollutionConc[[3]], OutlineLondon)
+CropPM10d <- crop(PollutionConc[[4]], OutlineLondon)
+CropPM2.5 <- crop(PollutionConc[[5]], OutlineLondon)
 
 # Mask rasters to the London outline.
-NO2Mask <-  mask(PollutionConc[[1]], LondonOutline, na.rm=TRUE)
-NOxMask <-  mask(PollutionConc[[2]], LondonOutline, na.rm=TRUE)
-PM10Mask <-  mask(PollutionConc[[3]], LondonOutline, na.rm=TRUE)
-PM10dMask <-  mask(PollutionConc[[4]], LondonOutline, na.rm=TRUE)
-PM2.5Mask <-  mask(PollutionConc[[5]], LondonOutline, na.rm=TRUE)
+MaskNO2 <-  mask(PollutionConc[[1]], OutlineLondon, na.rm=TRUE)
+MaskNOx <-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
+MaskPM10 <-  mask(PollutionConc[[3]], OutlineLondon, na.rm=TRUE)
+MaskPM10d <-  mask(PollutionConc[[4]], OutlineLondon, na.rm=TRUE)
+MaskPM2.5 <-  mask(PollutionConc[[5]], OutlineLondon, na.rm=TRUE)
 
 # Stack the masked rasters.
-PollutionLon <- stack(NO2Mask, NOxMask, PM10Mask, PM10dMask, PM2.5Mask)
+PollutionLondon <- stack(MaskNO2, MaskNOx, MaskPM10, MaskPM10d, MaskPM2.5)
 ```
 
 ### Read in Borough and Ward Boundaries
 ```{r}
-# Read in borough boundaries.
+# Read in boundaries as spatial polygons.
 Boroughs <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
-Boroughs <- st_as_sf(Boroughs)
-Boroughs <- st_transform(Boroughs, crs = 4326)
-Boroughs <- Boroughs[,c(1, 2, 8)]
-colnames(Boroughs) <- c("Borough Name", "Borough Code", "geometry")
-
-# Read in ward boundaries.
 Wards <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Ward_CityMerged_Clip.shp")
-Wards <- st_as_sf(Wards)
-Wards <- st_transform(Wards, crs = 4326)
-Wards <- Wards[,c(1, 2, 6, 5, 8)]
-colnames(Wards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "geometry")
+
+# Convert from an sp object to sf object.
+SFBoroughs <- st_as_sf(Boroughs)
+SFWards <- st_as_sf(Wards)
+
+# Transform CRS to WGS84.
+SFBoroughs <- st_transform(SFBoroughs, WGS84)
+SFWards <- st_transform(SFWards, WGS84)
+
+# Select relevent columns.
+SFBoroughs <- SFBoroughs[,c(1, 2, 8)]
+SFWards <- SFWards[,c(1, 2, 6, 5, 8)]
+
+# Rename columns.
+colnames(SFBoroughs) <- c("Borough Name", "Borough Code", "geometry")
+colnames(SFWards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "geometry")
 ```
 
 
@@ -155,143 +168,205 @@ Locations<-merge(Locations,
 Locations <- Locations[,c(2, 1, 3, 4, 5)]
 
 # Remove duplicates.
-Locations <- Locations[!duplicated(Locations$Postcode), ]
+Locations <- Locations[!duplicated(Locations$Name), ]
 
 ```
 
 ### Extract Concentrations for Schools, GPs and Hospitals
 ```{r}
-# Convert schools, GPs and hosptial coordinates into point geometry.
-Locations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = 27700)
-Locations <- st_transform(Locations, crs = 4326)
+# Convert location coordinates into point geometry.
+SFLocations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = BNG)
+
+# Transform CRS into WGS84.
+SFLocations <- st_transform(SFLocations, WGS84)
 
 # Select points inside London.
-Locations <- Locations[Boroughs,]
+SFLocations <- SFLocations[SFBoroughs,]
 
 # Extract concentrations.
-Locations$`NO2 (µg/m³)`<- raster::extract(PollutionConc[[1]], Locations)
-Locations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[5]], Locations)
+SFLocations$`NO2 (µg/m³)`<- raster::extract(PollutionConc[[1]], SFLocations)
+SFLocations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[5]], SFLocations)
 
 # Round concentrations to 2 d.p..
-Locations$`NO2 (µg/m³)` <- round(Locations$`NO2 (µg/m³)`, digits = 2)
-Locations$`PM2.5 (µg/m³)` <- round(Locations$`PM2.5 (µg/m³)`, digits = 2)
+SFLocations$`NO2 (µg/m³)` <- round(SFLocations$`NO2 (µg/m³)`, digits = 2)
+SFLocations$`PM2.5 (µg/m³)` <- round(SFLocations$`PM2.5 (µg/m³)`, digits = 2)
 
 # Rename columns.
-colnames(Locations) <- c("Building Name", "Postcode", "Building Type", "geometry", "NO2 (µg/m³)", "PM2.5 (µg/m³)")
+colnames(SFLocations) <- c("Building Name", "Postcode", "Building Type", "geometry", "NO2 (µg/m³)", "PM2.5 (µg/m³)")
 
 # Extract schools, GPs and hospitals that exceed WHO guides
-LocationsNO2 <- Locations %>% filter(`NO2 (µg/m³)` > 40)
-LocationsPM2.5 <- Locations %>% filter(`PM2.5 (µg/m³)` > 10)
+SFLocationsNO2 <- SFLocations %>% filter(`NO2 (µg/m³)` > 40)
+SFLocationsPM2.5 <- SFLocations %>% filter(`PM2.5 (µg/m³)` > 10)
 
 ```
 
-### Plot Map using tmap
-```{r}
-# Change tmap mode.
-tmap_mode("view")
-
-# Plot map of schools, GPs and hospitals.
-Map <- tm_shape(Boroughs)+ 
-  tm_fill(col = NA, alpha = 0)+ 
-  tm_borders(col = "black")+
-tm_shape(Wards)+ 
-  tm_fill(col = NA, alpha = 0)+ 
-  tm_borders(col = "black", alpha = 0.5)+
-tm_shape(Locations)+
-  tm_dots(title = "Building Type (All)", col = "Building Type", palette = c("lightblue", "navy", "lightgreen"))+
-tm_shape(LocationsNO2)+
-  tm_dots(title = "Building Type (NO2)", col = "Building Type", palette = c("red", "brown", "orange"))+
-tm_shape(LocationsPM2.5)+
-  tm_dots(title = "Building Type (PM2.5)", col = "Building Type", palette = c("red", "brown", "orange"))+
-tm_layout(legend.show = TRUE)
-Map
-
-```
 ### Subset Location Data and Set Up Popups
 ```{r}
-Schools <- subset(Locations, `Building Type` == "School")
+SFSchools <- subset(SFLocations, `Building Type` == "School")
 
-GPs <- subset(Locations, `Building Type` == "GP")
+SFGPs <- subset(SFLocations, `Building Type` == "GP")
 
-Hospitals <- subset(Locations, `Building Type` == "Hospital")
+SFHospitals <- subset(SFLocations, `Building Type` == "Hospital")
 
-SchoolsNO2 <- subset(LocationsNO2, `Building Type` == "School")
+SFSchoolsNO2 <- subset(SFLocationsNO2, `Building Type` == "School")
 
-GPsNO2 <- subset(LocationsNO2, `Building Type` == "GP")
+SFGPsNO2 <- subset(SFLocationsNO2, `Building Type` == "GP")
 
-HospitalsNO2 <- subset(LocationsNO2, `Building Type` == "Hospital")
+SFHospitalsNO2 <- subset(SFLocationsNO2, `Building Type` == "Hospital")
 
-SchoolsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "School")
+SFSchoolsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "School")
 
-GPsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "GP")
+SFGPsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "GP")
 
-HospitalsPM2.5 <- subset(LocationsPM2.5, `Building Type` == "Hospital")
+SFHospitalsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "Hospital")
 
 ```
 
-### Popup Tables and Palettes
+### Ward Data for Points
 ```{r}
-# Create popup tables for boundaries
-PopBoroughs <- Boroughs
+# Convert SF objects into SP objects
+SPBoroughs <- as(SFBoroughs, "Spatial")
+SPWards <- as(SFWards, "Spatial")
+SPSchools <- as(SFSchools, "Spatial")
+SPGPs <- as(SFGPs, "Spatial")
+SPHospitals <- as(SFHospitals, "Spatial")
+SPSchoolsNO2 <- as(SFSchoolsNO2, "Spatial")
+SPGPsNO2 <- as(SFGPsNO2, "Spatial")
+SPHospitalsNO2 <- as(SFHospitalsNO2, "Spatial")
+SPSchoolsPM2.5 <- as(SFSchoolsPM2.5, "Spatial")
+SPGPsPM2.5 <- as(SFGPsPM2.5, "Spatial")
+SPHospitalsPM2.5 <- as(SFHospitalsPM2.5, "Spatial")
+
+# Transform CRS to BNG (a projected CRS).
+SPBoroughs <- spTransform(SPBoroughs, BNG)
+SPWards <- spTransform(SPWards, BNG)
+SPSchools <- spTransform(SPSchools, BNG)
+SPGPs <- spTransform(SPGPs, BNG)
+SPHospitals <- spTransform(SPHospitals, BNG)
+SPSchoolsNO2 <- spTransform(SPSchoolsNO2, BNG)
+SPGPsNO2 <- spTransform(SPGPsNO2, BNG)
+SPHospitalsNO2 <- spTransform(SPHospitalsNO2, BNG)
+SPSchoolsPM2.5 <- spTransform(SPSchoolsPM2.5, BNG)
+SPGPsPM2.5 <- spTransform(SPGPsPM2.5, BNG)
+SPHospitalsPM2.5 <- spTransform(SPHospitalsPM2.5, BNG)
+
+# Count the number of points in each ward.
+SPWards@data$SchoolCount <- poly.counts(SPSchools, SPWards)
+SPWards@data$GPCount <- poly.counts(SPGPs, SPWards)
+SPWards@data$HospitalCount <- poly.counts(SPHospitals, SPWards)
+SPWards@data$SchoolNO2Count <- poly.counts(SPSchoolsNO2, SPWards)
+SPWards@data$GPNO2Count <- poly.counts(SPGPsNO2, SPWards)
+SPWards@data$HospitalNO2Count <- poly.counts(SPHospitalsNO2, SPWards)
+SPWards@data$SchoolPM2.5Count <- poly.counts(SPSchoolsPM2.5, SPWards)
+SPWards@data$GPPM2.5Count <- poly.counts(SPGPsPM2.5, SPWards)
+SPWards@data$HospitalPM2.5Count <- poly.counts(SPHospitalsPM2.5, SPWards)
+
+# Calculate point density.
+SPWards@data$SchoolDensity <- round(SPWards@data$SchoolCount/(poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$GPDensity <- round(SPWards@data$GPCount/(poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$HospitalDensity <- round(SPWards@data$HospitalCount/(poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$SchoolNO2Density <- round(SPWards@data$SchoolNO2Count/(poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$GPNO2Density <- round(SPWards@data$GPNO2Count/(poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$HospitalNO2Density <- round(SPWards@data$HospitalNO2Count/ (poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$SchoolPM2.5Density <- round(SPWards@data$SchoolPM2.5Count/ (poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$GPPM2.5Density <- round(SPWards@data$GPPM2.5Count/ (poly.areas(SPWards)/1000000), digits = 3)
+SPWards@data$HospitalPM2.5Density <- round(SPWards@data$HospitalPM2.5Count / (poly.areas(SPWards)/1000000), digits = 3)
+
+# Convert SP ward data into a data frame.
+SFWards <- st_as_sf(SPWards)
+
+# Transform CRS to WGS
+SFWards <- st_transform(SFWards, WGS84)
+
+# Rename columns.
+colnames(SFWards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "geometry")
+
+```
+
+### Popup Tables and Palettes For Point Data
+```{r}
+# Create copies of the point data.
+PopBoroughs <- SFBoroughs
+PopWards <- SFWards
+PopSchools <- SFSchools
+PopGPs <- SFGPs
+PopHospitals <- SFHospitals
+PopSchoolsNO2 <- SFSchoolsNO2
+PopGPsNO2 <- SFGPsNO2
+PopHospitalsNO2 <- SFHospitalsNO2
+PopSchoolsPM2.5 <- SFSchoolsPM2.5
+PopGPsPM2.5 <- SFGPsPM2.5
+PopHospitalsPM2.5 <- SFHospitalsPM2.5
+
+# Remove geometry data.
 st_geometry(PopBoroughs) <- NULL
-PopBoroughs <- popupTable(PopBoroughs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Borough Name", "Borough Code"))
-
-PopWards <- Wards
 st_geometry(PopWards) <- NULL
-PopWards <- popupTable(PopWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Ward Code", "Borough Name", "Borough Code"))
-
-# Create popup tables for locations
-PopSchools <- Schools
 st_geometry(PopSchools) <- NULL
-PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopGPs <- GPs
 st_geometry(PopGPs) <- NULL
-PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopHospitals <- Hospitals
 st_geometry(PopHospitals) <- NULL
-PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-# Create popup tables for locations exceeding NO2
-PopSchoolsNO2 <- SchoolsNO2
 st_geometry(PopSchoolsNO2) <- NULL
-PopSchoolsNO2 <- popupTable(PopSchoolsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopGPsNO2 <- GPsNO2
 st_geometry(PopGPsNO2) <- NULL
-PopGPs <- popupTable(PopGPsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopHospitalsNO2 <- HospitalsNO2
 st_geometry(PopHospitalsNO2) <- NULL
-PopHospitalsNO2 <- popupTable(PopHospitalsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-# Create popup tables for locations exceeding PM2.5
-PopSchoolsPM2.5 <- SchoolsPM2.5
 st_geometry(PopSchoolsPM2.5) <- NULL
-PopSchoolsPM2.5 <- popupTable(PopSchoolsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopGPsPM2.5 <- GPsPM2.5
 st_geometry(PopGPsPM2.5) <- NULL
-PopGPsPM2.5 <- popupTable(PopGPsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
-
-PopHospitalsPM2.5 <- HospitalsPM2.5
 st_geometry(PopHospitalsPM2.5) <- NULL
+
+# Create popup tables.
+PopBoroughs <- popupTable(PopBoroughs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Borough Name", "Borough Code"))
+PopWards <- popupTable(PopWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Ward Code", "Borough Name", "Borough Code"))
+PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopSchoolsNO2 <- popupTable(PopSchoolsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPsNO2 <- popupTable(PopGPsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopHospitalsNO2 <- popupTable(PopHospitalsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopSchoolsPM2.5 <- popupTable(PopSchoolsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPsPM2.5 <- popupTable(PopGPsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 PopHospitalsPM2.5 <- popupTable(PopHospitalsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 
-# Create colour factors.
+# Create colour palettes.
 PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("GP", "Hospital", "School"))
 PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
 
 ```
 
+### Popup Tables and Palettes For Ward Data
+```{r}
+# Create copies of the ward data.
+PopDataWards <- SFWards
 
-### Plot Map using leaflet
+# Remove geometry data.
+st_geometry(PopDataWards) <- NULL
+
+# Create popup tables.
+PopSchoolsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (All) Count", "School (All) Density"))
+PopGPsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (All) Count", "GP (All) Density"))
+PopHospitalsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (All) Count", "Hospital (All) Density"))
+PopSchoolsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (NO2) Count", "School (NO2) Density"))
+PopGPsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (NO2) Count", "GP (NO2) Density"))
+PopHospitalsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (NO2) Count", "Hospital (NO2) Density"))
+PopSchoolsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (PM2.5) Count", "School (PM2.5) Density"))
+PopGPsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (PM2.5) Count", "GP (PM2.5) Density"))
+PopHospitalsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density"))
+
+# Create palettes.
+PalSchoolsWards <- colorBin("GnBu", domain = PopDataWards$`School (All) Density`, bins = getJenksBreaks(PopDataWards$`School (All) Density`, k=6))
+PalGPsWards <- colorBin("GnBu", domain = PopDataWards$`GP (All) Density`, bins = getJenksBreaks(PopDataWards$`GP (All) Density`, k=6))
+PalHospitalsWards <- colorBin("GnBu", domain = PopDataWards$`Hospital (All) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (All) Density`, k=6))
+PalSchoolsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`School (NO2) Density`, bins = getJenksBreaks(PopDataWards$`School (NO2) Density`, k=6))
+PalGPsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`GP (NO2) Density`, bins = getJenksBreaks(PopDataWards$`GP (NO2) Density`, k=6))
+PalHospitalsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`Hospital (NO2) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (NO2) Density`, k=6))
+PalSchoolsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`School (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`School (PM2.5) Density`, k=6))
+PalGPsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`GP (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`GP (PM2.5) Density`, k=6))
+PalHospitalsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`Hospital (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (PM2.5) Density`, k=6))
+```
+
+### Plot Point Map using leaflet
 ```{r}
 # Map using leaflet.
-leaflet() %>% 
+MapLeaflet <- leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
-  addPolygons(data = Boroughs, 
+  addPolygons(data = SFBoroughs, 
               fill = "transparent", 
               color = "black",
               stroke = "black",
@@ -302,7 +377,7 @@ leaflet() %>%
               label = PopBoroughs,
               group = "Boroughs"
               ) %>% 
-  addPolygons(data = Wards, 
+  addPolygons(data = SFWards, 
               fill = "transparent",
               color = "black",
               stroke = "black", 
@@ -313,13 +388,117 @@ leaflet() %>%
               popup = PopWards,
               group = "Wards"
               ) %>% 
-  addCircleMarkers(data = Schools,
-             color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  
+  addPolygons(data = SFWards, 
+              fillColor = ~PalSchoolsWards(`School (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopSchoolsWards,
+              group = "Wards Schools (All)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalGPsWards(`GP (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopGPsWards,
+              group = "Wards GPs (All)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalHospitalsWards(`Hospital (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopHospitalsWards,
+              group = "Wards Hospitals (All)"
+              ) %>% 
+  
+  addPolygons(data = SFWards, 
+              fillColor = ~PalSchoolsWardsNO2(`School (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopSchoolsWardsNO2,
+              group = "Wards Schools (NO2)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalGPsWardsNO2(`GP (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopGPsWardsNO2,
+              group = "Wards GPs (NO2)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalHospitalsWardsNO2(`Hospital (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopHospitalsWardsNO2,
+              group = "Wards Hospitals (NO2)"
+              ) %>% 
+
+  addPolygons(data = SFWards, 
+              fillColor = ~PalSchoolsWardsPM2.5(`School (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopSchoolsWardsPM2.5,
+              group = "Wards Schools (PM2.5)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalGPsWardsPM2.5(`GP (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopGPsWardsPM2.5,
+              group = "Wards GPs (PM2.5)"
+              ) %>% 
+  addPolygons(data = SFWards, 
+              fillColor = ~PalHospitalsWardsPM2.5(`Hospital (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
+              popup = PopHospitalsWardsPM2.5,
+              group = "Wards Hospitals (PM2.5)"
+              ) %>% 
+  
+  addCircleMarkers(data = SFSchools,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopSchools,
              group = "Schools (All)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -336,13 +515,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = GPs,
-             color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFGPs,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopGPs,
              group = "GP (All)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -359,13 +539,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = Hospitals,
-             color = ~PalAll(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFHospitals,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopHospitals,
              group = "Hospital (All)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -382,13 +563,15 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = SchoolsNO2,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  
+  addCircleMarkers(data = SFSchoolsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopSchoolsNO2,
              group = "Schools (NO2)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -405,13 +588,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = GPsNO2,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFGPsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopGPsNO2,
              group = "GP (NO2)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -428,13 +612,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = HospitalsNO2,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFHospitalsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopHospitalsNO2,
              group = "Hospital (NO2)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -451,13 +636,15 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = SchoolsPM2.5,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  
+  addCircleMarkers(data = SFSchoolsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopSchoolsPM2.5,
              group = "Schools (PM2.5)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -474,13 +661,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = GPsPM2.5,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFGPsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopGPsPM2.5,
              group = "GP (PM2.5)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -497,13 +685,14 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  addCircleMarkers(data = HospitalsPM2.5,
-             color = ~PalWHO(`Building Type`),
-             radius = ~ifelse(`Building Type` == "Hospital", 10, 5),
+  addCircleMarkers(data = SFHospitalsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
              fillOpacity = 1.0,
              stroke = TRUE,
+             color = "black",
              opacity = 1.0,
-             weight = 0.5,
+             weight = 1.0,
              popup = PopHospitalsPM2.5,
              group = "Hospital (PM2.5)",
              clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
@@ -520,17 +709,33 @@ leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
+  
   addLayersControl(
     baseGroups = c("OSM (default)"),
-    overlayGroups = c("Boroughs", "Wards", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)"),
+    overlayGroups = c("Boroughs", "Wards", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "Wards Schools (All)", "Wards GPs (All)", "Wards Hospitals (All)", "Wards Schools (NO2)", "Wards GPs (NO2)", "Wards Hospitals (NO2)", "Wards Schools (PM2.5)", "Wards GPs (PM2.5)", "Wards Hospitals (PM2.5)"),
+    position = "topright",
     options = layersControlOptions(collapsed = TRUE)
     ) %>% 
-  hideGroup(c("Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)")) %>% 
-  addLegend(pal = PalAll, values = Locations$`Building Type`, title = "All Buildings") %>% 
-  addLegend(pal = PalWHO, values = LocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
+  
+  addLegend(pal = PalAll, values = SFLocations$`Building Type`, title = "All Buildings") %>% 
+  addLegend(pal = PalWHO, values = SFLocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
+  addLegend(pal = PalSchoolsWards, values = SFWards$`School (All) Density`, title = "School Density (per km2)", group = "Wards Schools (All)") %>%
+  addLegend(pal = PalGPsWards, values = SFWards$`GP (All) Density`, title = "GP Density (per km2)", group = "Wards GPs (All)") %>%
+  addLegend(pal = PalHospitalsWards, values = SFWards$`Hospital (All) Density`, title = "Hospital Density (per km2)", group = "Wards Hospitals (All)") %>%
+  addLegend(pal = PalSchoolsWardsNO2, values = SFWards$`School (NO2) Density`, title = "School NO2 Density (per km2)", group = "Wards Schools (NO2)") %>%
+  addLegend(pal = PalGPsWardsNO2, values = SFWards$`GP (NO2) Density`, title = "GP NO2 Density (per km2)", group = "Wards GPs (NO2)") %>%
+  addLegend(pal = PalHospitalsWardsNO2, values = SFWards$`Hospital (NO2) Density`, title = "Hospital NO2 Density (per km2)", group = "Wards Hospitals (NO2)") %>%
+  addLegend(pal = PalSchoolsWardsPM2.5, values = SFWards$`School (PM2.5) Density`, title = "School PM2.5 Density (per km2)", group = "Wards Schools (PM2.5)") %>%
+  addLegend(pal = PalGPsWardsPM2.5, values = SFWards$`GP (PM2.5) Density`, title = "GP PM2.5 Density (per km2)", group = "Wards GPs (PM2.5)") %>%
+  addLegend(pal = PalHospitalsWardsPM2.5, values = SFWards$`Hospital (PM2.5) Density`, title = "Hospital PM2.5 Density (per km2)", group = "Wards Hospitals (PM2.5)") %>%
+  
+  hideGroup(c("Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "Wards Schools (All)", "Wards GPs (All)", "Wards Hospitals (All)", "Wards Schools (NO2)", "Wards GPs (NO2)", "Wards Hospitals (NO2)", "Wards Schools (PM2.5)", "Wards GPs (PM2.5)", "Wards Hospitals (PM2.5)")) %>% 
   addEasyButton(easyButton(
     icon="fa-globe", title="Zoom to London",
-    onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }")))
-
+    onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }"))) %>% 
+  addScaleBar(position = "bottomleft", 
+              options = scaleBarOptions(metric = TRUE))
+  
+MapLeaflet
 ```
 

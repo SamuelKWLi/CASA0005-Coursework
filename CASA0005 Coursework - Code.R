@@ -8,19 +8,32 @@ BoroughMap <- EW[grep("^E09",EW@data$lad15cd),]
 addProviderTiles(providers$Stamen.TonerLines)
 addProviderTiles(providers$Stamen.TonerLabels)
   
-  var markers = L.markerClusterGroup({
-    iconCreateFunction: function (cluster) {
-      var childMarkers = cluster.getAllChildMarkers();
-      // count how many there are of each class
-      var counts = _.countBy(childMarkers, function(marker) {
-        // class at icon level
-        //return marker.options.icon.options.className;
-        // class inside html
-        return $(marker.options.icon.options.html).attr('class');
-      });
-      // get the class with the highest count
-      var maxClass = _.invert(counts)[_.max(counts)];
-      // use this class in the cluster marker
-      return L.divIcon({ html: cluster.getChildCount(), className: maxClass });
-    },
-  });
+view(SPWards@data)
+
+### Plot Map using tmap
+# Change tmap mode.
+tmap_mode("view")
+
+# Set colour palette.
+
+
+# Plot map of schools, GPs and hospitals.
+Map <- tm_shape(SFBoroughs)+ 
+    tm_fill(col = NA, alpha = 0)+ 
+    tm_borders(col = "black")+
+  tm_shape(SFWards)+ 
+    tm_fill(col = NA, alpha = 0)+ 
+    tm_borders(col = "black", alpha = 0.5)+
+  tm_shape(SFWards$`School Density`)+ 
+    tm_fill(col = NA, alpha = 0)+ 
+    tm_borders(col = "black", alpha = 0.5)+
+  tm_shape(SFLocations)+
+    tm_dots(title = "Building Type (All)", col = "Building Type", palette = c("lightblue", "navy", "lightgreen"))+
+  tm_shape(SFLocationsNO2)+
+   tm_dots(title = "Building Type (NO2)", col = "Building Type", palette = c("red", "brown", "orange"))+
+  tm_shape(SFLocationsPM2.5)+
+    tm_dots(title = "Building Type (PM2.5)", col = "Building Type", palette = c("red", "brown", "orange"))+
+  tm_layout(legend.show = TRUE)
+
+Map
+
