@@ -28,7 +28,7 @@ PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations", ".ti
 PollutionConc <- stack(PollutionFiles)
 
 # List the raster names.
-PollutionNames <- c("NO2", "NOx", "PM10", "PM10d", "PM2.5")
+PollutionNames <- c("NO2", "PM2.5")
 
 # Rename the raster files.
 names(PollutionConc) <- PollutionNames
@@ -57,75 +57,52 @@ ExtentLondon <- extent(OutlineLondon)
 
 # Crop the rasters to the London outline.
 CropNO2 <- crop(PollutionConc[[1]], OutlineLondon)
-CropNOx <- crop(PollutionConc[[2]], OutlineLondon)
-CropPM10 <- crop(PollutionConc[[3]], OutlineLondon)
-CropPM10d <- crop(PollutionConc[[4]], OutlineLondon)
-CropPM2.5 <- crop(PollutionConc[[5]], OutlineLondon)
+CropPM2.5 <- crop(PollutionConc[[2]], OutlineLondon)
 
 # Mask rasters to the London outline.
 MaskNO2 <-  mask(PollutionConc[[1]], OutlineLondon, na.rm=TRUE)
-MaskNOx <-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
-MaskPM10 <-  mask(PollutionConc[[3]], OutlineLondon, na.rm=TRUE)
-MaskPM10d <-  mask(PollutionConc[[4]], OutlineLondon, na.rm=TRUE)
-MaskPM2.5 <-  mask(PollutionConc[[5]], OutlineLondon, na.rm=TRUE)
+MaskPM2.5 <-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
 
 # Stack the masked rasters.
-PollutionLondon <- stack(MaskNO2, MaskNOx, MaskPM10, MaskPM10d, MaskPM2.5)
+PollutionLondon <- stack(MaskNO2, MaskPM2.5)
 ```
 
-### Read in Borough and Ward Boundaries
+### Read in Boundaries
 ```{r}
 # Read in boundaries as spatial polygons.
-Boroughs <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
-Wards <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Ward_CityMerged_Clip.shp")
+LAD <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
+MSOA <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/MSOA_2011_London_gen_MHW.shp")
+LSOA <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/LSOA_2011_London_gen_MHW.shp")
 
 # Convert from an sp object to sf object.
-SFBoroughs <- st_as_sf(Boroughs)
-SFWards <- st_as_sf(Wards)
+SFLAD <- st_as_sf(LAD)
+SFMSOA <- st_as_sf(MSOA)
+SFLSOA <- st_as_sf(LSOA)
 
 # Transform CRS to WGS84.
-SFBoroughs <- st_transform(SFBoroughs, WGS84)
-SFWards <- st_transform(SFWards, WGS84)
+SFLAD <- st_transform(SFLAD, WGS84)
+SFMSOA <- st_transform(SFMSOA, WGS84)
+SFLSOA <- st_transform(SFLSOA, WGS84)
 
 # Select relevent columns.
-SFBoroughs <- SFBoroughs[,c(1, 2, 8)]
-SFWards <- SFWards[,c(1, 2, 6, 5, 8)]
+SFLAD <- SFLAD[,c(1, 2, 8)]
+SFMSOA <- SFMSOA[,c(2, 1, 4, 3, 13)]
+SFLSOA <- SFLSOA[,c(2, 1, 4, 3, 6, 5, 15)]
 
 # Rename columns.
-colnames(SFBoroughs) <- c("Borough Name", "Borough Code", "geometry")
-colnames(SFWards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "geometry")
-```
-
-
-### Read in Code Points
-```{r}
-# List full file paths for all of the code point csv files.
-CodePointsFiles <- list.files(path = "Data/Schools and Health/OS Point Codes/Data", full.names=TRUE)
-
-# Run a function for each code point file path, reading the csvs into an object.
-AllCodePoints <- lapply(CodePointsFiles,function(i){
-  read.csv(i, header=FALSE, skip=4)
-})
-
-# Convert the object into a data frame.
-AllCodePoints <- do.call(rbind.data.frame, AllCodePoints)
-
-# Rename the columns.
-colnames(AllCodePoints) <- c("Postcode",	"Positional_quality_indicator",	"Eastings",	"Northings",	"Country_code",	"NHS_regional_HA_code",	"NHS_HA_code",	"Admin_county_code",	"Admin_district_code",	"Admin_ward_code")
-
-# Specify relevent columns.
-AllCodePoints <- AllCodePoints[,c(1, 3, 4)]
-
-# Remove spaces in postcodes
-AllCodePoints$Postcode <- gsub(" ","", AllCodePoints$Postcode)
-
-# Write complete dataframe into a csv file.
-write.csv(AllCodePoints,"AllCodePoints.csv", row.names=FALSE)
+colnames(SFLAD) <- c("LAD Name", "LAD Code", "geometry")
+colnames(SFMSOA) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "geometry")
+colnames(SFLSOA) <- c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code","LAD Name", "LAD Code", "geometry")
 
 ```
 
 ### Read in School, GP and Hospital Data
 ```{r}
+# Read in code points.
+AllCodePoints <- read_csv("Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+
 # Read in  data.
 Schools <- read_csv("Data/Schools and Health/All School Locations 2016.csv",
                        locale = locale(encoding = "latin1"),
@@ -181,11 +158,11 @@ SFLocations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = BN
 SFLocations <- st_transform(SFLocations, WGS84)
 
 # Select points inside London.
-SFLocations <- SFLocations[SFBoroughs,]
+SFLocations <- SFLocations[SFLAD,]
 
 # Extract concentrations.
 SFLocations$`NO2 (µg/m³)`<- raster::extract(PollutionConc[[1]], SFLocations)
-SFLocations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[5]], SFLocations)
+SFLocations$`PM2.5 (µg/m³)`<- raster::extract(PollutionConc[[2]], SFLocations)
 
 # Round concentrations to 2 d.p..
 SFLocations$`NO2 (µg/m³)` <- round(SFLocations$`NO2 (µg/m³)`, digits = 2)
@@ -225,8 +202,7 @@ SFHospitalsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "Hospital")
 ### Ward Data for Points
 ```{r}
 # Convert SF objects into SP objects
-SPBoroughs <- as(SFBoroughs, "Spatial")
-SPWards <- as(SFWards, "Spatial")
+SPMSOA <- as(SFMSOA, "Spatial")
 SPSchools <- as(SFSchools, "Spatial")
 SPGPs <- as(SFGPs, "Spatial")
 SPHospitals <- as(SFHospitals, "Spatial")
@@ -238,8 +214,7 @@ SPGPsPM2.5 <- as(SFGPsPM2.5, "Spatial")
 SPHospitalsPM2.5 <- as(SFHospitalsPM2.5, "Spatial")
 
 # Transform CRS to BNG (a projected CRS).
-SPBoroughs <- spTransform(SPBoroughs, BNG)
-SPWards <- spTransform(SPWards, BNG)
+SPMSOA <- spTransform(SPMSOA, BNG)
 SPSchools <- spTransform(SPSchools, BNG)
 SPGPs <- spTransform(SPGPs, BNG)
 SPHospitals <- spTransform(SPHospitals, BNG)
@@ -250,44 +225,45 @@ SPSchoolsPM2.5 <- spTransform(SPSchoolsPM2.5, BNG)
 SPGPsPM2.5 <- spTransform(SPGPsPM2.5, BNG)
 SPHospitalsPM2.5 <- spTransform(SPHospitalsPM2.5, BNG)
 
-# Count the number of points in each ward.
-SPWards@data$SchoolCount <- poly.counts(SPSchools, SPWards)
-SPWards@data$GPCount <- poly.counts(SPGPs, SPWards)
-SPWards@data$HospitalCount <- poly.counts(SPHospitals, SPWards)
-SPWards@data$SchoolNO2Count <- poly.counts(SPSchoolsNO2, SPWards)
-SPWards@data$GPNO2Count <- poly.counts(SPGPsNO2, SPWards)
-SPWards@data$HospitalNO2Count <- poly.counts(SPHospitalsNO2, SPWards)
-SPWards@data$SchoolPM2.5Count <- poly.counts(SPSchoolsPM2.5, SPWards)
-SPWards@data$GPPM2.5Count <- poly.counts(SPGPsPM2.5, SPWards)
-SPWards@data$HospitalPM2.5Count <- poly.counts(SPHospitalsPM2.5, SPWards)
+# Count the number of points in each MSOA.
+SPMSOA@data$SchoolCount <- poly.counts(SPSchools, SPMSOA)
+SPMSOA@data$GPCount <- poly.counts(SPGPs, SPMSOA)
+SPMSOA@data$HospitalCount <- poly.counts(SPHospitals, SPMSOA)
+SPMSOA@data$SchoolNO2Count <- poly.counts(SPSchoolsNO2, SPMSOA)
+SPMSOA@data$GPNO2Count <- poly.counts(SPGPsNO2, SPMSOA)
+SPMSOA@data$HospitalNO2Count <- poly.counts(SPHospitalsNO2, SPMSOA)
+SPMSOA@data$SchoolPM2.5Count <- poly.counts(SPSchoolsPM2.5, SPMSOA)
+SPMSOA@data$GPPM2.5Count <- poly.counts(SPGPsPM2.5, SPMSOA)
+SPMSOA@data$HospitalPM2.5Count <- poly.counts(SPHospitalsPM2.5, SPMSOA)
 
 # Calculate point density.
-SPWards@data$SchoolDensity <- round(SPWards@data$SchoolCount/(poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$GPDensity <- round(SPWards@data$GPCount/(poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$HospitalDensity <- round(SPWards@data$HospitalCount/(poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$SchoolNO2Density <- round(SPWards@data$SchoolNO2Count/(poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$GPNO2Density <- round(SPWards@data$GPNO2Count/(poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$HospitalNO2Density <- round(SPWards@data$HospitalNO2Count/ (poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$SchoolPM2.5Density <- round(SPWards@data$SchoolPM2.5Count/ (poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$GPPM2.5Density <- round(SPWards@data$GPPM2.5Count/ (poly.areas(SPWards)/1000000), digits = 3)
-SPWards@data$HospitalPM2.5Density <- round(SPWards@data$HospitalPM2.5Count / (poly.areas(SPWards)/1000000), digits = 3)
+SPMSOA@data$SchoolDensity <- round(SPMSOA@data$SchoolCount/(poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$GPDensity <- round(SPMSOA@data$GPCount/(poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$HospitalDensity <- round(SPMSOA@data$HospitalCount/(poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$SchoolNO2Density <- round(SPMSOA@data$SchoolNO2Count/(poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$GPNO2Density <- round(SPMSOA@data$GPNO2Count/(poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$HospitalNO2Density <- round(SPMSOA@data$HospitalNO2Count/ (poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$SchoolPM2.5Density <- round(SPMSOA@data$SchoolPM2.5Count/ (poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$GPPM2.5Density <- round(SPMSOA@data$GPPM2.5Count/ (poly.areas(SPMSOA)/1000000), digits = 3)
+SPMSOA@data$HospitalPM2.5Density <- round(SPMSOA@data$HospitalPM2.5Count / (poly.areas(SPMSOA)/1000000), digits = 3)
 
-# Convert SP ward data into a data frame.
-SFWards <- st_as_sf(SPWards)
+# Convert SP MSOA data into a data frame.
+SFMSOA <- st_as_sf(SPMSOA)
 
 # Transform CRS to WGS
-SFWards <- st_transform(SFWards, WGS84)
+SFMSOA <- st_transform(SFMSOA, WGS84)
 
 # Rename columns.
-colnames(SFWards) <- c("Ward Name", "Ward Code", "Borough Name", "Borough Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "geometry")
+colnames(SFMSOA) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "geometry")
 
 ```
 
 ### Popup Tables and Palettes For Point Data
 ```{r}
 # Create copies of the point data.
-PopBoroughs <- SFBoroughs
-PopWards <- SFWards
+PopLAD <- SFLAD
+PopMSOA <- SFMSOA
+PopLSOA <- SFLSOA
 PopSchools <- SFSchools
 PopGPs <- SFGPs
 PopHospitals <- SFHospitals
@@ -299,8 +275,9 @@ PopGPsPM2.5 <- SFGPsPM2.5
 PopHospitalsPM2.5 <- SFHospitalsPM2.5
 
 # Remove geometry data.
-st_geometry(PopBoroughs) <- NULL
-st_geometry(PopWards) <- NULL
+st_geometry(PopLAD) <- NULL
+st_geometry(PopMSOA) <- NULL
+st_geometry(PopLSOA) <- NULL
 st_geometry(PopSchools) <- NULL
 st_geometry(PopGPs) <- NULL
 st_geometry(PopHospitals) <- NULL
@@ -312,8 +289,9 @@ st_geometry(PopGPsPM2.5) <- NULL
 st_geometry(PopHospitalsPM2.5) <- NULL
 
 # Create popup tables.
-PopBoroughs <- popupTable(PopBoroughs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Borough Name", "Borough Code"))
-PopWards <- popupTable(PopWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Ward Code", "Borough Name", "Borough Code"))
+PopLAD <- popupTable(PopLAD, feature.id = FALSE, row.numbers = FALSE, zcol=c("LAD Name", "LAD Code"))
+PopMSOA <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
+PopLSOA <- popupTable(PopLSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
 PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
@@ -327,38 +305,39 @@ PopHospitalsPM2.5 <- popupTable(PopHospitalsPM2.5, feature.id = FALSE, row.numbe
 # Create colour palettes.
 PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("GP", "Hospital", "School"))
 PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
-
+PalNO2 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`NO2 (µg/m³)`, k=6)+0.001), 320), na.color = "transparent")
+PalPM2.5 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`PM2.5 (µg/m³)`, k=6)+0.001), 90), na.color = "transparent")
 ```
 
 ### Popup Tables and Palettes For Ward Data
 ```{r}
-# Create copies of the ward data.
-PopDataWards <- SFWards
+# Create copies of the MSOA data.
+PopDataMSOA <- SFMSOA
 
 # Remove geometry data.
-st_geometry(PopDataWards) <- NULL
+st_geometry(PopDataMSOA) <- NULL
 
 # Create popup tables.
-PopSchoolsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (All) Count", "School (All) Density"))
-PopGPsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (All) Count", "GP (All) Density"))
-PopHospitalsWards <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (All) Count", "Hospital (All) Density"))
-PopSchoolsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (NO2) Count", "School (NO2) Density"))
-PopGPsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (NO2) Count", "GP (NO2) Density"))
-PopHospitalsWardsNO2 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (NO2) Count", "Hospital (NO2) Density"))
-PopSchoolsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "School (PM2.5) Count", "School (PM2.5) Density"))
-PopGPsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "GP (PM2.5) Count", "GP (PM2.5) Density"))
-PopHospitalsWardsPM2.5 <- popupTable(PopDataWards, feature.id = FALSE, row.numbers = FALSE, zcol=c("Ward Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density"))
+PopSchoolsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (All) Count", "School (All) Density"))
+PopGPsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (All) Count", "GP (All) Density"))
+PopHospitalsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (All) Count", "Hospital (All) Density"))
+PopSchoolsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (NO2) Count", "School (NO2) Density"))
+PopGPsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (NO2) Count", "GP (NO2) Density"))
+PopHospitalsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (NO2) Count", "Hospital (NO2) Density"))
+PopSchoolsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (PM2.5) Count", "School (PM2.5) Density"))
+PopGPsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (PM2.5) Count", "GP (PM2.5) Density"))
+PopHospitalsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density"))
 
 # Create palettes.
-PalSchoolsWards <- colorBin("GnBu", domain = PopDataWards$`School (All) Density`, bins = getJenksBreaks(PopDataWards$`School (All) Density`, k=6))
-PalGPsWards <- colorBin("GnBu", domain = PopDataWards$`GP (All) Density`, bins = getJenksBreaks(PopDataWards$`GP (All) Density`, k=6))
-PalHospitalsWards <- colorBin("GnBu", domain = PopDataWards$`Hospital (All) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (All) Density`, k=6))
-PalSchoolsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`School (NO2) Density`, bins = getJenksBreaks(PopDataWards$`School (NO2) Density`, k=6))
-PalGPsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`GP (NO2) Density`, bins = getJenksBreaks(PopDataWards$`GP (NO2) Density`, k=6))
-PalHospitalsWardsNO2 <- colorBin("OrRd", domain = PopDataWards$`Hospital (NO2) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (NO2) Density`, k=6))
-PalSchoolsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`School (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`School (PM2.5) Density`, k=6))
-PalGPsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`GP (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`GP (PM2.5) Density`, k=6))
-PalHospitalsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`Hospital (PM2.5) Density`, bins = getJenksBreaks(PopDataWards$`Hospital (PM2.5) Density`, k=6))
+PalSchoolsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`School (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (All) Density`, k=5)+0.001)))
+PalGPsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`GP (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (All) Density`, k=5)+0.001)))
+PalHospitalsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`Hospital (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (All) Density`, k=5)+0.001)))
+PalSchoolsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`School (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (NO2) Density`, k=5)+0.001)))
+PalGPsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`GP (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (NO2) Density`, k=5)+0.001)))
+PalHospitalsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (NO2) Density`, k=5)+0.001)))
+PalSchoolsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`School (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (PM2.5) Density`, k=5)+0.001)))
+PalGPsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`GP (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (PM2.5) Density`, k=5)+0.001)))
+PalHospitalsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (PM2.5) Density`, k=5)+0.001)))
 ```
 
 ### Plot Point Map using leaflet
@@ -366,129 +345,156 @@ PalHospitalsWardsPM2.5 <- colorBin("OrRd", domain = PopDataWards$`Hospital (PM2.
 # Map using leaflet.
 MapLeaflet <- leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
-  addPolygons(data = SFBoroughs, 
+  setView(-0.10, 51.5, zoom = 10) %>% 
+  addRasterImage(PollutionLondon[[1]], colors = PalNO2, opacity = 1.0, group = "NO2 Concentration") %>%
+  addRasterImage(PollutionLondon[[2]], colors = PalPM2.5, opacity = 1.0, group = "PM2.5 Concentration") %>%
+
+  addPolygons(data = SFLAD, 
               fill = "transparent", 
               color = "black",
               stroke = "black",
               weight = 2, 
               opacity = 1.0, 
               fillOpacity = 0,
+              smoothFactor = 0.5,
               highlightOptions = highlightOptions(color = "white", weight = 3,bringToFront = FALSE),
-              label = PopBoroughs,
-              group = "Boroughs"
+              popup = PopLAD,
+              group = "LAD"
               ) %>% 
-  addPolygons(data = SFWards, 
+  addPolygons(data = SFMSOA, 
               fill = "transparent",
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 1.0, 
               opacity = 1.0, 
               fillOpacity = 0,
+              smoothFactor = 0.5,
               highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
-              popup = PopWards,
-              group = "Wards"
+              popup = PopMSOA,
+              group = "MSOA"
+              ) %>% 
+  addPolygons(data = SFLSOA, 
+              fill = "transparent",
+              color = "black",
+              stroke = "black", 
+              weight = 0.5, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
+              popup = PopLSOA,
+              group = "LSOA"
               ) %>% 
   
-  addPolygons(data = SFWards, 
-              fillColor = ~PalSchoolsWards(`School (All) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOA(`School (All) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopSchoolsWards,
-              group = "Wards Schools (All)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOA,
+              group = "MSOA Schools (All)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalGPsWards(`GP (All) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOA(`GP (All) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopGPsWards,
-              group = "Wards GPs (All)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOA,
+              group = "MSOA GPs (All)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalHospitalsWards(`Hospital (All) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOA(`Hospital (All) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopHospitalsWards,
-              group = "Wards Hospitals (All)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOA,
+              group = "MSOA Hospitals (All)"
               ) %>% 
   
-  addPolygons(data = SFWards, 
-              fillColor = ~PalSchoolsWardsNO2(`School (NO2) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOANO2(`School (NO2) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopSchoolsWardsNO2,
-              group = "Wards Schools (NO2)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOANO2,
+              group = "MSOA Schools (NO2)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalGPsWardsNO2(`GP (NO2) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOANO2(`GP (NO2) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopGPsWardsNO2,
-              group = "Wards GPs (NO2)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOANO2,
+              group = "MSOA GPs (NO2)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalHospitalsWardsNO2(`Hospital (NO2) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOANO2(`Hospital (NO2) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopHospitalsWardsNO2,
-              group = "Wards Hospitals (NO2)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOANO2,
+              group = "MSOA Hospitals (NO2)"
               ) %>% 
 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalSchoolsWardsPM2.5(`School (PM2.5) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOAPM2.5(`School (PM2.5) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopSchoolsWardsPM2.5,
-              group = "Wards Schools (PM2.5)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOAPM2.5,
+              group = "MSOA Schools (PM2.5)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalGPsWardsPM2.5(`GP (PM2.5) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOAPM2.5(`GP (PM2.5) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopGPsWardsPM2.5,
-              group = "Wards GPs (PM2.5)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOAPM2.5,
+              group = "MSOA GPs (PM2.5)"
               ) %>% 
-  addPolygons(data = SFWards, 
-              fillColor = ~PalHospitalsWardsPM2.5(`Hospital (PM2.5) Density`),
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOAPM2.5(`Hospital (PM2.5) Density`),
               color = "black",
               stroke = "black", 
-              weight = 1, 
+              weight = 0.1, 
               opacity = 1.0, 
               fillOpacity = 1.0,
-              highlightOptions = highlightOptions(color = "white", weight = 3, bringToFront = TRUE),
-              popup = PopHospitalsWardsPM2.5,
-              group = "Wards Hospitals (PM2.5)"
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOAPM2.5,
+              group = "MSOA Hospitals (PM2.5)"
               ) %>% 
   
   addCircleMarkers(data = SFSchools,
@@ -712,24 +718,26 @@ MapLeaflet <- leaflet() %>%
   
   addLayersControl(
     baseGroups = c("OSM (default)"),
-    overlayGroups = c("Boroughs", "Wards", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "Wards Schools (All)", "Wards GPs (All)", "Wards Hospitals (All)", "Wards Schools (NO2)", "Wards GPs (NO2)", "Wards Hospitals (NO2)", "Wards Schools (PM2.5)", "Wards GPs (PM2.5)", "Wards Hospitals (PM2.5)"),
+    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)"),
     position = "topright",
     options = layersControlOptions(collapsed = TRUE)
     ) %>% 
   
+  addLegend(pal = PalNO2, values = values(PollutionLondon[[1]]), title = "NO2 Concentration (µg/m³)", group = "NO2 Concentration") %>%
+  addLegend(pal = PalPM2.5, values = values(PollutionLondon[[2]]), title = "PM2.5 Concentration (µg/m³)", group = "PM2.5 Concentration") %>%
   addLegend(pal = PalAll, values = SFLocations$`Building Type`, title = "All Buildings") %>% 
   addLegend(pal = PalWHO, values = SFLocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
-  addLegend(pal = PalSchoolsWards, values = SFWards$`School (All) Density`, title = "School Density (per km2)", group = "Wards Schools (All)") %>%
-  addLegend(pal = PalGPsWards, values = SFWards$`GP (All) Density`, title = "GP Density (per km2)", group = "Wards GPs (All)") %>%
-  addLegend(pal = PalHospitalsWards, values = SFWards$`Hospital (All) Density`, title = "Hospital Density (per km2)", group = "Wards Hospitals (All)") %>%
-  addLegend(pal = PalSchoolsWardsNO2, values = SFWards$`School (NO2) Density`, title = "School NO2 Density (per km2)", group = "Wards Schools (NO2)") %>%
-  addLegend(pal = PalGPsWardsNO2, values = SFWards$`GP (NO2) Density`, title = "GP NO2 Density (per km2)", group = "Wards GPs (NO2)") %>%
-  addLegend(pal = PalHospitalsWardsNO2, values = SFWards$`Hospital (NO2) Density`, title = "Hospital NO2 Density (per km2)", group = "Wards Hospitals (NO2)") %>%
-  addLegend(pal = PalSchoolsWardsPM2.5, values = SFWards$`School (PM2.5) Density`, title = "School PM2.5 Density (per km2)", group = "Wards Schools (PM2.5)") %>%
-  addLegend(pal = PalGPsWardsPM2.5, values = SFWards$`GP (PM2.5) Density`, title = "GP PM2.5 Density (per km2)", group = "Wards GPs (PM2.5)") %>%
-  addLegend(pal = PalHospitalsWardsPM2.5, values = SFWards$`Hospital (PM2.5) Density`, title = "Hospital PM2.5 Density (per km2)", group = "Wards Hospitals (PM2.5)") %>%
+  addLegend(pal = PalSchoolsMSOA, values = SFMSOA$`School (All) Density`, title = "School Density (per km2)", group = "MSOA Schools (All)") %>%
+  addLegend(pal = PalGPsMSOA, values = SFMSOA$`GP (All) Density`, title = "GP Density (per km2)", group = "MSOA GPs (All)") %>%
+  addLegend(pal = PalHospitalsMSOA, values = SFMSOA$`Hospital (All) Density`, title = "Hospital Density (per km2)", group = "MSOA Hospitals (All)") %>%
+  addLegend(pal = PalSchoolsMSOANO2, values = SFMSOA$`School (NO2) Density`, title = "School NO2 Density (per km2)", group = "MSOA Schools (NO2)") %>%
+  addLegend(pal = PalGPsMSOANO2, values = SFMSOA$`GP (NO2) Density`, title = "GP NO2 Density (per km2)", group = "MSOA GPs (NO2)") %>%
+  addLegend(pal = PalHospitalsMSOANO2, values = SFMSOA$`Hospital (NO2) Density`, title = "Hospital NO2 Density (per km2)", group = "MSOA Hospitals (NO2)") %>%
+  addLegend(pal = PalSchoolsMSOAPM2.5, values = SFMSOA$`School (PM2.5) Density`, title = "School PM2.5 Density (per km2)", group = "MSOA Schools (PM2.5)") %>%
+  addLegend(pal = PalGPsMSOAPM2.5, values = SFMSOA$`GP (PM2.5) Density`, title = "GP PM2.5 Density (per km2)", group = "MSOA GPs (PM2.5)") %>%
+  addLegend(pal = PalHospitalsMSOAPM2.5, values = SFMSOA$`Hospital (PM2.5) Density`, title = "Hospital PM2.5 Density (per km2)", group = "MSOA Hospitals (PM2.5)") %>%
   
-  hideGroup(c("Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "Wards Schools (All)", "Wards GPs (All)", "Wards Hospitals (All)", "Wards Schools (NO2)", "Wards GPs (NO2)", "Wards Hospitals (NO2)", "Wards Schools (PM2.5)", "Wards GPs (PM2.5)", "Wards Hospitals (PM2.5)")) %>% 
+  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)")) %>% 
   addEasyButton(easyButton(
     icon="fa-globe", title="Zoom to London",
     onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }"))) %>% 
@@ -737,5 +745,13 @@ MapLeaflet <- leaflet() %>%
               options = scaleBarOptions(metric = TRUE))
   
 MapLeaflet
+```
+
+### Logistic Regression
+```{r}
+# Read in indices of deprivation data.
+IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
 ```
 
