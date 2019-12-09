@@ -5,6 +5,9 @@ datatypelist <- data.frame(cbind(lapply(Schools,class)))
 BoroughMap <- EW[grep("^E09",EW@data$lad15cd),]
 
 
+
+
+
 ### Read in Code Points
 # List full file paths for all of the code point csv files.
 CodePointsFiles <- list.files(path = "Data/Schools and Health/OS Point Codes/Data", full.names=TRUE)
@@ -30,29 +33,8 @@ AllCodePoints$Postcode <- gsub(" ","", AllCodePoints$Postcode)
 write.csv(AllCodePoints,"Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv", row.names=FALSE)
 
 
-### Plot Map using tmap
-# Change tmap mode.
-tmap_mode("view")
 
-# Plot map of schools, GPs and hospitals.
-Map <- tm_shape(SFBoroughs)+ 
-    tm_fill(col = NA, alpha = 0)+ 
-    tm_borders(col = "black")+
-  tm_shape(SFWards)+ 
-    tm_fill(col = NA, alpha = 0)+ 
-    tm_borders(col = "black", alpha = 0.5)+
-  tm_shape(SFWards$`School Density`)+ 
-    tm_fill(col = NA, alpha = 0)+ 
-    tm_borders(col = "black", alpha = 0.5)+
-  tm_shape(SFLocations)+
-    tm_dots(title = "Building Type (All)", col = "Building Type", palette = c("lightblue", "navy", "lightgreen"))+
-  tm_shape(SFLocationsNO2)+
-   tm_dots(title = "Building Type (NO2)", col = "Building Type", palette = c("red", "brown", "orange"))+
-  tm_shape(SFLocationsPM2.5)+
-    tm_dots(title = "Building Type (PM2.5)", col = "Building Type", palette = c("red", "brown", "orange"))+
-  tm_layout(legend.show = TRUE)
 
-Map
 
 ### Extract Mean Concentrations
 # Extract mean Wards pollution concentration.
@@ -82,3 +64,28 @@ write.csv(ConcLAD,"Data/Air Pollution/ConcLAD.csv", row.names=FALSE)
 write.csv(ConcMSOA,"Data/Air Pollution/ConcMSOA.csv", row.names=FALSE)
 write.csv(ConcLSOA,"Data/Air Pollution/ConcLSOA.csv", row.names=FALSE)
 write.csv(ConcWards[,c(1, 2, 3, 4, 23, 24)],"Data/Air Pollution/ConcWards.csv", row.names=FALSE)
+
+
+
+
+
+### Plot Map using tmap
+# Change tmap mode.
+tmap_mode("view")
+
+# Plot map of schools, GPs and hospitals.
+Map <- tm_shape(SFLAD)+ 
+  tm_polygons("LAD Name", col = NA, alpha = 0, border.col = "black", border.alpha = 0.5)+
+  tm_shape(SFMSOA)+ 
+  tm_polygons("MSOA Name", col = NA, alpha = 0, border.col = "black", border.alpha = 0.5)+
+  tm_shape(ClusterSFMSOA)+ 
+  tm_polygons("School (All) Moran's I", palette = PalMi, breaks = BrksMi, border.col = "black", border.alpha = 0.5)+
+  tm_shape(SFLocations)+
+  tm_dots(title = "Building Type (All)", col = "Building Type", palette = c("lightblue", "navy", "lightgreen"))+
+  tm_shape(SFLocationsNO2)+
+  tm_dots(title = "Building Type (NO2)", col = "Building Type", palette = c("red", "brown", "orange"))+
+  tm_shape(SFLocationsPM2.5)+
+  tm_dots(title = "Building Type (PM2.5)", col = "Building Type", palette = c("red", "brown", "orange"))+
+  tm_layout(legend.show = TRUE)
+
+Map

@@ -1,0 +1,493 @@
+---
+title: "Leaflet"
+output: html_document
+---
+
+### Popup Tables and Palettes For Point Data
+```{r}
+# Create copies of the point data.
+PopLAD <- SFLAD
+PopMSOA <- SFMSOA
+PopLSOA <- SFLSOA
+PopSchools <- SFSchools
+PopGPs <- SFGPs
+PopHospitals <- SFHospitals
+PopSchoolsNO2 <- SFSchoolsNO2
+PopGPsNO2 <- SFGPsNO2
+PopHospitalsNO2 <- SFHospitalsNO2
+PopSchoolsPM2.5 <- SFSchoolsPM2.5
+PopGPsPM2.5 <- SFGPsPM2.5
+PopHospitalsPM2.5 <- SFHospitalsPM2.5
+
+# Remove geometry data.
+st_geometry(PopLAD) <- NULL
+st_geometry(PopMSOA) <- NULL
+st_geometry(PopLSOA) <- NULL
+st_geometry(PopSchools) <- NULL
+st_geometry(PopGPs) <- NULL
+st_geometry(PopHospitals) <- NULL
+st_geometry(PopSchoolsNO2) <- NULL
+st_geometry(PopGPsNO2) <- NULL
+st_geometry(PopHospitalsNO2) <- NULL
+st_geometry(PopSchoolsPM2.5) <- NULL
+st_geometry(PopGPsPM2.5) <- NULL
+st_geometry(PopHospitalsPM2.5) <- NULL
+
+# Create popup tables.
+PopLAD <- popupTable(PopLAD, feature.id = FALSE, row.numbers = FALSE, zcol=c("LAD Name", "LAD Code"))
+PopMSOA <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
+PopLSOA <- popupTable(PopLSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
+PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopSchoolsNO2 <- popupTable(PopSchoolsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPsNO2 <- popupTable(PopGPsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopHospitalsNO2 <- popupTable(PopHospitalsNO2, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopSchoolsPM2.5 <- popupTable(PopSchoolsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopGPsPM2.5 <- popupTable(PopGPsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+PopHospitalsPM2.5 <- popupTable(PopHospitalsPM2.5, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
+
+# Create colour palettes.
+PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("GP", "Hospital", "School"))
+PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
+PalNO2 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`NO2 (µg/m³)`, k=6)+0.001), 320), na.color = "transparent")
+PalPM2.5 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`PM2.5 (µg/m³)`, k=6)+0.001), 90), na.color = "transparent")
+```
+
+### Popup Tables and Palettes For MSOA Cluster Data
+```{r}
+# Create copies of the MSOA data.
+PopDataMSOA <- SFMSOA
+
+# Remove geometry data.
+st_geometry(PopDataMSOA) <- NULL
+
+# Create popup tables.
+PopSchoolsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (All) Count", "School (All) Density"))
+PopGPsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (All) Count", "GP (All) Density"))
+PopHospitalsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (All) Count", "Hospital (All) Density"))
+PopSchoolsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (NO2) Count", "School (NO2) Density"))
+PopGPsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (NO2) Count", "GP (NO2) Density"))
+PopHospitalsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (NO2) Count", "Hospital (NO2) Density"))
+PopSchoolsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (PM2.5) Count", "School (PM2.5) Density"))
+PopGPsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (PM2.5) Count", "GP (PM2.5) Density"))
+PopHospitalsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density"))
+
+# Create palettes.
+PalSchoolsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`School (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (All) Density`, k=5)+0.001)))
+PalGPsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`GP (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (All) Density`, k=5)+0.001)))
+PalHospitalsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`Hospital (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (All) Density`, k=5)+0.001)))
+PalSchoolsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`School (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (NO2) Density`, k=5)+0.001)))
+PalGPsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`GP (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (NO2) Density`, k=5)+0.001)))
+PalHospitalsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (NO2) Density`, k=5)+0.001)))
+PalSchoolsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`School (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (PM2.5) Density`, k=5)+0.001)))
+PalGPsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`GP (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (PM2.5) Density`, k=5)+0.001)))
+PalHospitalsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (PM2.5) Density`, k=5)+0.001)))
+```
+
+### Plot Point Map using leaflet
+```{r}
+# Map using leaflet.
+MapLeaflet <- leaflet() %>% 
+  addTiles(group = "OSM (default)") %>% 
+  setView(-0.10, 51.5, zoom = 10) %>% 
+  addRasterImage(PollutionLondon[[1]], colors = PalNO2, opacity = 1.0, group = "NO2 Concentration") %>%
+  addRasterImage(PollutionLondon[[2]], colors = PalPM2.5, opacity = 1.0, group = "PM2.5 Concentration") %>%
+
+  addPolygons(data = SFLAD, 
+              fill = "transparent", 
+              color = "black",
+              stroke = "black",
+              weight = 2, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 3,bringToFront = FALSE),
+              popup = PopLAD,
+              group = "LAD"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fill = "transparent",
+              color = "black",
+              stroke = "black", 
+              weight = 1.0, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
+              popup = PopMSOA,
+              group = "MSOA"
+              ) %>% 
+  addPolygons(data = SFLSOA, 
+              fill = "transparent",
+              color = "black",
+              stroke = "black", 
+              weight = 0.5, 
+              opacity = 1.0, 
+              fillOpacity = 0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
+              popup = PopLSOA,
+              group = "LSOA"
+              ) %>% 
+  
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOA(`School (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOA,
+              group = "MSOA Schools (All)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOA(`GP (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOA,
+              group = "MSOA GPs (All)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOA(`Hospital (All) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOA,
+              group = "MSOA Hospitals (All)"
+              ) %>% 
+  
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOANO2(`School (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOANO2,
+              group = "MSOA Schools (NO2)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOANO2(`GP (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOANO2,
+              group = "MSOA GPs (NO2)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOANO2(`Hospital (NO2) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOANO2,
+              group = "MSOA Hospitals (NO2)"
+              ) %>% 
+
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalSchoolsMSOAPM2.5(`School (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopSchoolsMSOAPM2.5,
+              group = "MSOA Schools (PM2.5)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalGPsMSOAPM2.5(`GP (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopGPsMSOAPM2.5,
+              group = "MSOA GPs (PM2.5)"
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHospitalsMSOAPM2.5(`Hospital (PM2.5) Density`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHospitalsMSOAPM2.5,
+              group = "MSOA Hospitals (PM2.5)"
+              ) %>% 
+  
+  addCircleMarkers(data = SFSchools,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopSchools,
+             group = "Schools (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'LightGreen'
+                } else if (childCount < 100) {  
+                  c = 'LightGreen'  
+                } else { 
+                  c = 'LightGreen'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFGPs,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopGPs,
+             group = "GP (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'LightSkyBlue'
+                } else if (childCount < 100) {  
+                  c = 'LightSkyBlue'  
+                } else { 
+                  c = 'LightSkyBlue'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFHospitals,
+             radius = 5,
+             fillColor = ~PalAll(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopHospitals,
+             group = "Hospital (All)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'RoyalBlue'
+                } else if (childCount < 100) {  
+                  c = 'RoyalBlue'  
+                } else { 
+                  c = 'RoyalBlue'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  
+  addCircleMarkers(data = SFSchoolsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopSchoolsNO2,
+             group = "Schools (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Gold'
+                } else if (childCount < 100) {  
+                  c = 'Gold'  
+                } else { 
+                  c = 'Gold'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFGPsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopGPsNO2,
+             group = "GP (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Orange'
+                } else if (childCount < 100) {  
+                  c = 'Orange'  
+                } else { 
+                  c = 'Orange'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFHospitalsNO2,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopHospitalsNO2,
+             group = "Hospital (NO2)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Red'
+                } else if (childCount < 100) {  
+                  c = 'Red'  
+                } else { 
+                  c = 'Red'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  
+  addCircleMarkers(data = SFSchoolsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopSchoolsPM2.5,
+             group = "Schools (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Gold'
+                } else if (childCount < 100) {  
+                  c = 'Gold'  
+                } else { 
+                  c = 'Gold'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFGPsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopGPsPM2.5,
+             group = "GP (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Orange'
+                } else if (childCount < 100) {  
+                  c = 'Orange'  
+                } else { 
+                  c = 'Orange'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className: 'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  addCircleMarkers(data = SFHospitalsPM2.5,
+             radius = 5,
+             fillColor = ~PalWHO(`Building Type`),
+             fillOpacity = 1.0,
+             stroke = TRUE,
+             color = "black",
+             opacity = 1.0,
+             weight = 1.0,
+             popup = PopHospitalsPM2.5,
+             group = "Hospital (PM2.5)",
+             clusterOptions = markerClusterOptions(disableClusteringAtZoom = 13, iconCreateFunction=JS("function (cluster) {    
+                var childCount = cluster.getChildCount();  
+                if (childCount < 10) {  
+                  c = 'Red'
+                } else if (childCount < 100) {  
+                  c = 'Red'  
+                } else { 
+                  c = 'Red'  
+                }    
+                return new L.DivIcon({ html: '<div style=\"background-color:'+c+'\"><span>' + childCount + '</span></div>', 
+                className:  'marker-cluster', 
+                iconSize: new L.Point(40, 40) });
+              }"))
+             ) %>% 
+  
+  addLayersControl(
+    baseGroups = c("OSM (default)"),
+    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)"),
+    position = "topright",
+    options = layersControlOptions(collapsed = TRUE)
+    ) %>% 
+  
+  addLegend(pal = PalNO2, values = values(PollutionLondon[[1]]), title = "NO2 Concentration (µg/m³)", group = "NO2 Concentration") %>%
+  addLegend(pal = PalPM2.5, values = values(PollutionLondon[[2]]), title = "PM2.5 Concentration (µg/m³)", group = "PM2.5 Concentration") %>%
+  addLegend(pal = PalAll, values = SFLocations$`Building Type`, title = "All Buildings") %>% 
+  addLegend(pal = PalWHO, values = SFLocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
+  addLegend(pal = PalSchoolsMSOA, values = SFMSOA$`School (All) Density`, title = "School Density (per km2)", group = "MSOA Schools (All)") %>%
+  addLegend(pal = PalGPsMSOA, values = SFMSOA$`GP (All) Density`, title = "GP Density (per km2)", group = "MSOA GPs (All)") %>%
+  addLegend(pal = PalHospitalsMSOA, values = SFMSOA$`Hospital (All) Density`, title = "Hospital Density (per km2)", group = "MSOA Hospitals (All)") %>%
+  addLegend(pal = PalSchoolsMSOANO2, values = SFMSOA$`School (NO2) Density`, title = "School NO2 Density (per km2)", group = "MSOA Schools (NO2)") %>%
+  addLegend(pal = PalGPsMSOANO2, values = SFMSOA$`GP (NO2) Density`, title = "GP NO2 Density (per km2)", group = "MSOA GPs (NO2)") %>%
+  addLegend(pal = PalHospitalsMSOANO2, values = SFMSOA$`Hospital (NO2) Density`, title = "Hospital NO2 Density (per km2)", group = "MSOA Hospitals (NO2)") %>%
+  addLegend(pal = PalSchoolsMSOAPM2.5, values = SFMSOA$`School (PM2.5) Density`, title = "School PM2.5 Density (per km2)", group = "MSOA Schools (PM2.5)") %>%
+  addLegend(pal = PalGPsMSOAPM2.5, values = SFMSOA$`GP (PM2.5) Density`, title = "GP PM2.5 Density (per km2)", group = "MSOA GPs (PM2.5)") %>%
+  addLegend(pal = PalHospitalsMSOAPM2.5, values = SFMSOA$`Hospital (PM2.5) Density`, title = "Hospital PM2.5 Density (per km2)", group = "MSOA Hospitals (PM2.5)") %>%
+  
+  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)")) %>% 
+  addEasyButton(easyButton(
+    icon="fa-globe", title="Zoom to London",
+    onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }"))) %>% 
+  addScaleBar(position = "bottomleft", 
+              options = scaleBarOptions(metric = TRUE))
+  
+MapLeaflet
+```
