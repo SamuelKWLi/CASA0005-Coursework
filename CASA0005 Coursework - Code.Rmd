@@ -22,6 +22,9 @@ library(broom)
 library(corrplot)
 library(car)
 library(spgwr)
+
+# Set tmap to view mode
+tmap_mode("view")
 ```
 
 ### Read in Concentration Rasters
@@ -275,15 +278,15 @@ GlbMIPM2.5GP <- moran.test(SPClusterMSOA@data$GPPM2.5Density, SpWeightsMSOA)
 GlbMIPM2.5Hospital <- moran.test(SPClusterMSOA@data$HospitalPM2.5Density, SpWeightsMSOA)
 
 # Conduct local Moran's I.
-lclMIAllSchool <- localmoran(SPClusterMSOA@data$SchoolDensity, SpWeightsMSOA)
-lclMIAllGP <- localmoran(SPClusterMSOA@data$GPDensity, SpWeightsMSOA)
-lclMIAllHospital <- localmoran(SPClusterMSOA@data$HospitalDensity, SpWeightsMSOA)
-lclMINO2School <- localmoran(SPClusterMSOA@data$SchoolNO2Density, SpWeightsMSOA)
-lclMINO2GP <- localmoran(SPClusterMSOA@data$GPNO2Density, SpWeightsMSOA)
-lclMINO2Hospital <- localmoran(SPClusterMSOA@data$HospitalNO2Density, SpWeightsMSOA)
-lclMIPM2.5School <- localmoran(SPClusterMSOA@data$SchoolPM2.5Density, SpWeightsMSOA)
-lclMIPM2.5GP <- localmoran(SPClusterMSOA@data$GPPM2.5Density, SpWeightsMSOA)
-lclMIPM2.5Hospital <- localmoran(SPClusterMSOA@data$HospitalPM2.5Density, SpWeightsMSOA)
+lclMIAllSchool <- round(localmoran(SPClusterMSOA@data$SchoolDensity, SpWeightsMSOA), digits = 3)
+lclMIAllGP <- round(localmoran(SPClusterMSOA@data$GPDensity, SpWeightsMSOA), digits = 3)
+lclMIAllHospital <- round(localmoran(SPClusterMSOA@data$HospitalDensity, SpWeightsMSOA), digits = 3)
+lclMINO2School <- round(localmoran(SPClusterMSOA@data$SchoolNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2GP <- round(localmoran(SPClusterMSOA@data$GPNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2Hospital <- round(localmoran(SPClusterMSOA@data$HospitalNO2Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5School <- round(localmoran(SPClusterMSOA@data$SchoolPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5GP <- round(localmoran(SPClusterMSOA@data$GPPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5Hospital <- round(localmoran(SPClusterMSOA@data$HospitalPM2.5Density, SpWeightsMSOA), digits = 3)
 
 # Join local Moran's I Z values to shape file.
 SPClusterMSOA$lclMIAllSchool <- lclMIAllSchool[,4]
@@ -399,6 +402,11 @@ ConcLSOA <- read_csv("Data/Air Pollution/ConcLSOA.csv",
 ConcLAD <- ConcLAD[,c(2:4)]
 ConcMSOA <- ConcMSOA[,c(2, 5, 6)]
 ConcLSOA <- ConcLSOA[,c(2, 7, 8)]
+
+# Round concentration
+ConcLAD[, c(2, 3)] <- round(ConcLAD[, c(2, 3)], digits = 3)
+ConcMSOA[, c(2, 3)] <- round(ConcMSOA[, c(2, 3)], digits = 3)
+ConcLSOA[, c(2, 3)] <- round(ConcLSOA[, c(2, 3)], digits = 3)
 
 # Merge ID data to boundaries.
 SFLAD<-merge(SFLAD, 
@@ -544,23 +552,23 @@ GWRNO2Results <- as.data.frame(GWRNO2$SDF)
 GWRPM2.5Results <- as.data.frame(GWRPM2.5$SDF)
 
 # Merge coefficients with shapefiles.
-SFMSOA$`IMD NO2 Coef.`<- GWRNO2Results$X.IMD.Score.
-SFMSOA$`Income NO2 Coef.`<- GWRNO2Results$X.Income.Score.
-SFMSOA$`Employment NO2 Coef.`<- GWRNO2Results$X.Employment.Score.
-SFMSOA$`Education NO2 Coef.`<- GWRNO2Results$X.Education.Score.
-SFMSOA$`Health NO2 Coef.`<- GWRNO2Results$X.Health.Score.
-SFMSOA$`Crime NO2 Coef.`<- GWRNO2Results$X.Crime.Score.
-SFMSOA$`Housing NO2 Coef.`<- GWRNO2Results$X.Housing.Score.
-SFMSOA$`Environment NO2 Coef.`<- GWRNO2Results$X.Environment.Score.
+SFMSOA$`IMD NO2 Coef.`<- round(GWRNO2Results$X.IMD.Score., digits = 3)
+SFMSOA$`Income NO2 Coef.`<- round(GWRNO2Results$X.Income.Score., digits = 3)
+SFMSOA$`Employment NO2 Coef.`<- round(GWRNO2Results$X.Employment.Score., digits = 3)
+SFMSOA$`Education NO2 Coef.`<- round(GWRNO2Results$X.Education.Score., digits = 3)
+SFMSOA$`Health NO2 Coef.`<- round(GWRNO2Results$X.Health.Score., digits = 3)
+SFMSOA$`Crime NO2 Coef.`<- round(GWRNO2Results$X.Crime.Score., digits = 3)
+SFMSOA$`Housing NO2 Coef.`<- round(GWRNO2Results$X.Housing.Score., digits = 3)
+SFMSOA$`Environment NO2 Coef.`<- round(GWRNO2Results$X.Environment.Score., digits = 3)
 
-SFMSOA$`IMD PM2.5 Coef.`<- GWRPM2.5Results$X.IMD.Score.
-SFMSOA$`Income PM2.5 Coef.`<- GWRPM2.5Results$X.Income.Score.
-SFMSOA$`Employment PM2.5 Coef.`<- GWRPM2.5Results$X.Employment.Score.
-SFMSOA$`Education PM2.5 Coef.`<- GWRPM2.5Results$X.Education.Score.
-SFMSOA$`Health PM2.5 Coef.`<- GWRPM2.5Results$X.Health.Score.
-SFMSOA$`Crime PM2.5 Coef.`<- GWRPM2.5Results$X.Crime.Score.
-SFMSOA$`Housing PM2.5 Coef.`<- GWRPM2.5Results$X.Housing.Score.
-SFMSOA$`Environment PM2.5 Coef.`<- GWRPM2.5Results$X.Environment.Score.
+SFMSOA$`IMD PM2.5 Coef.`<- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
+SFMSOA$`Income PM2.5 Coef.`<- round(GWRPM2.5Results$X.Income.Score., digits = 3)
+SFMSOA$`Employment PM2.5 Coef.`<- round(GWRPM2.5Results$X.Employment.Score., digits = 3)
+SFMSOA$`Education PM2.5 Coef.`<- round(GWRPM2.5Results$X.Education.Score., digits = 3)
+SFMSOA$`Health PM2.5 Coef.`<- round(GWRPM2.5Results$X.Health.Score., digits = 3)
+SFMSOA$`Crime PM2.5 Coef.`<- round(GWRPM2.5Results$X.Crime.Score., digits = 3)
+SFMSOA$`Housing PM2.5 Coef.`<- round(GWRPM2.5Results$X.Housing.Score., digits = 3)
+SFMSOA$`Environment PM2.5 Coef.`<- round(GWRPM2.5Results$X.Environment.Score., digits = 3)
 
 # Map coefficients.
 tm_shape(SFMSOA) +

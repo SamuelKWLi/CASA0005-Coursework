@@ -1,14 +1,16 @@
 ---
 title: "Leaflet"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ### Popup Tables and Palettes For Point Data
 ```{r}
 # Create copies of the point data.
-PopLAD <- SFLAD
-PopMSOA <- SFMSOA
-PopLSOA <- SFLSOA
+PopLADBry <- SFLAD
+PopMSOABry <- SFMSOA
+PopLSOABry <- SFLSOA
 PopSchools <- SFSchools
 PopGPs <- SFGPs
 PopHospitals <- SFHospitals
@@ -20,9 +22,9 @@ PopGPsPM2.5 <- SFGPsPM2.5
 PopHospitalsPM2.5 <- SFHospitalsPM2.5
 
 # Remove geometry data.
-st_geometry(PopLAD) <- NULL
-st_geometry(PopMSOA) <- NULL
-st_geometry(PopLSOA) <- NULL
+st_geometry(PopLADBry) <- NULL
+st_geometry(PopMSOABry) <- NULL
+st_geometry(PopLSOABry) <- NULL
 st_geometry(PopSchools) <- NULL
 st_geometry(PopGPs) <- NULL
 st_geometry(PopHospitals) <- NULL
@@ -34,9 +36,9 @@ st_geometry(PopGPsPM2.5) <- NULL
 st_geometry(PopHospitalsPM2.5) <- NULL
 
 # Create popup tables.
-PopLAD <- popupTable(PopLAD, feature.id = FALSE, row.numbers = FALSE, zcol=c("LAD Name", "LAD Code"))
-PopMSOA <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
-PopLSOA <- popupTable(PopLSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
+PopLADBry <- popupTable(PopLADBry, feature.id = FALSE, row.numbers = FALSE, zcol=c("LAD Name", "LAD Code"))
+PopMSOABry <- popupTable(PopMSOABry, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
+PopLSOABry <- popupTable(PopLSOABry, feature.id = FALSE, row.numbers = FALSE, zcol=c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code", "LAD Name", "LAD Code"))
 PopSchools <- popupTable(PopSchools, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 PopGPs <- popupTable(PopGPs, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
 PopHospitals <- popupTable(PopHospitals, feature.id = FALSE, row.numbers = FALSE, zcol=c("Building Name", "Postcode", "Building Type", "NO2 (µg/m³)", "PM2.5 (µg/m³)"))
@@ -57,32 +59,79 @@ PalPM2.5 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocati
 ### Popup Tables and Palettes For MSOA Cluster Data
 ```{r}
 # Create copies of the MSOA data.
-PopDataMSOA <- SFMSOA
+PopClusterMSOA <- SFClusterMSOA
 
 # Remove geometry data.
-st_geometry(PopDataMSOA) <- NULL
+st_geometry(PopClusterMSOA) <- NULL
 
 # Create popup tables.
-PopSchoolsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (All) Count", "School (All) Density"))
-PopGPsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (All) Count", "GP (All) Density"))
-PopHospitalsMSOA <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (All) Count", "Hospital (All) Density"))
-PopSchoolsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (NO2) Count", "School (NO2) Density"))
-PopGPsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (NO2) Count", "GP (NO2) Density"))
-PopHospitalsMSOANO2 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (NO2) Count", "Hospital (NO2) Density"))
-PopSchoolsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (PM2.5) Count", "School (PM2.5) Density"))
-PopGPsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (PM2.5) Count", "GP (PM2.5) Density"))
-PopHospitalsMSOAPM2.5 <- popupTable(PopDataMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density"))
+PopSchoolsMSOA <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (All) Count", "School (All) Density", "School (All) Moran's I"))
+PopGPsMSOA <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (All) Count", "GP (All) Density", "GP (All) Moran's I"))
+PopHospitalsMSOA <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (All) Count", "Hospital (All) Density", "Hospital (All) Moran's I"))
+PopSchoolsMSOANO2 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (NO2) Count", "School (NO2) Density", "School (NO2) Moran's I"))
+PopGPsMSOANO2 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (NO2) Count", "GP (NO2) Density", "GP (NO2) Moran's I"))
+PopHospitalsMSOANO2 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (NO2) Count", "Hospital (NO2) Density", "Hospital (NO2) Moran's I"))
+PopSchoolsMSOAPM2.5 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "School (PM2.5) Count", "School (PM2.5) Density", "School (PM2.5) Moran's I"))
+PopGPsMSOAPM2.5 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "GP (PM2.5) Count", "GP (PM2.5) Density", "GP (PM2.5) Moran's I"))
+PopHospitalsMSOAPM2.5 <- popupTable(PopClusterMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Hospital (PM2.5) Count", "Hospital (PM2.5) Density", "Hospital (PM2.5) Moran's I"))
 
 # Create palettes.
-PalSchoolsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`School (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (All) Density`, k=5)+0.001)))
-PalGPsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`GP (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (All) Density`, k=5)+0.001)))
-PalHospitalsMSOA <- colorBin("GnBu", domain = PopDataMSOA$`Hospital (All) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (All) Density`, k=5)+0.001)))
-PalSchoolsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`School (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (NO2) Density`, k=5)+0.001)))
-PalGPsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`GP (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (NO2) Density`, k=5)+0.001)))
-PalHospitalsMSOANO2 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (NO2) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (NO2) Density`, k=5)+0.001)))
-PalSchoolsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`School (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`School (PM2.5) Density`, k=5)+0.001)))
-PalGPsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`GP (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`GP (PM2.5) Density`, k=5)+0.001)))
-PalHospitalsMSOAPM2.5 <- colorBin("OrRd", domain = PopDataMSOA$`Hospital (PM2.5) Density`, bins = c(0, (getJenksBreaks(PopDataMSOA$`Hospital (PM2.5) Density`, k=5)+0.001)))
+PalSchoolsMSOA <- colorBin(PalMi, domain = PopClusterMSOA$`School (All) Moran's I`, bins = BrksMi)
+PalGPsMSOA <- colorBin(PalMi, domain = PopClusterMSOA$`GP (All) Moran's I`, bins = BrksMi)
+PalHospitalsMSOA <- colorBin(PalMi, domain = PopClusterMSOA$`Hospital (All) Moran's I`, bins = BrksMi)
+PalSchoolsMSOANO2 <- colorBin(PalMi, domain = PopClusterMSOA$`School (NO2) Moran's I`, bins = BrksMi)
+PalGPsMSOANO2 <- colorBin(PalMi, domain = PopClusterMSOA$`GP (NO2) Moran's I`, bins = BrksMi)
+PalHospitalsMSOANO2 <- colorBin(PalMi, domain = PopClusterMSOA$`Hospital (NO2) Moran's I`, bins = BrksMi)
+PalSchoolsMSOAPM2.5 <- colorBin(PalMi, domain = PopClusterMSOA$`School (PM2.5) Moran's I`, bins = BrksMi)
+PalGPsMSOAPM2.5 <- colorBin(PalMi, domain = PopClusterMSOA$`GP (PM2.5) Moran's I`, bins = BrksMi)
+PalHospitalsMSOAPM2.5 <- colorBin(PalMi, domain = PopClusterMSOA$`Hospital (PM2.5) Moran's I`, bins = BrksMi)
+```
+
+### Popup Tables and Palettes For MSOA GWR Data
+```{r}
+# Create copies of the MSOA data.
+PopMSOA <- SFMSOA
+
+# Remove geometry data.
+st_geometry(PopMSOA) <- NULL
+
+# Create popup tables.
+PopIMDMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "IMD Score"))
+PopIncomeMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Income Score"))
+PopEmploymentMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Employment Score"))
+PopEducationMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Education Score"))
+PopHealthMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Health Score"))
+PopCrimeMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Crime Score"))
+PopHousingMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Housing Score"))
+PopEnvironmentMSOANO2 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "Environment Score"))
+
+PopIMDMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "IMD Score"))
+PopIncomeMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Income Score"))
+PopEmploymentMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Employment Score"))
+PopEducationMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Education Score"))
+PopHealthMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Health Score"))
+PopCrimeMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Crime Score"))
+PopHousingMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Housing Score"))
+PopEnvironmentMSOAPM2.5 <- popupTable(PopMSOA, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "Environment Score"))
+
+# Create palettes.
+PalIMDMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`IMD NO2 Coef.`)
+PalIncomeMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Income NO2 Coef.`)
+PalEmploymentMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Employment NO2 Coef.`)
+PalEducationMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Education NO2 Coef.`)
+PalHealthMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Health NO2 Coef.`)
+PalCrimeMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Crime NO2 Coef.`)
+PalHousingMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Housing NO2 Coef.`)
+PalEnvironmentMSOANO2 <- colorBin("RdBu", domain = PopMSOA$`Environment NO2 Coef.`)
+
+PalIMDMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`IMD PM2.5 Coef.`)
+PalIncomeMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Income PM2.5 Coef.`)
+PalEmploymentMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Employment PM2.5 Coef.`)
+PalEducationMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Education PM2.5 Coef.`)
+PalHealthMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Health PM2.5 Coef.`)
+PalCrimeMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Crime PM2.5 Coef.`)
+PalHousingMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Housing PM2.5 Coef.`)
+PalEnvironmentMSOAPM2.5 <- colorBin("RdBu", domain = PopMSOA$`Environment PM2.5 Coef.`)
 ```
 
 ### Plot Point Map using leaflet
@@ -93,7 +142,13 @@ MapLeaflet <- leaflet() %>%
   setView(-0.10, 51.5, zoom = 10) %>% 
   addRasterImage(PollutionLondon[[1]], colors = PalNO2, opacity = 1.0, group = "NO2 Concentration") %>%
   addRasterImage(PollutionLondon[[2]], colors = PalPM2.5, opacity = 1.0, group = "PM2.5 Concentration") %>%
-
+  
+  
+  
+  
+  
+  
+# Boundaries
   addPolygons(data = SFLAD, 
               fill = "transparent", 
               color = "black",
@@ -103,7 +158,7 @@ MapLeaflet <- leaflet() %>%
               fillOpacity = 0,
               smoothFactor = 0.5,
               highlightOptions = highlightOptions(color = "white", weight = 3,bringToFront = FALSE),
-              popup = PopLAD,
+              popup = PopLADBry,
               group = "LAD"
               ) %>% 
   addPolygons(data = SFMSOA, 
@@ -115,7 +170,7 @@ MapLeaflet <- leaflet() %>%
               fillOpacity = 0,
               smoothFactor = 0.5,
               highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
-              popup = PopMSOA,
+              popup = PopMSOABry,
               group = "MSOA"
               ) %>% 
   addPolygons(data = SFLSOA, 
@@ -127,12 +182,17 @@ MapLeaflet <- leaflet() %>%
               fillOpacity = 0,
               smoothFactor = 0.5,
               highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = FALSE),
-              popup = PopLSOA,
+              popup = PopLSOABry,
               group = "LSOA"
               ) %>% 
   
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalSchoolsMSOA(`School (All) Density`),
+  
+  
+  
+  
+# MSOA Point Cluster Results. 
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalSchoolsMSOA(`School (All) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -143,8 +203,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopSchoolsMSOA,
               group = "MSOA Schools (All)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalGPsMSOA(`GP (All) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalGPsMSOA(`GP (All) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -155,8 +215,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopGPsMSOA,
               group = "MSOA GPs (All)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalHospitalsMSOA(`Hospital (All) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalHospitalsMSOA(`Hospital (All) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -167,9 +227,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopHospitalsMSOA,
               group = "MSOA Hospitals (All)"
               ) %>% 
-  
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalSchoolsMSOANO2(`School (NO2) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalSchoolsMSOANO2(`School (NO2) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -180,8 +239,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopSchoolsMSOANO2,
               group = "MSOA Schools (NO2)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalGPsMSOANO2(`GP (NO2) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalGPsMSOANO2(`GP (NO2) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -192,8 +251,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopGPsMSOANO2,
               group = "MSOA GPs (NO2)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalHospitalsMSOANO2(`Hospital (NO2) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalHospitalsMSOANO2(`Hospital (NO2) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -204,9 +263,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopHospitalsMSOANO2,
               group = "MSOA Hospitals (NO2)"
               ) %>% 
-
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalSchoolsMSOAPM2.5(`School (PM2.5) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalSchoolsMSOAPM2.5(`School (PM2.5) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -217,8 +275,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopSchoolsMSOAPM2.5,
               group = "MSOA Schools (PM2.5)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalGPsMSOAPM2.5(`GP (PM2.5) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalGPsMSOAPM2.5(`GP (PM2.5) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -229,8 +287,8 @@ MapLeaflet <- leaflet() %>%
               popup = PopGPsMSOAPM2.5,
               group = "MSOA GPs (PM2.5)"
               ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalHospitalsMSOAPM2.5(`Hospital (PM2.5) Density`),
+  addPolygons(data = SFClusterMSOA, 
+              fillColor = ~PalHospitalsMSOAPM2.5(`Hospital (PM2.5) Moran's I`),
               color = "black",
               stroke = "black", 
               weight = 0.1, 
@@ -242,6 +300,213 @@ MapLeaflet <- leaflet() %>%
               group = "MSOA Hospitals (PM2.5)"
               ) %>% 
   
+  
+  
+  
+  
+# MSOA GWR NO2 Results
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalIMDMSOANO2(`IMD NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopIMDMSOANO2,
+              group = "NO2 IMD Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalIncomeMSOANO2(`Income NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopIncomeMSOANO2,
+              group = "NO2 Income Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEmploymentMSOANO2(`Employment NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEmploymentMSOANO2,
+              group = "NO2 Employment Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEducationMSOANO2(`Education NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEducationMSOANO2,
+              group = "NO2 Education Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHealthMSOANO2(`Health NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHealthMSOANO2,
+              group = "NO2 Health Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalCrimeMSOANO2(`Crime NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopCrimeMSOANO2,
+              group = "NO2 Crime Coef."
+              ) %>%
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHousingMSOANO2(`Housing NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHousingMSOANO2,
+              group = "NO2 Housing Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEnvironmentMSOANO2(`Environment NO2 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEnvironmentMSOANO2,
+              group = "NO2 Environment Coef."
+              ) %>% 
+  
+  
+  
+  
+# MSOA GWR PM2.5 Results
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalIMDMSOAPM2.5(`IMD PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopIMDMSOAPM2.5,
+              group = "PM2.5 IMD Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalIncomeMSOAPM2.5(`Income PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopIncomeMSOAPM2.5,
+              group = "PM2.5 Income Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEmploymentMSOAPM2.5(`Employment PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEmploymentMSOAPM2.5,
+              group = "PM2.5 Employment Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEducationMSOAPM2.5(`Education PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEducationMSOAPM2.5,
+              group = "PM2.5 Education Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHealthMSOAPM2.5(`Health PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHealthMSOAPM2.5,
+              group = "PM2.5 Health Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalCrimeMSOAPM2.5(`Crime PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopCrimeMSOAPM2.5,
+              group = "PM2.5 Crime Coef."
+              ) %>%
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalHousingMSOAPM2.5(`Housing PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopHousingMSOAPM2.5,
+              group = "PM2.5 Housing Coef."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalEnvironmentMSOAPM2.5(`Environment PM2.5 Coef.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopEnvironmentMSOAPM2.5,
+              group = "PM2.5 Environment Coef."
+              ) %>% 
+  
+  
+  
+  
+# Point Data.
   addCircleMarkers(data = SFSchools,
              radius = 5,
              fillColor = ~PalAll(`Building Type`),
@@ -314,7 +579,6 @@ MapLeaflet <- leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  
   addCircleMarkers(data = SFSchoolsNO2,
              radius = 5,
              fillColor = ~PalWHO(`Building Type`),
@@ -387,7 +651,6 @@ MapLeaflet <- leaflet() %>%
                 iconSize: new L.Point(40, 40) });
               }"))
              ) %>% 
-  
   addCircleMarkers(data = SFSchoolsPM2.5,
              radius = 5,
              fillColor = ~PalWHO(`Building Type`),
@@ -461,28 +724,60 @@ MapLeaflet <- leaflet() %>%
               }"))
              ) %>% 
   
+  
+  
+  
+  
+# Layer Controls
   addLayersControl(
     baseGroups = c("OSM (default)"),
-    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)"),
+    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Schools (All)", "GP (All)", "Hospital (All)", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)", "NO2 IMD Coef.", "NO2 Income Coef.", "NO2 Employment Coef.", "NO2 Education Coef.", "NO2 Health Coef.", "NO2 Crime Coef.", "NO2 Housing Coef.", "NO2 Environment Coef.", "PM2.5 IMD Coef.", "PM2.5 Income Coef.", "PM2.5 Employment Coef.", "PM2.5 Education Coef.", "PM2.5 Health Coef.", "PM2.5 Crime Coef.", "PM2.5 Housing Coef.", "PM2.5 Environment Coef."),
     position = "topright",
     options = layersControlOptions(collapsed = TRUE)
     ) %>% 
   
+  
+  
+  
+  
+# Legends
   addLegend(pal = PalNO2, values = values(PollutionLondon[[1]]), title = "NO2 Concentration (µg/m³)", group = "NO2 Concentration") %>%
   addLegend(pal = PalPM2.5, values = values(PollutionLondon[[2]]), title = "PM2.5 Concentration (µg/m³)", group = "PM2.5 Concentration") %>%
   addLegend(pal = PalAll, values = SFLocations$`Building Type`, title = "All Buildings") %>% 
   addLegend(pal = PalWHO, values = SFLocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
-  addLegend(pal = PalSchoolsMSOA, values = SFMSOA$`School (All) Density`, title = "School Density (per km2)", group = "MSOA Schools (All)") %>%
-  addLegend(pal = PalGPsMSOA, values = SFMSOA$`GP (All) Density`, title = "GP Density (per km2)", group = "MSOA GPs (All)") %>%
-  addLegend(pal = PalHospitalsMSOA, values = SFMSOA$`Hospital (All) Density`, title = "Hospital Density (per km2)", group = "MSOA Hospitals (All)") %>%
-  addLegend(pal = PalSchoolsMSOANO2, values = SFMSOA$`School (NO2) Density`, title = "School NO2 Density (per km2)", group = "MSOA Schools (NO2)") %>%
-  addLegend(pal = PalGPsMSOANO2, values = SFMSOA$`GP (NO2) Density`, title = "GP NO2 Density (per km2)", group = "MSOA GPs (NO2)") %>%
-  addLegend(pal = PalHospitalsMSOANO2, values = SFMSOA$`Hospital (NO2) Density`, title = "Hospital NO2 Density (per km2)", group = "MSOA Hospitals (NO2)") %>%
-  addLegend(pal = PalSchoolsMSOAPM2.5, values = SFMSOA$`School (PM2.5) Density`, title = "School PM2.5 Density (per km2)", group = "MSOA Schools (PM2.5)") %>%
-  addLegend(pal = PalGPsMSOAPM2.5, values = SFMSOA$`GP (PM2.5) Density`, title = "GP PM2.5 Density (per km2)", group = "MSOA GPs (PM2.5)") %>%
-  addLegend(pal = PalHospitalsMSOAPM2.5, values = SFMSOA$`Hospital (PM2.5) Density`, title = "Hospital PM2.5 Density (per km2)", group = "MSOA Hospitals (PM2.5)") %>%
+  addLegend(pal = PalSchoolsMSOA, values = SFClusterMSOA$`School (All) Moran's I`, title = "School Density", group = "MSOA Schools (All)") %>%
+  addLegend(pal = PalGPsMSOA, values = SFClusterMSOA$`GP (All) Moran's I`, title = "GP Moran's I", group = "MSOA GPs (All)") %>%
+  addLegend(pal = PalHospitalsMSOA, values = SFClusterMSOA$`Hospital (All) Moran's I`, title = "Hospital Moran's I", group = "MSOA Hospitals (All)") %>%
+  addLegend(pal = PalSchoolsMSOANO2, values = SFClusterMSOA$`School (NO2) Moran's I`, title = "School NO2 Moran's I", group = "MSOA Schools (NO2)") %>%
+  addLegend(pal = PalGPsMSOANO2, values = SFClusterMSOA$`GP (NO2) Moran's I`, title = "GP NO2 Moran's I", group = "MSOA GPs (NO2)") %>%
+  addLegend(pal = PalHospitalsMSOANO2, values = SFClusterMSOA$`Hospital (NO2) Moran's I`, title = "Hospital NO2 Moran's I", group = "MSOA Hospitals (NO2)") %>%
+  addLegend(pal = PalSchoolsMSOAPM2.5, values = SFClusterMSOA$`School (PM2.5) Moran's I`, title = "School PM2.5 Moran's I", group = "MSOA Schools (PM2.5)") %>%
+  addLegend(pal = PalGPsMSOAPM2.5, values = SFClusterMSOA$`GP (PM2.5) Moran's I`, title = "GP PM2.5 Moran's I", group = "MSOA GPs (PM2.5)") %>%
+  addLegend(pal = PalHospitalsMSOAPM2.5, values = SFClusterMSOA$`Hospital (PM2.5) Moran's I`, title = "Hospital PM2.5 Moran's I", group = "MSOA Hospitals (PM2.5)") %>%
+    addLegend(pal = PalHospitalsMSOAPM2.5, values = SFClusterMSOA$`Hospital (PM2.5) Moran's I`, title = "Hospital PM2.5 Moran's I", group = "MSOA Hospitals (PM2.5)") %>%
+    addLegend(pal = PalIMDMSOANO2, values = SFMSOA$`IMD NO2 Coef.`, title = "NO2 IMD Coef.", group = "NO2 IMD Coef.") %>%
+    addLegend(pal = PalIncomeMSOANO2, values = SFMSOA$`Income NO2 Coef.`, title = "NO2 Income Coef.", group = "NO2 Income Coef.") %>%
+    addLegend(pal = PalEmploymentMSOANO2, values = SFMSOA$`Employment NO2 Coef.`, title = "NO2 Employment Coef.", group = "NO2 Employment Coef.") %>%
+    addLegend(pal = PalEducationMSOANO2, values = SFMSOA$`Education NO2 Coef.`, title = "NO2 Education Coef.", group = "NO2 Education Coef.") %>%
+    addLegend(pal = PalHealthMSOANO2, values = SFMSOA$`Health NO2 Coef.`, title = "NO2 Health Coef.", group = "NO2 Health Coef.") %>%
+    addLegend(pal = PalCrimeMSOANO2, values = SFMSOA$`Crime NO2 Coef.`, title = "NO2 Crime Coef.", group = "NO2 Crime Coef.") %>%
+    addLegend(pal = PalHousingMSOANO2, values = SFMSOA$`Housing NO2 Coef.`, title = "NO2 Housing Coef.", group = "NO2 Housing Coef.") %>%
+    addLegend(pal = PalEnvironmentMSOANO2, values = SFMSOA$`Environment NO2 Coef.`, title = "NO2 Environment Coef.", group = "NO2 Environment Coef.") %>%
+    addLegend(pal = PalIMDMSOAPM2.5, values = SFMSOA$`IMD PM2.5 Coef.`, title = "PM2.5 IMD Coef.", group = "PM2.5 IMD Coef.") %>%
+    addLegend(pal = PalIncomeMSOAPM2.5, values = SFMSOA$`Income PM2.5 Coef.`, title = "PM2.5 Income Coef.", group = "PM2.5 Income Coef.") %>%
+    addLegend(pal = PalEmploymentMSOAPM2.5, values = SFMSOA$`Employment PM2.5 Coef.`, title = "PM2.5 Employment Coef.", group = "PM2.5 Employment Coef.") %>%
+    addLegend(pal = PalEducationMSOAPM2.5, values = SFMSOA$`Education PM2.5 Coef.`, title = "PM2.5 Education Coef.", group = "PM2.5 Education Coef.") %>%
+    addLegend(pal = PalHealthMSOAPM2.5, values = SFMSOA$`Health PM2.5 Coef.`, title = "PM2.5 Health Coef.", group = "PM2.5 Health Coef.") %>%
+    addLegend(pal = PalCrimeMSOAPM2.5, values = SFMSOA$`Crime PM2.5 Coef.`, title = "PM2.5 Crime Coef.", group = "PM2.5 Crime Coef.") %>%
+    addLegend(pal = PalHousingMSOAPM2.5, values = SFMSOA$`Housing PM2.5 Coef.`, title = "PM2.5 Housing Coef.", group = "PM2.5 Housing Coef.") %>%
+    addLegend(pal = PalEnvironmentMSOAPM2.5, values = SFMSOA$`Environment PM2.5 Coef.`, title = "PM2.5 Environment Coef.", group = "PM2.5 Environment Coef.") %>%
+
+
   
-  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)")) %>% 
+  
+  
+# Groups, Buttons, etc.
+  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "LSOA", "Schools (NO2)", "GP (NO2)", "Hospital (NO2)", "Schools (PM2.5)", "GP (PM2.5)", "Hospital (PM2.5)", "MSOA Schools (All)", "MSOA GPs (All)", "MSOA Hospitals (All)", "MSOA Schools (NO2)", "MSOA GPs (NO2)", "MSOA Hospitals (NO2)", "MSOA Schools (PM2.5)", "MSOA GPs (PM2.5)", "MSOA Hospitals (PM2.5)", "NO2 IMD Coef.", "NO2 Income Coef.", "NO2 Employment Coef.", "NO2 Education Coef.", "NO2 Health Coef.", "NO2 Crime Coef.", "NO2 Housing Coef.", "NO2 Environment Coef.", "PM2.5 IMD Coef.", "PM2.5 Income Coef.", "PM2.5 Employment Coef.", "PM2.5 Education Coef.", "PM2.5 Health Coef.", "PM2.5 Crime Coef.", "PM2.5 Housing Coef.", "PM2.5 Environment Coef.")) %>% 
   addEasyButton(easyButton(
     icon="fa-globe", title="Zoom to London",
     onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }"))) %>% 

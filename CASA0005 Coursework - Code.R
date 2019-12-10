@@ -4,7 +4,8 @@ datatypelist <- data.frame(cbind(lapply(Schools,class)))
 # Select rows that start with a certain string of values.
 BoroughMap <- EW[grep("^E09",EW@data$lad15cd),]
 
-
+# Colour bins for MSOA point density.
+bins = c(0, (getJenksBreaks(PopDataMSOA$`School (All) Density`, k=5)+0.001))
 
 
 
