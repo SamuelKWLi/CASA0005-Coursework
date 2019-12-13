@@ -210,7 +210,7 @@ SFHospitalsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "Hospital")
 ### MSOA Cluster Data for Points
 ```{r}
 # Convert SF objects into SP objects
-SPClusterMSOA <- as(SFMSOA, "Spatial")
+SPPointCluster <- as(SFMSOA, "Spatial")
 SPSchools <- as(SFSchools, "Spatial")
 SPGPs <- as(SFGPs, "Spatial")
 SPHospitals <- as(SFHospitals, "Spatial")
@@ -222,7 +222,7 @@ SPGPsPM2.5 <- as(SFGPsPM2.5, "Spatial")
 SPHospitalsPM2.5 <- as(SFHospitalsPM2.5, "Spatial")
 
 # Transform CRS to BNG (a projected CRS).
-SPClusterMSOA <- spTransform(SPClusterMSOA, BNG)
+SPPointCluster <- spTransform(SPPointCluster, BNG)
 SPSchools <- spTransform(SPSchools, BNG)
 SPGPs <- spTransform(SPGPs, BNG)
 SPHospitals <- spTransform(SPHospitals, BNG)
@@ -234,29 +234,29 @@ SPGPsPM2.5 <- spTransform(SPGPsPM2.5, BNG)
 SPHospitalsPM2.5 <- spTransform(SPHospitalsPM2.5, BNG)
 
 # Count the number of points in each MSOA.
-SPClusterMSOA@data$SchoolCount <- poly.counts(SPSchools, SPClusterMSOA)
-SPClusterMSOA@data$GPCount <- poly.counts(SPGPs, SPClusterMSOA)
-SPClusterMSOA@data$HospitalCount <- poly.counts(SPHospitals, SPClusterMSOA)
-SPClusterMSOA@data$SchoolNO2Count <- poly.counts(SPSchoolsNO2, SPClusterMSOA)
-SPClusterMSOA@data$GPNO2Count <- poly.counts(SPGPsNO2, SPClusterMSOA)
-SPClusterMSOA@data$HospitalNO2Count <- poly.counts(SPHospitalsNO2, SPClusterMSOA)
-SPClusterMSOA@data$SchoolPM2.5Count <- poly.counts(SPSchoolsPM2.5, SPClusterMSOA)
-SPClusterMSOA@data$GPPM2.5Count <- poly.counts(SPGPsPM2.5, SPClusterMSOA)
-SPClusterMSOA@data$HospitalPM2.5Count <- poly.counts(SPHospitalsPM2.5, SPClusterMSOA)
+SPPointCluster@data$SchoolCount <- poly.counts(SPSchools, SPPointCluster)
+SPPointCluster@data$GPCount <- poly.counts(SPGPs, SPPointCluster)
+SPPointCluster@data$HospitalCount <- poly.counts(SPHospitals, SPPointCluster)
+SPPointCluster@data$SchoolNO2Count <- poly.counts(SPSchoolsNO2, SPPointCluster)
+SPPointCluster@data$GPNO2Count <- poly.counts(SPGPsNO2, SPPointCluster)
+SPPointCluster@data$HospitalNO2Count <- poly.counts(SPHospitalsNO2, SPPointCluster)
+SPPointCluster@data$SchoolPM2.5Count <- poly.counts(SPSchoolsPM2.5, SPPointCluster)
+SPPointCluster@data$GPPM2.5Count <- poly.counts(SPGPsPM2.5, SPPointCluster)
+SPPointCluster@data$HospitalPM2.5Count <- poly.counts(SPHospitalsPM2.5, SPPointCluster)
 
 # Calculate point density.
-SPClusterMSOA@data$SchoolDensity <- round(SPClusterMSOA@data$SchoolCount/(poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$GPDensity <- round(SPClusterMSOA@data$GPCount/(poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$HospitalDensity <- round(SPClusterMSOA@data$HospitalCount/(poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$SchoolNO2Density <- round(SPClusterMSOA@data$SchoolNO2Count/(poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$GPNO2Density <- round(SPClusterMSOA@data$GPNO2Count/(poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$HospitalNO2Density <- round(SPClusterMSOA@data$HospitalNO2Count/ (poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$SchoolPM2.5Density <- round(SPClusterMSOA@data$SchoolPM2.5Count/ (poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$GPPM2.5Density <- round(SPClusterMSOA@data$GPPM2.5Count/ (poly.areas(SPClusterMSOA)/1000000), digits = 3)
-SPClusterMSOA@data$HospitalPM2.5Density <- round(SPClusterMSOA@data$HospitalPM2.5Count / (poly.areas(SPClusterMSOA)/1000000), digits = 3)
+SPPointCluster@data$SchoolDensity <- round(SPPointCluster@data$SchoolCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPDensity <- round(SPPointCluster@data$GPCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalDensity <- round(SPPointCluster@data$HospitalCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$SchoolNO2Density <- round(SPPointCluster@data$SchoolNO2Count/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPNO2Density <- round(SPPointCluster@data$GPNO2Count/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalNO2Density <- round(SPPointCluster@data$HospitalNO2Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$SchoolPM2.5Density <- round(SPPointCluster@data$SchoolPM2.5Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPPM2.5Density <- round(SPPointCluster@data$GPPM2.5Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalPM2.5Density <- round(SPPointCluster@data$HospitalPM2.5Count / (poly.areas(SPPointCluster)/1000000), digits = 3)
 
 # Determine centroids for MSOAs
-CentroidMSOA <- coordinates(SPClusterMSOA)
+CentroidMSOA <- coordinates(SPPointCluster)
 plot(CentroidMSOA)
 
 # Create neighbour list using queen's case neighbours.
@@ -267,46 +267,46 @@ plot(NNListMSOA, coordinates(CentroidMSOA), col="red")
 SpWeightsMSOA <- nb2listw(NNListMSOA, style="C")
 
 # Conduct global Moran's I.
-GlbMIAllSchool <- moran.test(SPClusterMSOA@data$SchoolDensity, SpWeightsMSOA)
-GlbMIAllGP <- moran.test(SPClusterMSOA@data$GPDensity, SpWeightsMSOA)
-GlbMIAllHospital <- moran.test(SPClusterMSOA@data$HospitalDensity, SpWeightsMSOA)
-GlbMINO2School <- moran.test(SPClusterMSOA@data$SchoolNO2Density, SpWeightsMSOA)
-GlbMINO2GP <- moran.test(SPClusterMSOA@data$GPNO2Density, SpWeightsMSOA)
-GlbMINO2Hospital <- moran.test(SPClusterMSOA@data$HospitalNO2Density, SpWeightsMSOA)
-GlbMIPM2.5School <- moran.test(SPClusterMSOA@data$SchoolPM2.5Density, SpWeightsMSOA)
-GlbMIPM2.5GP <- moran.test(SPClusterMSOA@data$GPPM2.5Density, SpWeightsMSOA)
-GlbMIPM2.5Hospital <- moran.test(SPClusterMSOA@data$HospitalPM2.5Density, SpWeightsMSOA)
+GlbMIAllSchool <- moran.test(SPPointCluster@data$SchoolDensity, SpWeightsMSOA)
+GlbMIAllGP <- moran.test(SPPointCluster@data$GPDensity, SpWeightsMSOA)
+GlbMIAllHospital <- moran.test(SPPointCluster@data$HospitalDensity, SpWeightsMSOA)
+GlbMINO2School <- moran.test(SPPointCluster@data$SchoolNO2Density, SpWeightsMSOA)
+GlbMINO2GP <- moran.test(SPPointCluster@data$GPNO2Density, SpWeightsMSOA)
+GlbMINO2Hospital <- moran.test(SPPointCluster@data$HospitalNO2Density, SpWeightsMSOA)
+GlbMIPM2.5School <- moran.test(SPPointCluster@data$SchoolPM2.5Density, SpWeightsMSOA)
+GlbMIPM2.5GP <- moran.test(SPPointCluster@data$GPPM2.5Density, SpWeightsMSOA)
+GlbMIPM2.5Hospital <- moran.test(SPPointCluster@data$HospitalPM2.5Density, SpWeightsMSOA)
 
 # Conduct local Moran's I.
-lclMIAllSchool <- round(localmoran(SPClusterMSOA@data$SchoolDensity, SpWeightsMSOA), digits = 3)
-lclMIAllGP <- round(localmoran(SPClusterMSOA@data$GPDensity, SpWeightsMSOA), digits = 3)
-lclMIAllHospital <- round(localmoran(SPClusterMSOA@data$HospitalDensity, SpWeightsMSOA), digits = 3)
-lclMINO2School <- round(localmoran(SPClusterMSOA@data$SchoolNO2Density, SpWeightsMSOA), digits = 3)
-lclMINO2GP <- round(localmoran(SPClusterMSOA@data$GPNO2Density, SpWeightsMSOA), digits = 3)
-lclMINO2Hospital <- round(localmoran(SPClusterMSOA@data$HospitalNO2Density, SpWeightsMSOA), digits = 3)
-lclMIPM2.5School <- round(localmoran(SPClusterMSOA@data$SchoolPM2.5Density, SpWeightsMSOA), digits = 3)
-lclMIPM2.5GP <- round(localmoran(SPClusterMSOA@data$GPPM2.5Density, SpWeightsMSOA), digits = 3)
-lclMIPM2.5Hospital <- round(localmoran(SPClusterMSOA@data$HospitalPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIAllSchool <- round(localmoran(SPPointCluster@data$SchoolDensity, SpWeightsMSOA), digits = 3)
+lclMIAllGP <- round(localmoran(SPPointCluster@data$GPDensity, SpWeightsMSOA), digits = 3)
+lclMIAllHospital <- round(localmoran(SPPointCluster@data$HospitalDensity, SpWeightsMSOA), digits = 3)
+lclMINO2School <- round(localmoran(SPPointCluster@data$SchoolNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2GP <- round(localmoran(SPPointCluster@data$GPNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2Hospital <- round(localmoran(SPPointCluster@data$HospitalNO2Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5School <- round(localmoran(SPPointCluster@data$SchoolPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5GP <- round(localmoran(SPPointCluster@data$GPPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5Hospital <- round(localmoran(SPPointCluster@data$HospitalPM2.5Density, SpWeightsMSOA), digits = 3)
 
 # Join local Moran's I Z values to shape file.
-SPClusterMSOA$lclMIAllSchool <- lclMIAllSchool[,4]
-SPClusterMSOA$lclMIAllGP <- lclMIAllGP[,4]
-SPClusterMSOA$lclMIAllHospital <- lclMIAllHospital[,4]
-SPClusterMSOA$lclMINO2School <- lclMINO2School[,4]
-SPClusterMSOA$lclMINO2GP <- lclMINO2GP[,4]
-SPClusterMSOA$lclMINO2Hospital <- lclMINO2Hospital[,4]
-SPClusterMSOA$lclMIPM2.5School <- lclMIPM2.5School[,4]
-SPClusterMSOA$lclMIPM2.5GP <- lclMIPM2.5GP[,4]
-SPClusterMSOA$lclMIPM2.5Hospital <- lclMIPM2.5Hospital[,4]
+SPPointCluster$lclMIAllSchool <- lclMIAllSchool[,4]
+SPPointCluster$lclMIAllGP <- lclMIAllGP[,4]
+SPPointCluster$lclMIAllHospital <- lclMIAllHospital[,4]
+SPPointCluster$lclMINO2School <- lclMINO2School[,4]
+SPPointCluster$lclMINO2GP <- lclMINO2GP[,4]
+SPPointCluster$lclMINO2Hospital <- lclMINO2Hospital[,4]
+SPPointCluster$lclMIPM2.5School <- lclMIPM2.5School[,4]
+SPPointCluster$lclMIPM2.5GP <- lclMIPM2.5GP[,4]
+SPPointCluster$lclMIPM2.5Hospital <- lclMIPM2.5Hospital[,4]
 
 # Convert SP MSOA data into a data frame.
-SFClusterMSOA <- st_as_sf(SPClusterMSOA)
+SFPointCluster <- st_as_sf(SPPointCluster)
 
 # Transform CRS to WGS
-SFClusterMSOA <- st_transform(SFClusterMSOA, WGS84)
+SFPointCluster <- st_transform(SFPointCluster, WGS84)
 
 # Rename columns.
-colnames(SFClusterMSOA) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "School (All) Moran's I", "GP (All) Moran's I", "Hospital (All) Moran's I", "School (NO2) Moran's I", "GP (NO2) Moran's I", "Hospital (NO2) Moran's I", "School (PM2.5) Moran's I", "GP (PM2.5) Moran's I", "Hospital (PM2.5) Moran's I", "geometry")
+colnames(SFPointCluster) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "School (All) Moran's I", "GP (All) Moran's I", "Hospital (All) Moran's I", "School (NO2) Moran's I", "GP (NO2) Moran's I", "Hospital (NO2) Moran's I", "School (PM2.5) Moran's I", "GP (PM2.5) Moran's I", "Hospital (PM2.5) Moran's I", "geometry")
 
 # Moran's I breaks.
 BrksMi <-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
@@ -315,74 +315,24 @@ BrksMi <-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
 PalMi<- rev(brewer.pal(7, "RdBu"))
 
 # Map Moran's I.
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "School (All) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "GP (All) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "Hospital (All) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "School (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "GP (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "Hospital (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "School (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "GP (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFClusterMSOA) +
-  tm_polygons(col = "Hospital (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-```
-
-### Index of Multiple Deprivation 
-```{r}
-# Read in indices of deprivation data.
-IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
-                       locale = locale(encoding = "latin1"),
-                       na = "n/a")
-# Merge ID data to location data.
-IDData<-merge(IDData, 
-             SFLSOA, 
-             by.x="LSOA code (2011)", 
-             by.y="LSOA Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-
-# Extract relevent columns.
-IDData <- IDData[,c(1, 31, 33, 5, 8, 11, 14, 17, 20, 23, 26)]
-
-# Rename columns.
-colnames(IDData) <- c("LSOA Code", "MSOA Code", "LAD Code", "IMD Score", "Income Score", "Employment Score", "Education Score", "Health Score", "Crime Score", "Housing Score", "Environment Score")
-
-# Aggregate IDM scores to MSOA and LADs.
-IDLSOA <- IDData[,c(1, 4:11)]
-IDMSOA <- aggregate(IDData[,c(4:11)], by = list(IDData$`MSOA Code`), FUN = mean)
-IDLAD <- aggregate(IDData[,c(4:11)], by = list(IDData$`LAD Code`), FUN = mean)
-IDMSOA[,c(2:9)] <- round(IDMSOA[,c(2:9)], digits = 3)
-IDLAD[,c(2:9)] <- round(IDLAD[,c(2:9)], digits = 3)
-colnames(IDMSOA) <- c("MSOA Code", "IMD Score", "Income Score", "Employment Score", "Education Score", "Health Score", "Crime Score", "Housing Score", "Environment Score")
-colnames(IDLAD) <- c("LAD Code", "IMD Score", "Income Score", "Employment Score", "Education Score", "Health Score", "Crime Score", "Housing Score", "Environment Score")
-
-# Merge ID data to boundaries.
-SFLAD<-merge(SFLAD, 
-             IDLAD, 
-             by.x="LAD Code", 
-             by.y="LAD Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-SFMSOA<-merge(SFMSOA, 
-             IDMSOA, 
-             by.x="MSOA Code", 
-             by.y="MSOA Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-SFLSOA<-merge(SFLSOA, 
-             IDLSOA, 
-             by.x="LSOA Code", 
-             by.y="LSOA Code",
-             no.dups = TRUE,
-             all.x = TRUE)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "School (All) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "GP (All) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "Hospital (All) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "School (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "GP (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "Hospital (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "School (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "GP (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
+#tm_shape(SFPointCluster) +
+#  tm_polygons(col = "Hospital (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
 ```
 
 ### NO2 and PM2.5. Mean Concentration
@@ -429,11 +379,184 @@ SFLSOA<-merge(SFLSOA,
              all.x = TRUE)
 ```
 
+### MSOA Cluster Data for Areas
+```{r}
+# Convert SF objects into SP objects
+SPAreaCluster <- as(SFMSOA, "Spatial")
+
+# Conduct global Moran's I.
+GlbMINO2 <- moran.test(SPAreaCluster@data$Mean.NO2.Conc., SpWeightsMSOA)
+GlbMIPM2.5 <- moran.test(SPAreaCluster@data$Mean.PM2.5.Conc., SpWeightsMSOA)
+
+# Conduct local Moran's I.
+lclMINO2 <- round(localmoran(SPAreaCluster@data$Mean.NO2.Conc. , SpWeightsMSOA), digits = 3)
+lclMIPM2.5 <- round(localmoran(SPAreaCluster@data$Mean.PM2.5.Conc. , SpWeightsMSOA), digits = 3)
+
+# Join local Moran's I Z values to shape file.
+SPAreaCluster$lclMINO2 <- lclMINO2[,4]
+SPAreaCluster$lclMIPM2.5 <- lclMIPM2.5[,4]
+
+# Convert SP MSOA data into a data frame.
+SFAreaCluster <- st_as_sf(SPAreaCluster)
+
+# Rename columns.
+colnames(SFAreaCluster) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Moran's I", "PM2.5 Moran's I", "geometry")
+
+# Map Moran's I.
+tm_shape(SFAreaCluster) +
+  tm_polygons(col = "NO2 Moran's I", palette = PalMi, breaks = BrksMi)
+tm_shape(SFAreaCluster) +
+  tm_polygons(col = "PM2.5 Moran's I", palette = PalMi, breaks = BrksMi)
+```
+
+
+### Index of Multiple Deprivation 
+```{r}
+# Read in indices of deprivation data.
+IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+# Merge ID data to location data.
+IDData<-merge(IDData, 
+             SFLSOA, 
+             by.x="LSOA code (2011)", 
+             by.y="LSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+
+# Extract relevent columns.
+IDData <- IDData[,c(1, 31, 33, 5)]
+
+# Rename columns.
+colnames(IDData) <- c("LSOA Code", "MSOA Code", "LAD Code", "IMD Score")
+
+# Aggregate IDM scores to MSOA and LADs.
+IDLSOA <- IDData[,c(1, 4)]
+IDMSOA <- aggregate(IDData[, 4], by = list(IDData$`MSOA Code`), FUN = mean)
+IDLAD <- aggregate(IDData[, 4], by = list(IDData$`LAD Code`), FUN = mean)
+IDMSOA[, 2] <- round(IDMSOA[, 2], digits = 3)
+IDLAD[, 2] <- round(IDLAD[, 2], digits = 3)
+colnames(IDMSOA) <- c("MSOA Code", "IMD Score")
+colnames(IDLAD) <- c("LAD Code", "IMD Score")
+
+# Merge ID data to boundaries.
+SFLAD<-merge(SFLAD, 
+             IDLAD, 
+             by.x="LAD Code", 
+             by.y="LAD Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFMSOA<-merge(SFMSOA, 
+             IDMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFLSOA<-merge(SFLSOA, 
+             IDLSOA, 
+             by.x="LSOA Code", 
+             by.y="LSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+### Road Density
+```{r}
+# Load road shapefile.
+Roads <- st_read("Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp")
+
+# Tranform into an SF object.
+SFRoads <- st_as_sf(Roads)
+
+# Transform into BNG.
+SFRoads <- st_transform(SFRoads, BNG)
+
+# Select relevent columns.
+SFRoads <- SFRoads[,c(6, 9, 25)]
+
+# Rename columns.
+colnames(SFRoads) <- c("Road Type", "Road Nature", "geometry")
+
+# Copy and tranform MSOA SF into BNG
+RoadsMSOA <- st_transform(SFMSOA, BNG)
+
+# Run intersection.
+RoadsMSOA <- st_intersection(SFRoads, RoadsMSOA)
+
+# Determine road lengths.
+RoadsMSOA$`Road Length (km)` <- st_length(RoadsMSOA)/1000
+
+# Aggregate road lengths.
+RoadsMSOA <- aggregate(RoadsMSOA$`Road Length (km)`, by = list(RoadsMSOA$MSOA.Code), FUN = sum)
+
+# Rename columns.
+colnames(RoadsMSOA) <- c("MSOA Code", "Road Length (km)")
+
+# Determine road density.
+RoadsMSOA$`Road Density (km/km2)` <- round(as.numeric(RoadsMSOA$`Road Length (km)` / (st_area(SFMSOA) /1000000)), digits = 2)
+
+# Round lengths.
+RoadsMSOA[, 2] <- round(as.numeric(RoadsMSOA[, 2]), digits = 2)
+
+# Merge road length with MSOA.
+SFMSOA<-merge(SFMSOA, 
+             RoadsMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+### Distance from Central London (Charing Cross)
+```{r}
+# Create Postcode vector with Charing Cross postcode.
+Postcode <- "WC2N5DU"
+
+# Convert object to dataframe.
+CharingCross <- data.frame(Postcode)
+
+# Join code points.
+CharingCross<-merge(CharingCross, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
+
+# Convert Charing Cross to SF.
+CharingCross <- st_as_sf(CharingCross, coords = c("Eastings", "Northings"), crs = BNG)
+
+# Get SF MSOA Codes.
+SFCentroidMSOA <- data.frame(SFMSOA$`MSOA Code`)
+
+# Set MSOA centroids.
+SFCentroidMSOA[,2:3] <- coordinates(SPPointCluster)
+
+# Change column names.
+colnames(SFCentroidMSOA) <- c("MSOA Code", "Eastings", "Northings")
+
+# Convert to SF.
+SFCentroidMSOA <- st_as_sf(SFCentroidMSOA, coords = c("Eastings", "Northings"), crs = BNG)
+
+# Determine distance of MSOA centroids to Charing Cross.
+SFCentroidMSOA$`Dist. from C. London (km)` <- round(as.numeric(st_distance(SFCentroidMSOA$geometry, CharingCross)/1000), digits = 2)
+
+# Remove geometry.
+st_geometry(SFCentroidMSOA) <- NULL
+
+# Join to SFMSOA.
+SFMSOA<-merge(SFMSOA, 
+             SFCentroidMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
 ### Linear Regression Model
 ```{r}
 # Conduct linear regression.
-LRNO2 <- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA)
-LRPM2.5 <- lm(`Mean PM2.5 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA)
+LRNO2 <- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
+LRPM2.5 <- lm(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
 
 # Summarise data.
 summary(LRNO2)
@@ -457,27 +580,17 @@ ggplot(SFMSOA, aes(x=`Mean PM2.5 Conc.`)) +
 ggplot(SFMSOA, aes(x=`IMD Score`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Income Score`)) + 
-  geom_histogram(aes(y = ..density..),binwidth = 0.01) + 
-  geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Employment Score`)) + 
-  geom_histogram(aes(y = ..density..),binwidth = 0.01) + 
-  geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Health Score`)) + 
-  geom_histogram(aes(y = ..density..),binwidth = 0.1) + 
-  geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Crime Score`)) + 
-  geom_histogram(aes(y = ..density..),binwidth = 0.1) + 
-  geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Housing Score`)) + 
+ggplot(SFMSOA, aes(x=`Road Density (km/km2)`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour="red", size=1, adjust=1)
-ggplot(SFMSOA, aes(x=`Environment Score`)) + 
+ggplot(SFMSOA, aes(x=`Dist. from C. London (km)`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour="red", size=1, adjust=1)
 
 # Plot Scatter plot
 qplot(x = `Mean NO2 Conc.`, y = `IMD Score`, data = SFMSOA)
+qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)
+qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)
 ```
 
 ### Linear Regression - Assumption 2
@@ -493,7 +606,7 @@ qplot(LRPM2.5$residuals) + geom_histogram()
 CorMSOA <- st_set_geometry(SFMSOA,NULL)
 
 # Extract dependent varaiables
-CorMSOA <- CorMSOA[,c(5:12)]
+CorMSOA <- CorMSOA[,c("IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)")]
 
 # Calculate correlation matrix.
 CorMSOA <- cor(CorMSOA, use="complete.obs", method="pearson")
@@ -522,11 +635,9 @@ SFMSOA$`LRPM2.5 Residuals` <- LRPM2.5$residuals
 
 # Map model residuals.
 tm_shape(SFMSOA) +
-  tm_polygons("LRNO2 Residuals",
-              palette = "RdYlBu")
+  tm_polygons("LRNO2 Residuals", palette = "RdYlBu")
 tm_shape(SFMSOA) +
-  tm_polygons("LRPM2.5 Residuals",
-              palette = "RdYlBu")
+  tm_polygons("LRPM2.5 Residuals", palette = "RdYlBu")
 
 # Convert SF objects to SP objects.
 SPMSOA <- as(SFMSOA, "Spatial")
@@ -540,12 +651,12 @@ moran.test(SPMSOA@data$LRPM2.5.Residuals, SpWeightsMSOA)
 ### GWR
 ```{r}
 # Calculate kernel bandwidths.
-GWRbandwidthNO2 <- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
-GWRbandwidthPM2.5 <- gwr.sel(`Mean PM2.5 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
+GWRbandwidthNO2 <- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
+GWRbandwidthPM2.5 <- gwr.sel(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
 
 # Run the GWR model.
-GWRNO2 = gwr(`Mean NO2 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
-GWRPM2.5 = gwr(`Mean PM2.5 Conc.` ~ `IMD Score` + `Income Score` + `Employment Score` + `Education Score` + `Health Score` + `Crime Score` + `Housing Score` + `Environment Score`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+GWRNO2 = gwr(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+GWRPM2.5 = gwr(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
 
 # Save the results.
 GWRNO2Results <- as.data.frame(GWRNO2$SDF)
@@ -553,56 +664,24 @@ GWRPM2.5Results <- as.data.frame(GWRPM2.5$SDF)
 
 # Merge coefficients with shapefiles.
 SFMSOA$`IMD NO2 Coef.`<- round(GWRNO2Results$X.IMD.Score., digits = 3)
-SFMSOA$`Income NO2 Coef.`<- round(GWRNO2Results$X.Income.Score., digits = 3)
-SFMSOA$`Employment NO2 Coef.`<- round(GWRNO2Results$X.Employment.Score., digits = 3)
-SFMSOA$`Education NO2 Coef.`<- round(GWRNO2Results$X.Education.Score., digits = 3)
-SFMSOA$`Health NO2 Coef.`<- round(GWRNO2Results$X.Health.Score., digits = 3)
-SFMSOA$`Crime NO2 Coef.`<- round(GWRNO2Results$X.Crime.Score., digits = 3)
-SFMSOA$`Housing NO2 Coef.`<- round(GWRNO2Results$X.Housing.Score., digits = 3)
-SFMSOA$`Environment NO2 Coef.`<- round(GWRNO2Results$X.Environment.Score., digits = 3)
+SFMSOA$`Road Density NO2 Coef.`<- round(GWRNO2Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London NO2 Coef.`<- round(GWRNO2Results$X.Dist..from.C..London..km.., digits = 3)
 
 SFMSOA$`IMD PM2.5 Coef.`<- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
-SFMSOA$`Income PM2.5 Coef.`<- round(GWRPM2.5Results$X.Income.Score., digits = 3)
-SFMSOA$`Employment PM2.5 Coef.`<- round(GWRPM2.5Results$X.Employment.Score., digits = 3)
-SFMSOA$`Education PM2.5 Coef.`<- round(GWRPM2.5Results$X.Education.Score., digits = 3)
-SFMSOA$`Health PM2.5 Coef.`<- round(GWRPM2.5Results$X.Health.Score., digits = 3)
-SFMSOA$`Crime PM2.5 Coef.`<- round(GWRPM2.5Results$X.Crime.Score., digits = 3)
-SFMSOA$`Housing PM2.5 Coef.`<- round(GWRPM2.5Results$X.Housing.Score., digits = 3)
-SFMSOA$`Environment PM2.5 Coef.`<- round(GWRPM2.5Results$X.Environment.Score., digits = 3)
+SFMSOA$`Road Density PM2.5 Coef.`<- round(GWRPM2.5Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London PM2.5 Coef.`<- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
 
 # Map coefficients.
 tm_shape(SFMSOA) +
   tm_polygons(col = "IMD NO2 Coef.", palette = "RdBu", alpha = 1.0)
 tm_shape(SFMSOA) +
-  tm_polygons(col = "Income NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Employment NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Education NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Health NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Crime NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Housing NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Environment NO2 Coef.", palette = "RdBu", alpha = 1.0)
-
-tm_shape(SFMSOA) +
   tm_polygons(col = "IMD PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
 tm_shape(SFMSOA) +
-  tm_polygons(col = "Income PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
+  tm_polygons(col = "Road Density NO2 Coef.", palette = "RdBu", alpha = 1.0)
 tm_shape(SFMSOA) +
-  tm_polygons(col = "Employment PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
+  tm_polygons(col = "Road Density PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
 tm_shape(SFMSOA) +
-  tm_polygons(col = "Education PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
+  tm_polygons(col = "Dist. from C. London NO2 Coef.", palette = "RdBu", alpha = 1.0)
 tm_shape(SFMSOA) +
-  tm_polygons(col = "Health PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Crime PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Housing PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Environment PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
+  tm_polygons(col = "Dist. from C. London PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
 ```
-
