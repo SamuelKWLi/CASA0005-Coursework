@@ -24,7 +24,7 @@ library(car)
 library(spgwr)
 
 # Set tmap to view mode
-tmap_mode("view")
+tmap_mode("plot")
 ```
 
 ### Read in Concentration Rasters
@@ -102,6 +102,194 @@ colnames(SFLAD) <- c("LAD Name", "LAD Code", "geometry")
 colnames(SFMSOA) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "geometry")
 colnames(SFLSOA) <- c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code","LAD Name", "LAD Code", "geometry")
 
+```
+
+### NO2 and PM2.5. Mean Concentration
+```{r}
+# Read in Concentration data.
+ConcLAD <- read_csv("Data/Air Pollution/ConcLAD.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+ConcMSOA <- read_csv("Data/Air Pollution/ConcMSOA.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+ConcLSOA <- read_csv("Data/Air Pollution/ConcLSOA.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+
+# Extract relevent columns.
+ConcLAD <- ConcLAD[,c(2:4)]
+ConcMSOA <- ConcMSOA[,c(2, 5, 6)]
+ConcLSOA <- ConcLSOA[,c(2, 7, 8)]
+
+# Round concentration
+ConcLAD[, c(2, 3)] <- round(ConcLAD[, c(2, 3)], digits = 3)
+ConcMSOA[, c(2, 3)] <- round(ConcMSOA[, c(2, 3)], digits = 3)
+ConcLSOA[, c(2, 3)] <- round(ConcLSOA[, c(2, 3)], digits = 3)
+
+# Merge ID data to boundaries.
+SFLAD<-merge(SFLAD, 
+             ConcLAD, 
+             by.x="LAD Code", 
+             by.y="LAD Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFMSOA<-merge(SFMSOA, 
+             ConcMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFLSOA<-merge(SFLSOA, 
+             ConcLSOA, 
+             by.x="LSOA Code", 
+             by.y="LSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+### MSOA Cluster Data for Areas
+```{r}
+# Convert SF objects into SP objects
+SPAreaCluster <- as(SFMSOA, "Spatial")
+
+# Determine centroids for MSOAs
+CentroidMSOA <- coordinates(SPAreaCluster)
+plot(CentroidMSOA)
+
+# Create neighbour list using queen's case neighbours.
+NNListMSOA <- poly2nb(SFMSOA, queen=T)
+plot(NNListMSOA, coordinates(CentroidMSOA), col="red")
+
+# Create spatial weights object.
+SpWeightsMSOA <- nb2listw(NNListMSOA, style="C")
+
+# Conduct global Moran's I.
+GlbGGNO2 <- globalG.test(SPAreaCluster@data$Mean.NO2.Conc., SpWeightsMSOA)
+GlbGGPM2.5 <- globalG.test(SPAreaCluster@data$Mean.PM2.5.Conc., SpWeightsMSOA)
+
+# Conduct local Moran's I.
+lclGGNO2 <- round(localG(SPAreaCluster@data$Mean.NO2.Conc. , SpWeightsMSOA), digits = 3)
+lclGGPM2.5 <- round(localG(SPAreaCluster@data$Mean.PM2.5.Conc. , SpWeightsMSOA), digits = 3)
+
+# Join local Moran's I Z values to shape file.
+SPAreaCluster$lclGGNO2 <- lclGGNO2
+SPAreaCluster$lclGGPM2.5 <- lclGGPM2.5
+
+# Convert SP MSOA data into a data frame.
+SFAreaCluster <- st_as_sf(SPAreaCluster)
+
+# Rename columns.
+colnames(SFAreaCluster) <- c("MSOA Code","MSOA Name", "LAD Name","LAD Code", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Getis Ord G", "PM2.5 Getis Ord G", "geometry")
+
+# Subset Data
+SFAreaCluster_NO2 <- SFAreaCluster[, c(2, 5, 7, 9)]
+SFAreaCluster_PM2.5 <- SFAreaCluster[, c(2, 6, 8, 9)]
+
+# Rename columns.
+colnames(SFAreaCluster_NO2) <- c("MSOA Name", "Mean Conc. (µg/m3)", "Getis Ord G", "geometry")
+colnames(SFAreaCluster_PM2.5) <- c("MSOA Name", "Mean Conc. (µg/m3)", "Getis Ord G", "geometry")
+
+# Moran's I breaks.
+BrksMi <-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+# Moran's I palette.
+PalMi<- rev(brewer.pal(7, "RdBu"))
+
+# Map Conc.
+Mean_NO2_Conc <- tm_shape(SFAreaCluster_NO2) +
+  tm_polygons(col = "Mean Conc. (µg/m3)", 
+              palette = "seq", 
+              breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80),
+              midpoint = 40,
+              legend.hist=TRUE)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            main.title = "Mean NO2 Concentration for London MSOAs",
+            main.title.size = 1.2,
+            legend.outside = TRUE,
+            legend.outside.position = "right")+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))
+Mean_NO2_Conc
+
+Mean_PM2.5_Conc <- tm_shape(SFAreaCluster_PM2.5) +
+  tm_polygons(col = "Mean Conc. (µg/m3)", 
+              palette = "seq", 
+              breaks = c(0, 2.5, 5.0, 7.5, 10, 12.5, 15.0, 17.5, 20),
+              midpoint = 10,
+              legend.hist=TRUE)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            main.title = "Mean PM2.5 Concentration for London MSOAs",
+            main.title.size = 1.2,
+            legend.outside = TRUE,
+            legend.outside.position = "right")+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))
+Mean_PM2.5_Conc
+
+# Save Maps of Conc.
+tmap_save(Mean_NO2_Conc, 'Mean_NO2_Conc.png', units = "in", height = 5.59, width = 6.59)
+tmap_save(Mean_PM2.5_Conc, 'Mean_PM2.5_Conc.png', units = "in", height = 5.59, width = 6.59)
+
+# Map Getis G.
+Mean_NO2_GetisG <- tm_shape(SFAreaCluster_NO2) +
+  tm_polygons(col = "Getis Ord G", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+Mean_NO2_GetisG
+
+Mean_PM2.5_GetisG <- tm_shape(SFAreaCluster_PM2.5) +
+  tm_polygons(col = "Getis Ord G", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+Mean_PM2.5_GetisG
+
+Mean_GetisG_Legend <- tm_shape(SFAreaCluster_PM2.5) +
+  tm_polygons(col = "Getis Ord G", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_layout(legend.only = TRUE, legend.position=c(0,0.5),asp=0.1)
+Mean_GetisG_Legend
+
+Mean_GetisG <- tmap_arrange(Mean_NO2_GetisG, Mean_GetisG_Legend, Mean_PM2.5_GetisG, ncol=2, nrow = 2)
+Mean_GetisG
+
+# Save Maps of Moran's I.
+tmap_save(Mean_GetisG, 'Mean_GetisG.png', units = "in", height = 5.59, width = 6.59)
 ```
 
 ### Read in School, GP and Hospital Data
@@ -255,17 +443,6 @@ SPPointCluster@data$SchoolPM2.5Density <- round(SPPointCluster@data$SchoolPM2.5C
 SPPointCluster@data$GPPM2.5Density <- round(SPPointCluster@data$GPPM2.5Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
 SPPointCluster@data$HospitalPM2.5Density <- round(SPPointCluster@data$HospitalPM2.5Count / (poly.areas(SPPointCluster)/1000000), digits = 3)
 
-# Determine centroids for MSOAs
-CentroidMSOA <- coordinates(SPPointCluster)
-plot(CentroidMSOA)
-
-# Create neighbour list using queen's case neighbours.
-NNListMSOA <- poly2nb(SFMSOA, queen=T)
-plot(NNListMSOA, coordinates(CentroidMSOA), col="red")
-
-# Create spatial weights object.
-SpWeightsMSOA <- nb2listw(NNListMSOA, style="C")
-
 # Conduct global Moran's I.
 GlbMIAllSchool <- moran.test(SPPointCluster@data$SchoolDensity, SpWeightsMSOA)
 GlbMIAllGP <- moran.test(SPPointCluster@data$GPDensity, SpWeightsMSOA)
@@ -305,110 +482,159 @@ SFPointCluster <- st_as_sf(SPPointCluster)
 # Transform CRS to WGS
 SFPointCluster <- st_transform(SFPointCluster, WGS84)
 
-# Rename columns.
-colnames(SFPointCluster) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "School (All) Moran's I", "GP (All) Moran's I", "Hospital (All) Moran's I", "School (NO2) Moran's I", "GP (NO2) Moran's I", "Hospital (NO2) Moran's I", "School (PM2.5) Moran's I", "GP (PM2.5) Moran's I", "Hospital (PM2.5) Moran's I", "geometry")
+# Rename columns
+colnames(SFPointCluster) <- c("MSOA Code", "MSOA Name", "LAD Name", "LAD Code", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "School (All) Count", "GP (All) Count", "Hospital (All) Count", "School (NO2) Count", "GP (NO2) Count", "Hospital (NO2) Count", "School (PM2.5) Count", "GP (PM2.5) Count", "Hospital (PM2.5) Count", "School (All) Density", "GP (All) Density", "Hospital (All) Density", "School (NO2) Density", "GP (NO2) Density", "Hospital (NO2) Density", "School (PM2.5) Density", "GP (PM2.5) Density", "Hospital (PM2.5) Density", "School (All) Moran's I", "GP (All) Moran's I", "Hospital (All) Moran's I", "School (NO2) Moran's I", "GP (NO2) Moran's I", "Hospital (NO2) Moran's I", "School (PM2.5) Moran's I", "GP (PM2.5) Moran's I", "Hospital (PM2.5) Moran's I", "geometry")
 
-# Moran's I breaks.
-BrksMi <-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
-
-# Moran's I palette.
-PalMi<- rev(brewer.pal(7, "RdBu"))
-
-# Map Moran's I.
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "School (All) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "GP (All) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "Hospital (All) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "School (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "GP (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "Hospital (NO2) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "School (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "GP (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-#tm_shape(SFPointCluster) +
-#  tm_polygons(col = "Hospital (PM2.5) Moran's I", palette = PalMi, breaks = BrksMi)
-```
-
-### NO2 and PM2.5. Mean Concentration
-```{r}
-# Read in Concentration data.
-ConcLAD <- read_csv("Data/Air Pollution/ConcLAD.csv",
-                       locale = locale(encoding = "latin1"),
-                       na = "n/a")
-ConcMSOA <- read_csv("Data/Air Pollution/ConcMSOA.csv",
-                       locale = locale(encoding = "latin1"),
-                       na = "n/a")
-ConcLSOA <- read_csv("Data/Air Pollution/ConcLSOA.csv",
-                       locale = locale(encoding = "latin1"),
-                       na = "n/a")
-
-# Extract relevent columns.
-ConcLAD <- ConcLAD[,c(2:4)]
-ConcMSOA <- ConcMSOA[,c(2, 5, 6)]
-ConcLSOA <- ConcLSOA[,c(2, 7, 8)]
-
-# Round concentration
-ConcLAD[, c(2, 3)] <- round(ConcLAD[, c(2, 3)], digits = 3)
-ConcMSOA[, c(2, 3)] <- round(ConcMSOA[, c(2, 3)], digits = 3)
-ConcLSOA[, c(2, 3)] <- round(ConcLSOA[, c(2, 3)], digits = 3)
-
-# Merge ID data to boundaries.
-SFLAD<-merge(SFLAD, 
-             ConcLAD, 
-             by.x="LAD Code", 
-             by.y="LAD Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-SFMSOA<-merge(SFMSOA, 
-             ConcMSOA, 
-             by.x="MSOA Code", 
-             by.y="MSOA Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-SFLSOA<-merge(SFLSOA, 
-             ConcLSOA, 
-             by.x="LSOA Code", 
-             by.y="LSOA Code",
-             no.dups = TRUE,
-             all.x = TRUE)
-```
-
-### MSOA Cluster Data for Areas
-```{r}
-# Convert SF objects into SP objects
-SPAreaCluster <- as(SFMSOA, "Spatial")
-
-# Conduct global Moran's I.
-GlbMINO2 <- moran.test(SPAreaCluster@data$Mean.NO2.Conc., SpWeightsMSOA)
-GlbMIPM2.5 <- moran.test(SPAreaCluster@data$Mean.PM2.5.Conc., SpWeightsMSOA)
-
-# Conduct local Moran's I.
-lclMINO2 <- round(localmoran(SPAreaCluster@data$Mean.NO2.Conc. , SpWeightsMSOA), digits = 3)
-lclMIPM2.5 <- round(localmoran(SPAreaCluster@data$Mean.PM2.5.Conc. , SpWeightsMSOA), digits = 3)
-
-# Join local Moran's I Z values to shape file.
-SPAreaCluster$lclMINO2 <- lclMINO2[,4]
-SPAreaCluster$lclMIPM2.5 <- lclMIPM2.5[,4]
-
-# Convert SP MSOA data into a data frame.
-SFAreaCluster <- st_as_sf(SPAreaCluster)
+# Subset Data
+SFPointCluster_SchoolsAll <- SFPointCluster[, c(25, 34)]
+SFPointCluster_GPsAll <- SFPointCluster[, c(26, 34)]
+SFPointCluster_HospitalsAll <- SFPointCluster[, c(27, 34)]
+SFPointCluster_SchoolsNO2 <- SFPointCluster[, c(28, 34)]
+SFPointCluster_GPsNO2 <- SFPointCluster[, c(29, 34)]
+SFPointCluster_HospitalsNO2 <- SFPointCluster[, c(30, 34)]
+SFPointCluster_SchoolsPM2.5 <- SFPointCluster[, c(31, 34)]
+SFPointCluster_GPsPM2.5 <- SFPointCluster[, c(32, 34)]
+SFPointCluster_HospitalsPM2.5 <- SFPointCluster[, c(33, 34)]
 
 # Rename columns.
-colnames(SFAreaCluster) <- c("MSOA Name", "MSOA Code", "LAD Name", "LAD Code", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Moran's I", "PM2.5 Moran's I", "geometry")
+colnames(SFPointCluster_SchoolsAll) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_GPsAll) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_HospitalsAll) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_SchoolsNO2) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_GPsNO2) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_HospitalsNO2) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_SchoolsPM2.5) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_GPsPM2.5) <- c("Moran's I", "geometry")
+colnames(SFPointCluster_HospitalsPM2.5) <- c("Moran's I", "geometry")
 
 # Map Moran's I.
-tm_shape(SFAreaCluster) +
-  tm_polygons(col = "NO2 Moran's I", palette = PalMi, breaks = BrksMi)
-tm_shape(SFAreaCluster) +
-  tm_polygons(col = "PM2.5 Moran's I", palette = PalMi, breaks = BrksMi)
-```
+All_Schools_MoransI <- tm_shape(SFPointCluster_SchoolsAll) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
 
+All_GPs_MoransI <- tm_shape(SFPointCluster_GPsAll) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+
+All_Hospitals_MoransI <- tm_shape(SFPointCluster_HospitalsAll) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+
+All_MoransI_Legend <- tm_shape(SFPointCluster_HospitalsAll) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_layout(legend.only = TRUE, legend.position=c(0,0.4),asp=0.1)
+All_MoransI_Legend
+
+All_MoransI <- tmap_arrange(All_Schools_MoransI, All_GPs_MoransI, All_Hospitals_MoransI, All_MoransI_Legend, ncol=2, nrow = 2)
+All_MoransI
+
+NO2_Schools_MoransI <- tm_shape(SFPointCluster_SchoolsNO2) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+
+NO2_GPs_MoransI <- tm_shape(SFPointCluster_GPsNO2) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+
+NO2_Hospitals_MoransI <- tm_shape(SFPointCluster_HospitalsNO2) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = "-RdYlBu"),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0,
+             position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+
+NO2_MoransI_Legend <- tm_shape(SFPointCluster_SchoolsNO2) +
+  tm_polygons(col = "Moran's I", 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_layout(legend.only = TRUE, legend.position=c(0,0.4),asp=0.1)
+
+NO2_MoransI <- tmap_arrange(NO2_Schools_MoransI, NO2_GPs_MoransI, NO2_Hospitals_MoransI, NO2_MoransI_Legend, ncol=2, nrow = 2)
+NO2_MoransI
+
+# Save Maps of Moran's I.
+tmap_save(All_MoransI, 'All_MoransI.png', units = "in", height = 5.59, width = 6.59)
+tmap_save(NO2_MoransI, 'NO2_MoransI.png', units = "in", height = 5.59, width = 6.59)
+
+
+```
 
 ### Index of Multiple Deprivation 
 ```{r}
@@ -672,16 +898,106 @@ SFMSOA$`Road Density PM2.5 Coef.`<- round(GWRPM2.5Results$X.Road.Density..km.km2
 SFMSOA$`Dist. from C. London PM2.5 Coef.`<- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
 
 # Map coefficients.
-tm_shape(SFMSOA) +
-  tm_polygons(col = "IMD NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "IMD PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Road Density NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Road Density PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Dist. from C. London NO2 Coef.", palette = "RdBu", alpha = 1.0)
-tm_shape(SFMSOA) +
-  tm_polygons(col = "Dist. from C. London PM2.5 Coef.", palette = "RdBu", alpha = 1.0)
+NO2_IMD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "IMD NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+NO2_IMD_Coef
+NO2_RD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Road Density NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+NO2_RD_Coef
+NO2_DfCL_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Dist. from C. London NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+NO2_DfCL_Coef
+
+NO2_Coef <- tmap_arrange(NO2_IMD_Coef, NO2_RD_Coef, NO2_DfCL_Coef, ncol=1, nrow = 3)
+NO2_Coef
+
+PM2.5_IMD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "IMD PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+PM2.5_IMD_Coef
+PM2.5_RD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Road Density PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+PM2.5_RD_Coef
+PM2.5_DfCL_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Dist. from C. London PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+PM2.5_DfCL_Coef
+
+PM2.5_Coef <- tmap_arrange(PM2.5_IMD_Coef, PM2.5_RD_Coef, PM2.5_DfCL_Coef, ncol=1, nrow = 3)
+PM2.5_Coef
+
+# Save Maps of GWR Coef.
+tmap_save(NO2_Coef, 'NO2_Coef.png', units = "in", height = 5.59, width = 6.59)
+tmap_save(PM2.5_Coef, 'PM2.5_Coef.png', units = "in", height = 5.59, width = 6.59)
+
 ```

@@ -1,12 +1,47 @@
 ---
-title: "Leaflet"
+title: "CASA0005 Coursework - Leaflet"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+### Popup Tables and Palettes For Area Data
+```{r include=FALSE}
+# Create copies of the MSOA data.
+PopArea <- SFMSOA
+
+# Remove geometry data.
+st_geometry(PopArea) <- NULL
+
+# Create popup tables.
+PopNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc."))
+PopPM2.5 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc."))
+
+# Create palettes.
+PalNO2 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean NO2 Conc.`, bins = c(0, 10, 20, 30, 40, 50, 60, 70, 80))
+PalPM2.5 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean PM2.5 Conc.`, bins = c(0, 2.5, 5.0, 7.5, 10, 12.5, 15.0, 17.5, 20))
+
+```
+
+### Popup Tables and Palettes For MSOA Area Cluster Data
+```{r include=FALSE}
+# Create copies of the MSOA data.
+PopAreaCluster <- SFAreaCluster
+
+# Remove geometry data.
+st_geometry(PopAreaCluster) <- NULL
+
+# Create popup tables.
+PopNO2Cluster <- popupTable(PopAreaCluster, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "NO2 Getis Ord G"))
+PopPM2.5Cluster <- popupTable(PopAreaCluster, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "PM2.5 Getis Ord G"))
+
+# Create palettes.
+PalNO2Cluster <- colorBin(PalMi, domain = PopAreaCluster$`NO2 Getis Ord G`, bins = BrksMi)
+PalPM2.5Cluster <- colorBin(PalMi, domain = PopAreaCluster$`PM2.5 Getis Ord G`, bins = BrksMi)
+
+```
 
 ### Popup Tables and Palettes For Point Data
-```{r}
+```{r include=FALSE}
 # Create copies of the point data.
 PopLADBry <- SFLAD
 PopMSOABry <- SFMSOA
@@ -52,12 +87,10 @@ PopHospitalsPM2.5 <- popupTable(PopHospitalsPM2.5, feature.id = FALSE, row.numbe
 # Create colour palettes.
 PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("GP", "Hospital", "School"))
 PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
-PalNO2 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`NO2 (µg/m³)`, k=6)+0.001), 320), na.color = "transparent")
-PalPM2.5 <- colorBin("OrRd", domain = NULL, bins = c(0, (getJenksBreaks(SFLocations$`PM2.5 (µg/m³)`, k=6)+0.001), 90), na.color = "transparent")
 ```
 
 ### Popup Tables and Palettes For Point Cluster Data
-```{r}
+```{r include=FALSE}
 # Create copies of the MSOA data.
 PopPointCluster <- SFPointCluster
 
@@ -87,45 +120,8 @@ PalGPsPM2.5Cluster <- colorBin(PalMi, domain = PopPointCluster$`GP (PM2.5) Moran
 PalHospitalsPM2.5Cluster <- colorBin(PalMi, domain = PopPointCluster$`Hospital (PM2.5) Moran's I`, bins = BrksMi)
 ```
 
-### Popup Tables and Palettes For Area Data
-```{r}
-# Create copies of the MSOA data.
-PopArea <- SFMSOA
-
-# Remove geometry data.
-st_geometry(PopArea) <- NULL
-
-# Create popup tables.
-PopNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc."))
-PopPM2.5 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc."))
-
-# Create palettes.
-PalNO2 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean NO2 Conc.`, bins = c(0, 10, 20, 30, 40, 50, 60, 70, 80))
-PalPM2.5 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean PM2.5 Conc.`, bins = c(0, 2.5, 5.0, 7.5, 10, 12.5, 15.0, 17.5, 20))
-
-```
-
-
-### Popup Tables and Palettes For MSOA Area Cluster Data
-```{r}
-# Create copies of the MSOA data.
-PopAreaCluster <- SFAreaCluster
-
-# Remove geometry data.
-st_geometry(PopAreaCluster) <- NULL
-
-# Create popup tables.
-PopNO2Cluster <- popupTable(PopAreaCluster, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean NO2 Conc.", "NO2 Moran's I"))
-PopPM2.5Cluster <- popupTable(PopAreaCluster, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "PM2.5 Moran's I"))
-
-# Create palettes.
-PalNO2Cluster <- colorBin(PalMi, domain = PopAreaCluster$`NO2 Moran's I`, bins = BrksMi)
-PalPM2.5Cluster <- colorBin(PalMi, domain = PopAreaCluster$`PM2.5 Moran's I`, bins = BrksMi)
-
-```
-
 ### Popup Tables and Palettes For MSOA LR Data
-```{r}
+```{r include=FALSE}
 # Create popup tables.
 PopIMDScore <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD Score"))
 PopRoadDensity <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Road Length (km)"))
@@ -139,7 +135,7 @@ PalDistCLondon <- colorBin("YlOrBr", domain = PopArea$`Dist. from C. London (km)
 ```
 
 ### Popup Tables and Palettes For MSOA GWR Data
-```{r}
+```{r include=FALSE}
 # Create popup tables.
 PopIMDScoreNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD NO2 Coef."))
 PopIMDScorePM2.5 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "IMD PM2.5 Coef."))
@@ -149,16 +145,16 @@ PopDistCLondonNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE
 PopDistCLondonPM2.5 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Dist. from C. London PM2.5 Coef."))
 
 # Create palettes.
-PalIMDScoreNO2 <- colorBin("RdBu", domain = PopArea$`IMD NO2 Coef.`, bins = getJenksBreaks(PopArea$`IMD NO2 Coef.`, k=6))
-PalIMDScorePM2.5 <- colorBin("RdBu", domain = PopArea$`IMD PM2.5 Coef.`, bins = getJenksBreaks(PopArea$`IMD PM2.5 Coef.`, k=6))
-PalRoadDensityNO2 <- colorBin("RdBu", domain = PopArea$`Road Density NO2 Coef.`, bins = getJenksBreaks(PopArea$`Road Density NO2 Coef.`, k=6))
-PalRoadDensityPM2.5 <- colorBin("RdBu", domain = PopArea$`Road Density PM2.5 Coef.`, bins = getJenksBreaks(PopArea$`Road Density PM2.5 Coef.`, k=6))
-PalDistCLondonNO2 <- colorBin("RdBu", domain = PopArea$`Dist. from C. London NO2 Coef.`, bins = getJenksBreaks(PopArea$`Dist. from C. London NO2 Coef.`, k=6))
-PalDistCLondonPM2.5 <- colorBin("RdBu", domain = PopArea$`Dist. from C. London PM2.5 Coef.`, bins = getJenksBreaks(PopArea$`Dist. from C. London PM2.5 Coef.`, k=6))
+PalIMDScoreNO2 <- colorBin("RdBu", domain = PopArea$`IMD NO2 Coef.`, bins = c(-0.20, -0.15, -0.10, -0.05, 0.00, 0.05, 0.10, 0.15))
+PalIMDScorePM2.5 <- colorBin("RdBu", domain = PopArea$`IMD PM2.5 Coef.`, bins = c(-0.03, -0.02, -0.01, 0.00, 0.01, 0.02, 0.03))
+PalRoadDensityNO2 <- colorBin("Blues", domain = PopArea$`Road Density NO2 Coef.`, bins = c(-0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4))
+PalRoadDensityPM2.5 <- colorBin("Blues", domain = PopArea$`Road Density PM2.5 Coef.`, bins = c(-0.05, 0.00, 0.05, 0.10, 0.15, 0.20))
+PalDistCLondonNO2 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. from C. London NO2 Coef.`, bins = c(-3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5))
+PalDistCLondonPM2.5 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. from C. London PM2.5 Coef.`, bins = c(-0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0))
 ```
 
 ### Plot Point Map using leaflet
-```{r}
+```{r echo=FALSE}
 # Map using leaflet.
 MapLeaflet <- leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
@@ -212,6 +208,65 @@ MapLeaflet <- leaflet() %>%
               ) %>% 
 
   
+  
+  
+  # MSOA Area Data. 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalNO2(`Mean NO2 Conc.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopNO2,
+              group = "Mean NO2 Conc."
+              ) %>% 
+  addPolygons(data = SFMSOA, 
+              fillColor = ~PalPM2.5(`Mean PM2.5 Conc.`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopPM2.5,
+              group = "Mean PM2.5 Conc."
+              ) %>% 
+  
+  
+  
+  
+  
+# MSOA Area Cluster Results. 
+  addPolygons(data = SFAreaCluster, 
+              fillColor = ~PalNO2Cluster(`NO2 Getis Ord G`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopNO2Cluster,
+              group = "NO2 Getis Ord G"
+              ) %>% 
+  addPolygons(data = SFAreaCluster, 
+              fillColor = ~PalPM2.5Cluster(`PM2.5 Getis Ord G`),
+              color = "black",
+              stroke = "black", 
+              weight = 0.1, 
+              opacity = 1.0, 
+              fillOpacity = 1.0,
+              smoothFactor = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
+              popup = PopPM2.5Cluster,
+              group = "PM2.5 Getis Ord G"
+              ) %>% 
+  
+
   
   
   
@@ -550,66 +605,7 @@ MapLeaflet <- leaflet() %>%
   
   
   
-  # MSOA Area Data. 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalNO2(`Mean NO2 Conc.`),
-              color = "black",
-              stroke = "black", 
-              weight = 0.1, 
-              opacity = 1.0, 
-              fillOpacity = 1.0,
-              smoothFactor = 0.5,
-              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
-              popup = PopNO2,
-              group = "Mean NO2 Conc."
-              ) %>% 
-  addPolygons(data = SFMSOA, 
-              fillColor = ~PalPM2.5(`Mean PM2.5 Conc.`),
-              color = "black",
-              stroke = "black", 
-              weight = 0.1, 
-              opacity = 1.0, 
-              fillOpacity = 1.0,
-              smoothFactor = 0.5,
-              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
-              popup = PopPM2.5,
-              group = "Mean PM2.5 Conc."
-              ) %>% 
-  
-  
-  
-  
-  
-# MSOA Area Cluster Results. 
-  addPolygons(data = SFAreaCluster, 
-              fillColor = ~PalNO2Cluster(`NO2 Moran's I`),
-              color = "black",
-              stroke = "black", 
-              weight = 0.1, 
-              opacity = 1.0, 
-              fillOpacity = 1.0,
-              smoothFactor = 0.5,
-              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
-              popup = PopNO2Cluster,
-              group = "NO2 Moran's I"
-              ) %>% 
-  addPolygons(data = SFAreaCluster, 
-              fillColor = ~PalPM2.5Cluster(`PM2.5 Moran's I`),
-              color = "black",
-              stroke = "black", 
-              weight = 0.1, 
-              opacity = 1.0, 
-              fillOpacity = 1.0,
-              smoothFactor = 0.5,
-              highlightOptions = highlightOptions(color = "white", weight = 1, bringToFront = TRUE),
-              popup = PopPM2.5Cluster,
-              group = "PM2.5 Moran's I"
-              ) %>% 
-  
 
-  
-  
-  
 # MSOA LR Data.
   addPolygons(data = SFMSOA, 
               fillColor = ~PalIMDScore(`IMD Score`),
@@ -733,7 +729,7 @@ MapLeaflet <- leaflet() %>%
 # Layer Controls
   addLayersControl(
     baseGroups = c("OSM (default)", "Toner", "CartoDB"),
-    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Schools (All)", "GPs (All)", "Hospitals (All)", "Schools (NO2)", "GPs (NO2)", "Hospitals (NO2)", "Schools (PM2.5)", "GPs (PM2.5)", "Hospitals (PM2.5)", "Schools (All) Moran's I", "GPs (All) Moran's I", "Hospitals (All) Moran's I", "Schools (NO2) Moran's I", "GPs (NO2) Moran's I", "Hospitals (NO2) Moran's I", "Schools (PM2.5) Moran's I", "GPs (PM2.5) Moran's I", "Hospitals (PM2.5) Moran's I", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Moran's I", "PM2.5 Moran's I", "IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)", "IMD NO2 Coef.", "IMD PM2.5 Coef.", "Road Density NO2 Coef.", "Road Density PM2.5 Coef.", "Dist. from C. London NO2 Coef.", "Dist. from C. London PM2.5 Coef."),
+    overlayGroups = c("NO2 Concentration", "PM2.5 Concentration", "LAD", "MSOA", "LSOA", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Getis Ord G", "PM2.5 Getis Ord G", "Schools (All)", "GPs (All)", "Hospitals (All)", "Schools (NO2)", "GPs (NO2)", "Hospitals (NO2)", "Schools (PM2.5)", "GPs (PM2.5)", "Hospitals (PM2.5)", "Schools (All) Moran's I", "GPs (All) Moran's I", "Hospitals (All) Moran's I", "Schools (NO2) Moran's I", "GPs (NO2) Moran's I", "Hospitals (NO2) Moran's I", "Schools (PM2.5) Moran's I", "GPs (PM2.5) Moran's I", "Hospitals (PM2.5) Moran's I", "IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)", "IMD NO2 Coef.", "IMD PM2.5 Coef.", "Road Density NO2 Coef.", "Road Density PM2.5 Coef.", "Dist. from C. London NO2 Coef.", "Dist. from C. London PM2.5 Coef."),
     position = "topright",
     options = layersControlOptions(collapsed = TRUE)
     ) %>% 
@@ -745,6 +741,10 @@ MapLeaflet <- leaflet() %>%
 # Legends
   addLegend(pal = PalNO2, values = values(PollutionLondon[[1]]), title = "NO2 Concentration (µg/m³)", group = "NO2 Concentration") %>%
   addLegend(pal = PalPM2.5, values = values(PollutionLondon[[2]]), title = "PM2.5 Concentration (µg/m³)", group = "PM2.5 Concentration") %>%
+  addLegend(pal = PalNO2, values = SFMSOA$`Mean NO2 Conc.`, title = "Mean NO2 Conc.", group = "Mean NO2 Conc.") %>%
+  addLegend(pal = PalPM2.5, values = SFMSOA$`Mean PM2.5 Conc.`, title = "Mean PM2.5 Conc.", group = "Mean PM2.5 Conc.") %>%
+  addLegend(pal = PalNO2Cluster, values = SFAreaCluster$`NO2 Getis Ord G`, title = "NO2 Getis Ord G", group = "NO2 Getis Ord G") %>%
+  addLegend(pal = PalPM2.5Cluster, values = SFAreaCluster$`PM2.5 Getis Ord G`, title = "PM2.5 Getis Ord G", group = "PM2.5 Getis Ord G") %>%
   addLegend(pal = PalAll, values = SFLocations$`Building Type`, title = "All Buildings") %>% 
   addLegend(pal = PalWHO, values = SFLocationsNO2$`Building Type`, title = "Exceeding Limits") %>% 
   addLegend(pal = PalSchoolsCluster, values = SFPointCluster$`School (All) Moran's I`, title = "Schools (All) Moran's I", group = "Schools (All) Moran's I") %>%
@@ -756,10 +756,6 @@ MapLeaflet <- leaflet() %>%
   addLegend(pal = PalSchoolsPM2.5Cluster, values = SFPointCluster$`School (PM2.5) Moran's I`, title = "Schools (PM2.5) Moran's I", group = "Schools (PM2.5) Moran's I") %>%
   addLegend(pal = PalGPsPM2.5Cluster, values = SFPointCluster$`GP (PM2.5) Moran's I`, title = "GPs (PM2.5) Moran's I", group = "GPs (PM2.5) Moran's I") %>%
   addLegend(pal = PalHospitalsPM2.5Cluster, values = SFPointCluster$`Hospital (PM2.5) Moran's I`, title = "Hospitals (PM2.5) Moran's I", group = "Hospitals (PM2.5) Moran's I") %>%
-  addLegend(pal = PalNO2, values = SFMSOA$`Mean NO2 Conc.`, title = "Mean NO2 Conc.", group = "Mean NO2 Conc.") %>%
-  addLegend(pal = PalPM2.5, values = SFMSOA$`Mean PM2.5 Conc.`, title = "Mean PM2.5 Conc.", group = "Mean PM2.5 Conc.") %>%
-  addLegend(pal = PalNO2Cluster, values = SFAreaCluster$`NO2 Moran's I`, title = "NO2 Moran's I", group = "NO2 Moran's I") %>%
-  addLegend(pal = PalPM2.5Cluster, values = SFAreaCluster$`PM2.5 Moran's I`, title = "PM2.5 Moran's I", group = "PM2.5 Moran's I") %>%
   addLegend(pal = PalIMDScore, values = SFMSOA$`IMD Score`, title = "IMD Score", group = "IMD Score") %>%
   addLegend(pal = PalRoadDensity, values = SFMSOA$`Road Density (km/km2)`, title = "Road Density (km/km2)", group = "Road Density (km/km2)") %>%
   addLegend(pal = PalDistCLondon, values = SFMSOA$`Dist. from C. London (km)`, title = "Dist. from C. London (km)", group = "Dist. from C. London (km)") %>%
@@ -773,7 +769,7 @@ MapLeaflet <- leaflet() %>%
   
   
 # Groups, Buttons, etc.
-  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "LSOA", "Schools (All)", "GPs (All)", "Hospitals (All)", "Schools (NO2)", "GPs (NO2)", "Hospitals (NO2)", "Schools (PM2.5)", "GPs (PM2.5)", "Hospitals (PM2.5)", "Schools (All) Moran's I", "GPs (All) Moran's I", "Hospitals (All) Moran's I", "Schools (NO2) Moran's I", "GPs (NO2) Moran's I", "Hospitals (NO2) Moran's I", "Schools (PM2.5) Moran's I", "GPs (PM2.5) Moran's I", "Hospitals (PM2.5) Moran's I", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Moran's I", "PM2.5 Moran's I", "IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)", "IMD NO2 Coef.", "IMD PM2.5 Coef.", "Road Density NO2 Coef.", "Road Density PM2.5 Coef.", "Dist. from C. London NO2 Coef.", "Dist. from C. London PM2.5 Coef.")) %>% 
+  hideGroup(c("NO2 Concentration","PM2.5 Concentration", "LSOA", "Mean NO2 Conc.", "Mean PM2.5 Conc.", "NO2 Getis Ord G", "PM2.5 Getis Ord G", "Schools (NO2)", "GPs (NO2)", "Hospitals (NO2)", "Schools (PM2.5)", "GPs (PM2.5)", "Hospitals (PM2.5)", "Schools (All) Moran's I", "GPs (All) Moran's I", "Hospitals (All) Moran's I", "Schools (NO2) Moran's I", "GPs (NO2) Moran's I", "Hospitals (NO2) Moran's I", "Schools (PM2.5) Moran's I", "GPs (PM2.5) Moran's I", "Hospitals (PM2.5) Moran's I", "IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)", "IMD NO2 Coef.", "IMD PM2.5 Coef.", "Road Density NO2 Coef.", "Road Density PM2.5 Coef.", "Dist. from C. London NO2 Coef.", "Dist. from C. London PM2.5 Coef.")) %>% 
   addEasyButton(easyButton(
     icon="fa-globe", title="Zoom to London",
     onClick=JS("function(btn, map){ map.setView([51.5, -0.10],10); }"))) %>% 
