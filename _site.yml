@@ -1,0 +1,17 @@
+name: "CASA0005 Coursework - Code"
+output_dir: "."
+navbar:
+  title: "CASA0005 Coursework - Code"
+  left:
+    - text: "Home"
+      href: Index.html
+    - text: "Packages"
+      href: Packages.html
+    - text: "Research Question 1"
+      href: Research-Question-1.html
+    - text: "Research Question 2"
+      href: Research-Question-2.html
+    - text: "Research Question 3"
+      href: Research-Question-3.html
+    - text: "Interactive Map"
+      href: Interactive-Map.html

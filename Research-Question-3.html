@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Research Question 3</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 45px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h2 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h3 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h4 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h5 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h6 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">CASA0005 Coursework - Code</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="Index.html">Home</a>
+</li>
+<li>
+  <a href="Packages.html">Packages</a>
+</li>
+<li>
+  <a href="Research-Question-1.html">Research Question 1</a>
+</li>
+<li>
+  <a href="Research-Question-2.html">Research Question 2</a>
+</li>
+<li>
+  <a href="Research-Question-3.html">Research Question 3</a>
+</li>
+<li>
+  <a href="Interactive-Map.html">Interactive Map</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Research Question 3</h1>
+
+</div>
+
+
+<div id="index-of-multiple-deprivation" class="section level1">
+<h1><span class="header-section-number">1</span> Index of Multiple Deprivation</h1>
+<pre class="r"><code># Read in indices of deprivation data.
+IDData &lt;- read_csv(&quot;Data/Boundaries and Census/ID 2019 for London.csv&quot;,
+                       locale = locale(encoding = &quot;latin1&quot;),
+                       na = &quot;n/a&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   `LSOA code (2011)` = col_character(),
+##   `LSOA name (2011)` = col_character(),
+##   `Local Authority District code (2019)` = col_character(),
+##   `Local Authority District name (2019)` = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code># Merge ID data to location data.
+IDData&lt;-merge(IDData, 
+             SFLSOA, 
+             by.x=&quot;LSOA code (2011)&quot;, 
+             by.y=&quot;LSOA Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)
+
+# Extract relevent columns.
+IDData &lt;- IDData[,c(1, 31, 33, 5)]
+
+# Rename columns.
+colnames(IDData) &lt;- c(&quot;LSOA Code&quot;, &quot;MSOA Code&quot;, &quot;LAD Code&quot;, &quot;IMD Score&quot;)
+
+# Aggregate IDM scores to MSOA and LADs.
+IDLSOA &lt;- IDData[,c(1, 4)]
+IDMSOA &lt;- aggregate(IDData[, 4], by = list(IDData$`MSOA Code`), FUN = mean)
+IDLAD &lt;- aggregate(IDData[, 4], by = list(IDData$`LAD Code`), FUN = mean)
+IDMSOA[, 2] &lt;- round(IDMSOA[, 2], digits = 3)
+IDLAD[, 2] &lt;- round(IDLAD[, 2], digits = 3)
+colnames(IDMSOA) &lt;- c(&quot;MSOA Code&quot;, &quot;IMD Score&quot;)
+colnames(IDLAD) &lt;- c(&quot;LAD Code&quot;, &quot;IMD Score&quot;)
+
+# Merge ID data to boundaries.
+SFLAD&lt;-merge(SFLAD, 
+             IDLAD, 
+             by.x=&quot;LAD Code&quot;, 
+             by.y=&quot;LAD Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)
+SFMSOA&lt;-merge(SFMSOA, 
+             IDMSOA, 
+             by.x=&quot;MSOA Code&quot;, 
+             by.y=&quot;MSOA Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)
+SFLSOA&lt;-merge(SFLSOA, 
+             IDLSOA, 
+             by.x=&quot;LSOA Code&quot;, 
+             by.y=&quot;LSOA Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)</code></pre>
+</div>
+<div id="road-density" class="section level1">
+<h1><span class="header-section-number">2</span> Road Density</h1>
+<pre class="r"><code># Load road shapefile.
+Roads &lt;- st_read(&quot;Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp&quot;)</code></pre>
+<pre><code>## Reading layer `LAEI_MajorRoadNetwork_Link&#39; from data source `C:\Users\sammy\Desktop\Work\UCL\CASA0005 Geographic Information Systems and Science\Coursework\CASA0005 Coursework\Data\Air Pollution\LAEI 2016 Supporting Information\LAEI_MajorRoadNetwork_Link.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 78603 features and 24 fields
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: 500831 ymin: 152436 xmax: 560038 ymax: 204099.7
+## epsg (SRID):    NA
+## proj4string:    +proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +datum=OSGB36 +units=m +no_defs</code></pre>
+<pre class="r"><code># Tranform into an SF object.
+SFRoads &lt;- st_as_sf(Roads)
+
+# Transform into BNG.
+SFRoads &lt;- st_transform(SFRoads, BNG)
+
+# Select relevent columns.
+SFRoads &lt;- SFRoads[,c(6, 9, 25)]
+
+# Rename columns.
+colnames(SFRoads) &lt;- c(&quot;Road Type&quot;, &quot;Road Nature&quot;, &quot;geometry&quot;)
+
+# Copy and tranform MSOA SF into BNG
+RoadsMSOA &lt;- st_transform(SFMSOA, BNG)
+
+# Run intersection.
+RoadsMSOA &lt;- st_intersection(SFRoads, RoadsMSOA)</code></pre>
+<pre><code>## Warning: attribute variables are assumed to be spatially constant throughout all geometries</code></pre>
+<pre class="r"><code># Determine road lengths.
+RoadsMSOA$`Road Length (km)` &lt;- st_length(RoadsMSOA)/1000
+
+# Aggregate road lengths.
+RoadsMSOA &lt;- aggregate(RoadsMSOA$`Road Length (km)`, by = list(RoadsMSOA$MSOA.Code), FUN = sum)
+
+# Rename columns.
+colnames(RoadsMSOA) &lt;- c(&quot;MSOA Code&quot;, &quot;Road Length (km)&quot;)
+
+# Determine road density.
+RoadsMSOA$`Road Density (km/km2)` &lt;- round(as.numeric(RoadsMSOA$`Road Length (km)` / (st_area(SFMSOA) /1000000)), digits = 2)
+
+# Round lengths.
+RoadsMSOA[, 2] &lt;- round(as.numeric(RoadsMSOA[, 2]), digits = 2)
+
+# Merge road length with MSOA.
+SFMSOA&lt;-merge(SFMSOA, 
+             RoadsMSOA, 
+             by.x=&quot;MSOA Code&quot;, 
+             by.y=&quot;MSOA Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)</code></pre>
+</div>
+<div id="distance-from-central-london-charing-cross" class="section level1">
+<h1><span class="header-section-number">3</span> Distance from Central London (Charing Cross)</h1>
+<pre class="r"><code># Create Postcode vector with Charing Cross postcode.
+Postcode &lt;- &quot;WC2N5DU&quot;
+
+# Convert object to dataframe.
+CharingCross &lt;- data.frame(Postcode)
+
+# Join code points.
+CharingCross&lt;-merge(CharingCross, 
+             AllCodePoints, 
+             by.x=&quot;Postcode&quot;, 
+             by.y=&quot;Postcode&quot;,
+             no.dups = TRUE)
+
+# Convert Charing Cross to SF.
+CharingCross &lt;- st_as_sf(CharingCross, coords = c(&quot;Eastings&quot;, &quot;Northings&quot;), crs = BNG)
+
+# Get SF MSOA Codes.
+SFCentroidMSOA &lt;- data.frame(SFMSOA$`MSOA Code`)
+
+# Set MSOA centroids.
+SFCentroidMSOA[,2:3] &lt;- coordinates(SPPointCluster)
+
+# Change column names.
+colnames(SFCentroidMSOA) &lt;- c(&quot;MSOA Code&quot;, &quot;Eastings&quot;, &quot;Northings&quot;)
+
+# Convert to SF.
+SFCentroidMSOA &lt;- st_as_sf(SFCentroidMSOA, coords = c(&quot;Eastings&quot;, &quot;Northings&quot;), crs = BNG)
+
+# Determine distance of MSOA centroids to Charing Cross.
+SFCentroidMSOA$`Dist. from C. London (km)` &lt;- round(as.numeric(st_distance(SFCentroidMSOA$geometry, CharingCross)/1000), digits = 2)
+
+# Remove geometry.
+st_geometry(SFCentroidMSOA) &lt;- NULL
+
+# Join to SFMSOA.
+SFMSOA&lt;-merge(SFMSOA, 
+             SFCentroidMSOA, 
+             by.x=&quot;MSOA Code&quot;, 
+             by.y=&quot;MSOA Code&quot;,
+             no.dups = TRUE,
+             all.x = TRUE)</code></pre>
+</div>
+<div id="linear-regression-model" class="section level1">
+<h1><span class="header-section-number">4</span> Linear Regression Model</h1>
+<pre class="r"><code># Conduct linear regression.
+LRNO2 &lt;- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
+LRPM2.5 &lt;- lm(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
+
+# Summarise data.
+summary(LRNO2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = `Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + 
+##     `Dist. from C. London (km)`, data = SFMSOA)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -4.854 -1.167 -0.057  0.896 10.043 
+## 
+## Coefficients:
+##                              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                 39.696950   0.265804 149.347  &lt; 2e-16 ***
+## `IMD Score`                  0.036811   0.005785   6.364 3.02e-10 ***
+## `Road Density (km/km2)`      0.966191   0.032657  29.586  &lt; 2e-16 ***
+## `Dist. from C. London (km)` -0.637576   0.010932 -58.324  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.649 on 979 degrees of freedom
+## Multiple R-squared:  0.9035, Adjusted R-squared:  0.9032 
+## F-statistic:  3056 on 3 and 979 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>summary(LRPM2.5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = `Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + 
+##     `Dist. from C. London (km)`, data = SFMSOA)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.75444 -0.15949 -0.01655  0.13814  1.61795 
+## 
+## Coefficients:
+##                               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                 13.9024912  0.0395100 351.873  &lt; 2e-16 ***
+## `IMD Score`                  0.0038751  0.0008598   4.507 7.38e-06 ***
+## `Road Density (km/km2)`      0.1345742  0.0048543  27.723  &lt; 2e-16 ***
+## `Dist. from C. London (km)` -0.1004925  0.0016249 -61.845  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.2451 on 979 degrees of freedom
+## Multiple R-squared:  0.9066, Adjusted R-squared:  0.9063 
+## F-statistic:  3166 on 3 and 979 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Extract linear regression results.
+LRResultsNO2 &lt;- tidy(LRNO2)
+LRResultsPM2.5 &lt;- tidy(LRPM2.5)</code></pre>
+</div>
+<div id="linear-regression---assumption-1" class="section level1">
+<h1><span class="header-section-number">5</span> Linear Regression - Assumption 1</h1>
+<pre class="r"><code># Plot histogram on variables.
+ggplot(SFMSOA, aes(x=`Mean NO2 Conc.`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(SFMSOA, aes(x=`Mean PM2.5 Conc.`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 0.1) + 
+  geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(SFMSOA, aes(x=`IMD Score`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(SFMSOA, aes(x=`Road Density (km/km2)`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(SFMSOA, aes(x=`Dist. from C. London (km)`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-5.png" width="672" /></p>
+<pre class="r"><code># Plot Scatter plot
+qplot(x = `Mean NO2 Conc.`, y = `IMD Score`, data = SFMSOA)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-6.png" width="672" /></p>
+<pre class="r"><code>qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-7.png" width="672" /></p>
+<pre class="r"><code>qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-8.png" width="672" /></p>
+</div>
+<div id="linear-regression---assumption-2" class="section level1">
+<h1><span class="header-section-number">6</span> Linear Regression - Assumption 2</h1>
+<pre class="r"><code># Plot linear regression model residuals in a histogram.
+qplot(LRNO2$residuals) + geom_histogram() </code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>qplot(LRPM2.5$residuals) + geom_histogram() </code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+</div>
+<div id="linear-regression---assumption-3" class="section level1">
+<h1><span class="header-section-number">7</span> Linear Regression - Assumption 3</h1>
+<pre class="r"><code># Remove geometry of SFMSOA.
+CorMSOA &lt;- st_set_geometry(SFMSOA,NULL)
+
+# Extract dependent varaiables
+CorMSOA &lt;- CorMSOA[,c(&quot;IMD Score&quot;, &quot;Road Density (km/km2)&quot;, &quot;Dist. from C. London (km)&quot;)]
+
+# Calculate correlation matrix.
+CorMSOA &lt;- cor(CorMSOA, use=&quot;complete.obs&quot;, method=&quot;pearson&quot;)
+
+# Plot correlation matrix.
+corrplot(CorMSOA, type = &quot;lower&quot;)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code># Calculate VIF.
+vif(LRNO2)</code></pre>
+<pre><code>##                 `IMD Score`     `Road Density (km/km2)` `Dist. from C. London (km)` 
+##                    1.079822                    1.411485                    1.445274</code></pre>
+<pre class="r"><code>vif(LRPM2.5)</code></pre>
+<pre><code>##                 `IMD Score`     `Road Density (km/km2)` `Dist. from C. London (km)` 
+##                    1.079822                    1.411485                    1.445274</code></pre>
+</div>
+<div id="linear-regression---assumption-4" class="section level1">
+<h1><span class="header-section-number">8</span> Linear Regression - Assumption 4</h1>
+<pre class="r"><code># Plot model diagnostics.
+plot(LRNO2)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-1.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-2.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-3.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-4.png" width="672" /></p>
+<pre class="r"><code>plot(LRPM2.5)</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-5.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-6.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-7.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-8.png" width="672" /></p>
+</div>
+<div id="linear-regression---assumption-5" class="section level1">
+<h1><span class="header-section-number">9</span> Linear Regression - Assumption 5</h1>
+<pre class="r"><code># Merge model residuals to shapefile.
+SFMSOA$`LRNO2 Residuals` &lt;- LRNO2$residuals
+SFMSOA$`LRPM2.5 Residuals` &lt;- LRPM2.5$residuals
+
+# Map model residuals.
+tm_shape(SFMSOA) +
+  tm_polygons(&quot;LRNO2 Residuals&quot;, palette = &quot;RdYlBu&quot;)</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Variable &quot;LRNO2 Residuals&quot; contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>tm_shape(SFMSOA) +
+  tm_polygons(&quot;LRPM2.5 Residuals&quot;, palette = &quot;RdYlBu&quot;)</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Variable &quot;LRPM2.5 Residuals&quot; contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code># Convert SF objects to SP objects.
+SPMSOA &lt;- as(SFMSOA, &quot;Spatial&quot;)
+
+# Run Moran&#39;s I on residuals.
+moran.test(SPMSOA@data$LRNO2.Residuals, SpWeightsMSOA)</code></pre>
+<pre><code>## 
+##  Moran I test under randomisation
+## 
+## data:  SPMSOA@data$LRNO2.Residuals  
+## weights: SpWeightsMSOA    
+## 
+## Moran I statistic standard deviate = 37.052, p-value &lt; 2.2e-16
+## alternative hypothesis: greater
+## sample estimates:
+## Moran I statistic       Expectation          Variance 
+##       0.693091668      -0.001018330       0.000350938</code></pre>
+<pre class="r"><code>moran.test(SPMSOA@data$LRPM2.5.Residuals, SpWeightsMSOA)</code></pre>
+<pre><code>## 
+##  Moran I test under randomisation
+## 
+## data:  SPMSOA@data$LRPM2.5.Residuals  
+## weights: SpWeightsMSOA    
+## 
+## Moran I statistic standard deviate = 33.876, p-value &lt; 2.2e-16
+## alternative hypothesis: greater
+## sample estimates:
+## Moran I statistic       Expectation          Variance 
+##      0.6329460582     -0.0010183299      0.0003502281</code></pre>
+</div>
+<div id="gwr" class="section level1">
+<h1><span class="header-section-number">10</span> GWR</h1>
+<pre class="r"><code># Calculate kernel bandwidths.
+GWRbandwidthNO2 &lt;- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)</code></pre>
+<pre><code>## Adaptive q: 0.381966 CV score: 2159.029 
+## Adaptive q: 0.618034 CV score: 2374.825 
+## Adaptive q: 0.236068 CV score: 1893.228 
+## Adaptive q: 0.145898 CV score: 1618.452 
+## Adaptive q: 0.09016994 CV score: 1404.759 
+## Adaptive q: 0.05572809 CV score: 1229.012 
+## Adaptive q: 0.03444185 CV score: 1066.084 
+## Adaptive q: 0.02128624 CV score: 927.7249 
+## Adaptive q: 0.01315562 CV score: 821.145 
+## Adaptive q: 0.008130619 CV score: 743.0468 
+## Adaptive q: 0.005024999 CV score: 700.1589 
+## Adaptive q: 0.00310562 CV score: 694.8845 
+## Adaptive q: 0.003441161 CV score: 689.1392 
+## Adaptive q: 0.003955792 CV score: 687.3265 
+## Adaptive q: 0.003808574 CV score: 687.2194 
+## Adaptive q: 0.003850728 CV score: 687.2062 
+## Adaptive q: 0.003891418 CV score: 687.2276 
+## Adaptive q: 0.003850728 CV score: 687.2062</code></pre>
+<pre class="r"><code>GWRbandwidthPM2.5 &lt;- gwr.sel(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)</code></pre>
+<pre><code>## Adaptive q: 0.381966 CV score: 52.81942 
+## Adaptive q: 0.618034 CV score: 56.20016 
+## Adaptive q: 0.236068 CV score: 48.1472 
+## Adaptive q: 0.145898 CV score: 42.62459 
+## Adaptive q: 0.09016994 CV score: 37.59806 
+## Adaptive q: 0.05572809 CV score: 33.15437 
+## Adaptive q: 0.03444185 CV score: 28.74819 
+## Adaptive q: 0.02128624 CV score: 24.6271 
+## Adaptive q: 0.01315562 CV score: 21.12475 
+## Adaptive q: 0.008130619 CV score: 18.19072 
+## Adaptive q: 0.005024999 CV score: 16.15525 
+## Adaptive q: 0.00310562 CV score: 15.21066 
+## Adaptive q: 0.001919379 CV score: 15.70753 
+## Adaptive q: 0.003226455 CV score: 15.21012 
+## Adaptive q: 0.003267145 CV score: 15.21236 
+## Adaptive q: 0.003185765 CV score: 15.20906 
+## Adaptive q: 0.003185765 CV score: 15.20906</code></pre>
+<pre class="r"><code># Run the GWR model.
+GWRNO2 = gwr(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+GWRPM2.5 = gwr(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+
+# Save the results.
+GWRNO2Results &lt;- as.data.frame(GWRNO2$SDF)
+GWRPM2.5Results &lt;- as.data.frame(GWRPM2.5$SDF)
+
+# Merge coefficients with shapefiles.
+SFMSOA$`IMD NO2 Coef.`&lt;- round(GWRNO2Results$X.IMD.Score., digits = 3)
+SFMSOA$`Road Density NO2 Coef.`&lt;- round(GWRNO2Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London NO2 Coef.`&lt;- round(GWRNO2Results$X.Dist..from.C..London..km.., digits = 3)
+
+SFMSOA$`IMD PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
+SFMSOA$`Road Density PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
+
+# Map coefficients.
+NO2_IMD_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;IMD NO2 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(a)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_RD_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;Road Density NO2 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(b)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_DfCL_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;Dist. from C. London NO2 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(c)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_Coef &lt;- tmap_arrange(NO2_IMD_Coef, NO2_RD_Coef, NO2_DfCL_Coef, ncol=1, nrow = 3)
+NO2_Coef</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>PM2.5_IMD_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;IMD PM2.5 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(a)&quot;, position=c(0,0.85), size=1.5)
+
+PM2.5_RD_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;Road Density PM2.5 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(b)&quot;, position=c(0,0.85), size=1.5)
+
+PM2.5_DfCL_Coef &lt;- tm_shape(SFMSOA) +
+  tm_polygons(col = &quot;Dist. from C. London PM2.5 Coef.&quot;, 
+              palette = &quot;RdBu&quot;,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = &quot;right&quot;,
+            frame = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(c)&quot;, position=c(0,0.85), size=1.5)
+
+
+PM2.5_Coef &lt;- tmap_arrange(PM2.5_IMD_Coef, PM2.5_RD_Coef, PM2.5_DfCL_Coef, ncol=1, nrow = 3)
+PM2.5_Coef</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid
+
+## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

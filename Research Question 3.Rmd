@@ -1,0 +1,375 @@
+---
+title: "Research Question 3"
+output: 
+  html_document:
+    theme: yeti
+    smart: true
+    highlight: textmate
+    toc: true
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options: 
+  chunk_output_type: console
+---
+# Index of Multiple Deprivation 
+```{r}
+# Read in indices of deprivation data.
+IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
+                       locale = locale(encoding = "latin1"),
+                       na = "n/a")
+# Merge ID data to location data.
+IDData<-merge(IDData, 
+             SFLSOA, 
+             by.x="LSOA code (2011)", 
+             by.y="LSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+
+# Extract relevent columns.
+IDData <- IDData[,c(1, 31, 33, 5)]
+
+# Rename columns.
+colnames(IDData) <- c("LSOA Code", "MSOA Code", "LAD Code", "IMD Score")
+
+# Aggregate IDM scores to MSOA and LADs.
+IDLSOA <- IDData[,c(1, 4)]
+IDMSOA <- aggregate(IDData[, 4], by = list(IDData$`MSOA Code`), FUN = mean)
+IDLAD <- aggregate(IDData[, 4], by = list(IDData$`LAD Code`), FUN = mean)
+IDMSOA[, 2] <- round(IDMSOA[, 2], digits = 3)
+IDLAD[, 2] <- round(IDLAD[, 2], digits = 3)
+colnames(IDMSOA) <- c("MSOA Code", "IMD Score")
+colnames(IDLAD) <- c("LAD Code", "IMD Score")
+
+# Merge ID data to boundaries.
+SFLAD<-merge(SFLAD, 
+             IDLAD, 
+             by.x="LAD Code", 
+             by.y="LAD Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFMSOA<-merge(SFMSOA, 
+             IDMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+SFLSOA<-merge(SFLSOA, 
+             IDLSOA, 
+             by.x="LSOA Code", 
+             by.y="LSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+# Road Density
+```{r}
+# Load road shapefile.
+Roads <- st_read("Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp")
+
+# Tranform into an SF object.
+SFRoads <- st_as_sf(Roads)
+
+# Transform into BNG.
+SFRoads <- st_transform(SFRoads, BNG)
+
+# Select relevent columns.
+SFRoads <- SFRoads[,c(6, 9, 25)]
+
+# Rename columns.
+colnames(SFRoads) <- c("Road Type", "Road Nature", "geometry")
+
+# Copy and tranform MSOA SF into BNG
+RoadsMSOA <- st_transform(SFMSOA, BNG)
+
+# Run intersection.
+RoadsMSOA <- st_intersection(SFRoads, RoadsMSOA)
+
+# Determine road lengths.
+RoadsMSOA$`Road Length (km)` <- st_length(RoadsMSOA)/1000
+
+# Aggregate road lengths.
+RoadsMSOA <- aggregate(RoadsMSOA$`Road Length (km)`, by = list(RoadsMSOA$MSOA.Code), FUN = sum)
+
+# Rename columns.
+colnames(RoadsMSOA) <- c("MSOA Code", "Road Length (km)")
+
+# Determine road density.
+RoadsMSOA$`Road Density (km/km2)` <- round(as.numeric(RoadsMSOA$`Road Length (km)` / (st_area(SFMSOA) /1000000)), digits = 2)
+
+# Round lengths.
+RoadsMSOA[, 2] <- round(as.numeric(RoadsMSOA[, 2]), digits = 2)
+
+# Merge road length with MSOA.
+SFMSOA<-merge(SFMSOA, 
+             RoadsMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+# Distance from Central London (Charing Cross)
+```{r}
+# Create Postcode vector with Charing Cross postcode.
+Postcode <- "WC2N5DU"
+
+# Convert object to dataframe.
+CharingCross <- data.frame(Postcode)
+
+# Join code points.
+CharingCross<-merge(CharingCross, 
+             AllCodePoints, 
+             by.x="Postcode", 
+             by.y="Postcode",
+             no.dups = TRUE)
+
+# Convert Charing Cross to SF.
+CharingCross <- st_as_sf(CharingCross, coords = c("Eastings", "Northings"), crs = BNG)
+
+# Get SF MSOA Codes.
+SFCentroidMSOA <- data.frame(SFMSOA$`MSOA Code`)
+
+# Set MSOA centroids.
+SFCentroidMSOA[,2:3] <- coordinates(SPPointCluster)
+
+# Change column names.
+colnames(SFCentroidMSOA) <- c("MSOA Code", "Eastings", "Northings")
+
+# Convert to SF.
+SFCentroidMSOA <- st_as_sf(SFCentroidMSOA, coords = c("Eastings", "Northings"), crs = BNG)
+
+# Determine distance of MSOA centroids to Charing Cross.
+SFCentroidMSOA$`Dist. from C. London (km)` <- round(as.numeric(st_distance(SFCentroidMSOA$geometry, CharingCross)/1000), digits = 2)
+
+# Remove geometry.
+st_geometry(SFCentroidMSOA) <- NULL
+
+# Join to SFMSOA.
+SFMSOA<-merge(SFMSOA, 
+             SFCentroidMSOA, 
+             by.x="MSOA Code", 
+             by.y="MSOA Code",
+             no.dups = TRUE,
+             all.x = TRUE)
+```
+
+# Linear Regression Model
+```{r}
+# Conduct linear regression.
+LRNO2 <- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
+LRPM2.5 <- lm(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
+
+# Summarise data.
+summary(LRNO2)
+summary(LRPM2.5)
+
+# Extract linear regression results.
+LRResultsNO2 <- tidy(LRNO2)
+LRResultsPM2.5 <- tidy(LRPM2.5)
+
+```
+
+# Linear Regression - Assumption 1
+```{r}
+# Plot histogram on variables.
+ggplot(SFMSOA, aes(x=`Mean NO2 Conc.`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour="red", size=1, adjust=1)
+ggplot(SFMSOA, aes(x=`Mean PM2.5 Conc.`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 0.1) + 
+  geom_density(colour="red", size=1, adjust=1)
+ggplot(SFMSOA, aes(x=`IMD Score`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour="red", size=1, adjust=1)
+ggplot(SFMSOA, aes(x=`Road Density (km/km2)`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour="red", size=1, adjust=1)
+ggplot(SFMSOA, aes(x=`Dist. from C. London (km)`)) + 
+  geom_histogram(aes(y = ..density..),binwidth = 1) + 
+  geom_density(colour="red", size=1, adjust=1)
+
+# Plot Scatter plot
+qplot(x = `Mean NO2 Conc.`, y = `IMD Score`, data = SFMSOA)
+qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)
+qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)
+```
+
+# Linear Regression - Assumption 2
+```{r}
+# Plot linear regression model residuals in a histogram.
+qplot(LRNO2$residuals) + geom_histogram() 
+qplot(LRPM2.5$residuals) + geom_histogram() 
+```
+
+# Linear Regression - Assumption 3
+```{r}
+# Remove geometry of SFMSOA.
+CorMSOA <- st_set_geometry(SFMSOA,NULL)
+
+# Extract dependent varaiables
+CorMSOA <- CorMSOA[,c("IMD Score", "Road Density (km/km2)", "Dist. from C. London (km)")]
+
+# Calculate correlation matrix.
+CorMSOA <- cor(CorMSOA, use="complete.obs", method="pearson")
+
+# Plot correlation matrix.
+corrplot(CorMSOA, type = "lower")
+
+# Calculate VIF.
+vif(LRNO2)
+vif(LRPM2.5)
+```
+
+# Linear Regression - Assumption 4
+```{r}
+# Plot model diagnostics.
+plot(LRNO2)
+plot(LRPM2.5)
+
+```
+
+# Linear Regression - Assumption 5
+```{r}
+# Merge model residuals to shapefile.
+SFMSOA$`LRNO2 Residuals` <- LRNO2$residuals
+SFMSOA$`LRPM2.5 Residuals` <- LRPM2.5$residuals
+
+# Map model residuals.
+tm_shape(SFMSOA) +
+  tm_polygons("LRNO2 Residuals", palette = "RdYlBu")
+tm_shape(SFMSOA) +
+  tm_polygons("LRPM2.5 Residuals", palette = "RdYlBu")
+
+# Convert SF objects to SP objects.
+SPMSOA <- as(SFMSOA, "Spatial")
+
+# Run Moran's I on residuals.
+moran.test(SPMSOA@data$LRNO2.Residuals, SpWeightsMSOA)
+moran.test(SPMSOA@data$LRPM2.5.Residuals, SpWeightsMSOA)
+
+```
+
+# GWR
+```{r}
+# Calculate kernel bandwidths.
+GWRbandwidthNO2 <- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
+GWRbandwidthPM2.5 <- gwr.sel(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
+
+# Run the GWR model.
+GWRNO2 = gwr(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+GWRPM2.5 = gwr(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=GWRbandwidthNO2, hatmatrix=TRUE, se.fit=TRUE)
+
+# Save the results.
+GWRNO2Results <- as.data.frame(GWRNO2$SDF)
+GWRPM2.5Results <- as.data.frame(GWRPM2.5$SDF)
+
+# Merge coefficients with shapefiles.
+SFMSOA$`IMD NO2 Coef.`<- round(GWRNO2Results$X.IMD.Score., digits = 3)
+SFMSOA$`Road Density NO2 Coef.`<- round(GWRNO2Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London NO2 Coef.`<- round(GWRNO2Results$X.Dist..from.C..London..km.., digits = 3)
+
+SFMSOA$`IMD PM2.5 Coef.`<- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
+SFMSOA$`Road Density PM2.5 Coef.`<- round(GWRPM2.5Results$X.Road.Density..km.km2.., digits = 3)
+SFMSOA$`Dist. from C. London PM2.5 Coef.`<- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
+
+# Map coefficients.
+NO2_IMD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "IMD NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+
+NO2_RD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Road Density NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+
+NO2_DfCL_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Dist. from C. London NO2 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+
+NO2_Coef <- tmap_arrange(NO2_IMD_Coef, NO2_RD_Coef, NO2_DfCL_Coef, ncol=1, nrow = 3)
+NO2_Coef
+
+PM2.5_IMD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "IMD PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+
+PM2.5_RD_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Road Density PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+
+PM2.5_DfCL_Coef <- tm_shape(SFMSOA) +
+  tm_polygons(col = "Dist. from C. London PM2.5 Coef.", 
+              palette = "RdBu",
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = "black", lwd = 1.0)+
+  tm_layout(legend.outside = TRUE,
+            legend.outside.position = "right",
+            frame = FALSE)+
+  tm_scale_bar(position = c("left", "bottom"))+
+  tm_compass(north = 0, position = c("right", "top"))+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+
+
+PM2.5_Coef <- tmap_arrange(PM2.5_IMD_Coef, PM2.5_RD_Coef, PM2.5_DfCL_Coef, ncol=1, nrow = 3)
+PM2.5_Coef
+
+```

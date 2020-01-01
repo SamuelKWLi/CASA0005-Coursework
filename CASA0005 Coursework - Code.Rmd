@@ -1,10 +1,19 @@
 ---
 title: "CASA0005 Coursework - Code"
-output: html_document
+output: 
+  html_document:
+    theme: yeti
+    smart: true
+    highlight: textmate
+    toc: true
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
 editor_options: 
   chunk_output_type: console
 ---
-### Packages
+# Packages
 ```{r}
 library(tidyverse)
 library(raster)
@@ -27,9 +36,9 @@ library(spgwr)
 tmap_mode("plot")
 ```
 
-## Research Question 1
+# Research Question 1
 
-### Read in Concentration Rasters
+## Read in Concentration Rasters
 ```{r}
 # List the full file paths of all the raster files.
 PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations", ".tif", full.names = TRUE)
@@ -54,7 +63,7 @@ PollutionConc <- projectRaster(PollutionConc, crs= WGS84)
 
 ```
 
-### Crop Raster Data
+## Crop Raster Data
 ```{r}
 # Read in the London boundary.
 OutlineLondon <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp")
@@ -77,7 +86,7 @@ MaskPM2.5 <-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
 PollutionLondon <- stack(MaskNO2, MaskPM2.5)
 ```
 
-### Read in Boundaries
+## Read in Boundaries
 ```{r}
 # Read in boundaries as spatial polygons.
 LAD <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
@@ -106,7 +115,7 @@ colnames(SFLSOA) <- c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code","LAD Na
 
 ```
 
-### NO2 and PM2.5. Mean Concentration
+## NO2 and PM2.5. Mean Concentration
 ```{r}
 # Read in Concentration data.
 ConcLAD <- read_csv("Data/Air Pollution/ConcLAD.csv",
@@ -150,7 +159,7 @@ SFLSOA<-merge(SFLSOA,
              all.x = TRUE)
 ```
 
-### MSOA Cluster Data for Areas
+## MSOA Cluster Data for Areas
 ```{r}
 # Convert SF objects into SP objects
 SPAreaCluster <- as(SFMSOA, "Spatial")
@@ -292,9 +301,9 @@ Mean_GetisG
 tmap_save(Mean_GetisG, 'Mean_GetisG.png', units = "in", height = 5.59, width = 6.59)
 ```
 
-## Research Question 2
+# Research Question 2
 
-### Read in School, GP and Hospital Data
+## Read in School, GP and Hospital Data
 ```{r}
 # Read in code points.
 AllCodePoints <- read_csv("Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv",
@@ -347,7 +356,7 @@ Locations <- Locations[!duplicated(Locations$Name), ]
 
 ```
 
-### Extract Concentrations for Schools, GPs and Hospitals
+## Extract Concentrations for Schools, GPs and Hospitals
 ```{r}
 # Convert location coordinates into point geometry.
 SFLocations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = BNG)
@@ -393,7 +402,7 @@ SFGPsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "GP")
 SFHospitalsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "Hospital")
 ```
 
-### MSOA Cluster Data for Points
+## MSOA Cluster Data for Points
 ```{r}
 # Convert SF objects into SP objects
 SPPointCluster <- as(SFMSOA, "Spatial")
@@ -634,9 +643,9 @@ tmap_save(NO2_MoransI, 'NO2_MoransI.png', units = "in", height = 5.59, width = 6
 
 ```
 
-## Research Question 3
+# Research Question 3
 
-### Index of Multiple Deprivation 
+## Index of Multiple Deprivation 
 ```{r}
 # Read in indices of deprivation data.
 IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
@@ -686,7 +695,7 @@ SFLSOA<-merge(SFLSOA,
              all.x = TRUE)
 ```
 
-### Road Density
+## Road Density
 ```{r}
 # Load road shapefile.
 Roads <- st_read("Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp")
@@ -733,7 +742,7 @@ SFMSOA<-merge(SFMSOA,
              all.x = TRUE)
 ```
 
-### Distance from Central London (Charing Cross)
+## Distance from Central London (Charing Cross)
 ```{r}
 # Create Postcode vector with Charing Cross postcode.
 Postcode <- "WC2N5DU"
@@ -778,7 +787,7 @@ SFMSOA<-merge(SFMSOA,
              all.x = TRUE)
 ```
 
-### Linear Regression Model
+## Linear Regression Model
 ```{r}
 # Conduct linear regression.
 LRNO2 <- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
@@ -794,7 +803,7 @@ LRResultsPM2.5 <- tidy(LRPM2.5)
 
 ```
 
-### Linear Regression - Assumption 1
+## Linear Regression - Assumption 1
 ```{r}
 # Plot histogram on variables.
 ggplot(SFMSOA, aes(x=`Mean NO2 Conc.`)) + 
@@ -819,14 +828,14 @@ qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)
 qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)
 ```
 
-### Linear Regression - Assumption 2
+## Linear Regression - Assumption 2
 ```{r}
 # Plot linear regression model residuals in a histogram.
 qplot(LRNO2$residuals) + geom_histogram() 
 qplot(LRPM2.5$residuals) + geom_histogram() 
 ```
 
-### Linear Regression - Assumption 3
+## Linear Regression - Assumption 3
 ```{r}
 # Remove geometry of SFMSOA.
 CorMSOA <- st_set_geometry(SFMSOA,NULL)
@@ -845,7 +854,7 @@ vif(LRNO2)
 vif(LRPM2.5)
 ```
 
-### Linear Regression - Assumption 4
+## Linear Regression - Assumption 4
 ```{r}
 # Plot model diagnostics.
 plot(LRNO2)
@@ -853,7 +862,7 @@ plot(LRPM2.5)
 
 ```
 
-### Linear Regression - Assumption 5
+## Linear Regression - Assumption 5
 ```{r}
 # Merge model residuals to shapefile.
 SFMSOA$`LRNO2 Residuals` <- LRNO2$residuals
@@ -874,7 +883,7 @@ moran.test(SPMSOA@data$LRPM2.5.Residuals, SpWeightsMSOA)
 
 ```
 
-### GWR
+## GWR
 ```{r}
 # Calculate kernel bandwidths.
 GWRbandwidthNO2 <- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
@@ -1001,9 +1010,9 @@ tmap_save(PM2.5_Coef, 'PM2.5_Coef.png', units = "in", height = 5.59, width = 6.5
 
 ```
 
-## Leaflet Popups and Palettes
+# Leaflet Popups and Palettes
 
-### Popup Tables and Palettes For Area Data
+## Popup Tables and Palettes For Area Data
 ```{r}
 # Create copies of the MSOA data.
 PopArea <- SFMSOA
@@ -1021,7 +1030,7 @@ PalPM2.5 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean PM2.5 Conc
 
 ```
 
-### Popup Tables and Palettes For MSOA Area Cluster Data
+## Popup Tables and Palettes For MSOA Area Cluster Data
 ```{r}
 # Create copies of the MSOA data.
 PopAreaCluster <- SFAreaCluster
@@ -1039,7 +1048,7 @@ PalPM2.5Cluster <- colorBin(PalMi, domain = PopAreaCluster$`PM2.5 Getis Ord G`, 
 
 ```
 
-### Popup Tables and Palettes For Point Data
+## Popup Tables and Palettes For Point Data
 ```{r}
 # Create copies of the point data.
 PopLADBry <- SFLAD
@@ -1088,7 +1097,7 @@ PalAll <- colorFactor(c("LightSkyBlue", "RoyalBlue", "LightGreen"), levels = c("
 PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "School"))
 ```
 
-### Popup Tables and Palettes For Point Cluster Data
+## Popup Tables and Palettes For Point Cluster Data
 ```{r}
 # Create copies of the MSOA data.
 PopPointCluster <- SFPointCluster
@@ -1119,7 +1128,7 @@ PalGPsPM2.5Cluster <- colorBin(PalMi, domain = PopPointCluster$`GP (PM2.5) Moran
 PalHospitalsPM2.5Cluster <- colorBin(PalMi, domain = PopPointCluster$`Hospital (PM2.5) Moran's I`, bins = BrksMi)
 ```
 
-### Popup Tables and Palettes For MSOA LR Data
+## Popup Tables and Palettes For MSOA LR Data
 ```{r}
 # Create popup tables.
 PopIMDScore <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD Score"))
@@ -1133,7 +1142,7 @@ PalDistCLondon <- colorBin("YlOrBr", domain = PopArea$`Dist. from C. London (km)
 
 ```
 
-### Popup Tables and Palettes For MSOA GWR Data
+## Popup Tables and Palettes For MSOA GWR Data
 ```{r}
 # Create popup tables.
 PopIMDScoreNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD NO2 Coef."))
@@ -1152,7 +1161,7 @@ PalDistCLondonNO2 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. fr
 PalDistCLondonPM2.5 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. from C. London PM2.5 Coef.`, bins = c(-0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0))
 ```
 
-## Leaflet Interactive Map
+# Leaflet Interactive Map
 ```{r}
 # Map using leaflet.
 MapLeaflet <- leaflet() %>% 

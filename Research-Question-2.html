@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Research Question 2</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 45px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h2 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h3 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h4 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h5 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h6 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">CASA0005 Coursework - Code</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="Index.html">Home</a>
+</li>
+<li>
+  <a href="Packages.html">Packages</a>
+</li>
+<li>
+  <a href="Research-Question-1.html">Research Question 1</a>
+</li>
+<li>
+  <a href="Research-Question-2.html">Research Question 2</a>
+</li>
+<li>
+  <a href="Research-Question-3.html">Research Question 3</a>
+</li>
+<li>
+  <a href="Interactive-Map.html">Interactive Map</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Research Question 2</h1>
+
+</div>
+
+
+<div id="read-in-school-gp-and-hospital-data" class="section level1">
+<h1><span class="header-section-number">1</span> Read in School, GP and Hospital Data</h1>
+<pre class="r"><code># Read in code points.
+AllCodePoints &lt;- read_csv(&quot;Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv&quot;,
+                       locale = locale(encoding = &quot;latin1&quot;),
+                       na = &quot;n/a&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Postcode = col_character(),
+##   Eastings = col_double(),
+##   Northings = col_double()
+## )</code></pre>
+<pre class="r"><code># Read in  data.
+Schools &lt;- read_csv(&quot;Data/Schools and Health/All School Locations 2016.csv&quot;,
+                       locale = locale(encoding = &quot;latin1&quot;),
+                       na = &quot;n/a&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   OBJECTID = col_number(),
+##   URN = col_double(),
+##   EASTING = col_double(),
+##   NORTHING = col_double(),
+##   NEW_URN = col_logical(),
+##   OLD_URN = col_logical(),
+##   map_icon_l = col_double(),
+##   Primary = col_double(),
+##   x = col_double(),
+##   y = col_double()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>GPs &lt;- read_csv(&quot;Data/Schools and Health/GP Locations.csv&quot;,
+                       locale = locale(encoding = &quot;latin1&quot;),
+                       na = &quot;n/a&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   `Value  (NHS.UK users rating)` = col_double(),
+##   `Banding Classification  (NHS.UK users rating)` = col_double(),
+##   `Value  (Registered patients)` = col_double(),
+##   `Banding Classification  (Registered patients)` = col_logical(),
+##   `Banding Classification  (Weekday evening and weekend appointments offered here or nearby)` = col_logical()
+## )
+## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>Hospitals &lt;- read_csv(&quot;Data/Schools and Health/Hospital Locations.csv&quot;,
+                       locale = locale(encoding = &quot;latin1&quot;),
+                       na = &quot;n/a&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   `Value  (NHS.UK users rating)` = col_double(),
+##   `Banding Classification  (NHS.UK users rating)` = col_double(),
+##   `Value  (Care Quality Commission inspection ratings)` = col_double(),
+##   `Value  (Recommended by staff)` = col_double(),
+##   `Value  (Mortality rate (in hospital and up to 30 days after discharge))` = col_double(),
+##   `A&amp;E (A&amp;E onsite Comparison)` = col_logical()
+## )
+## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code># Select the necessary columns.
+Schools &lt;- Schools[,c(3, 8)]
+GPs &lt;- GPs[,c(1, 9)]
+Hospitals &lt;- Hospitals[,c(1, 9)]
+
+# Rename Columns.
+colnames(Schools) &lt;- c(&quot;Name&quot;, &quot;Postcode&quot;)
+colnames(GPs) &lt;- c(&quot;Name&quot;, &quot;Postcode&quot;)
+colnames(Hospitals) &lt;- c(&quot;Name&quot;, &quot;Postcode&quot;)
+
+# Classify data.
+Schools$Type &lt;- &quot;School&quot;
+GPs$Type &lt;- &quot;GP&quot;
+Hospitals$Type &lt;- &quot;Hospital&quot;
+
+# Merge school, GP and hospital points.
+Locations &lt;- rbind(Schools, GPs, Hospitals)
+
+# Remove space in postcodes
+Locations$Postcode &lt;- gsub(&quot; &quot;,&quot;&quot;, Locations$Postcode)
+
+# Attach code points.
+Locations&lt;-merge(Locations, 
+             AllCodePoints, 
+             by.x=&quot;Postcode&quot;, 
+             by.y=&quot;Postcode&quot;,
+             no.dups = TRUE)
+
+# Reorder columns
+Locations &lt;- Locations[,c(2, 1, 3, 4, 5)]
+
+# Remove duplicates.
+Locations &lt;- Locations[!duplicated(Locations$Name), ]</code></pre>
+</div>
+<div id="extract-concentrations-for-schools-gps-and-hospitals" class="section level1">
+<h1><span class="header-section-number">2</span> Extract Concentrations for Schools, GPs and Hospitals</h1>
+<pre class="r"><code># Convert location coordinates into point geometry.
+SFLocations &lt;- st_as_sf(Locations, coords = c(&quot;Eastings&quot;, &quot;Northings&quot;), crs = BNG)
+
+# Transform CRS into WGS84.
+SFLocations &lt;- st_transform(SFLocations, WGS84)
+
+# Select points inside London.
+SFLocations &lt;- SFLocations[SFLAD,]</code></pre>
+<pre><code>## although coordinates are longitude/latitude, st_intersects assumes that they are planar
+## although coordinates are longitude/latitude, st_intersects assumes that they are planar</code></pre>
+<pre class="r"><code># Extract concentrations.
+SFLocations$`NO2 (µg/m³)`&lt;- raster::extract(PollutionConc[[1]], SFLocations)
+SFLocations$`PM2.5 (µg/m³)`&lt;- raster::extract(PollutionConc[[2]], SFLocations)
+
+# Round concentrations to 2 d.p..
+SFLocations$`NO2 (µg/m³)` &lt;- round(SFLocations$`NO2 (µg/m³)`, digits = 2)
+SFLocations$`PM2.5 (µg/m³)` &lt;- round(SFLocations$`PM2.5 (µg/m³)`, digits = 2)
+
+# Rename columns.
+colnames(SFLocations) &lt;- c(&quot;Building Name&quot;, &quot;Postcode&quot;, &quot;Building Type&quot;, &quot;geometry&quot;, &quot;NO2 (µg/m³)&quot;, &quot;PM2.5 (µg/m³)&quot;)
+
+# Extract schools, GPs and hospitals that exceed WHO guides
+SFLocationsNO2 &lt;- SFLocations %&gt;% filter(`NO2 (µg/m³)` &gt; 40)
+SFLocationsPM2.5 &lt;- SFLocations %&gt;% filter(`PM2.5 (µg/m³)` &gt; 10)
+
+# Subset data
+SFSchools &lt;- subset(SFLocations, `Building Type` == &quot;School&quot;)
+
+SFGPs &lt;- subset(SFLocations, `Building Type` == &quot;GP&quot;)
+
+SFHospitals &lt;- subset(SFLocations, `Building Type` == &quot;Hospital&quot;)
+
+SFSchoolsNO2 &lt;- subset(SFLocationsNO2, `Building Type` == &quot;School&quot;)
+
+SFGPsNO2 &lt;- subset(SFLocationsNO2, `Building Type` == &quot;GP&quot;)
+
+SFHospitalsNO2 &lt;- subset(SFLocationsNO2, `Building Type` == &quot;Hospital&quot;)
+
+SFSchoolsPM2.5 &lt;- subset(SFLocationsPM2.5, `Building Type` == &quot;School&quot;)
+
+SFGPsPM2.5 &lt;- subset(SFLocationsPM2.5, `Building Type` == &quot;GP&quot;)
+
+SFHospitalsPM2.5 &lt;- subset(SFLocationsPM2.5, `Building Type` == &quot;Hospital&quot;)</code></pre>
+</div>
+<div id="msoa-cluster-data-for-points" class="section level1">
+<h1><span class="header-section-number">3</span> MSOA Cluster Data for Points</h1>
+<pre class="r"><code># Convert SF objects into SP objects
+SPPointCluster &lt;- as(SFMSOA, &quot;Spatial&quot;)
+SPSchools &lt;- as(SFSchools, &quot;Spatial&quot;)
+SPGPs &lt;- as(SFGPs, &quot;Spatial&quot;)
+SPHospitals &lt;- as(SFHospitals, &quot;Spatial&quot;)
+SPSchoolsNO2 &lt;- as(SFSchoolsNO2, &quot;Spatial&quot;)
+SPGPsNO2 &lt;- as(SFGPsNO2, &quot;Spatial&quot;)
+SPHospitalsNO2 &lt;- as(SFHospitalsNO2, &quot;Spatial&quot;)
+SPSchoolsPM2.5 &lt;- as(SFSchoolsPM2.5, &quot;Spatial&quot;)
+SPGPsPM2.5 &lt;- as(SFGPsPM2.5, &quot;Spatial&quot;)
+SPHospitalsPM2.5 &lt;- as(SFHospitalsPM2.5, &quot;Spatial&quot;)
+
+# Transform CRS to BNG (a projected CRS).
+SPPointCluster &lt;- spTransform(SPPointCluster, BNG)
+SPSchools &lt;- spTransform(SPSchools, BNG)
+SPGPs &lt;- spTransform(SPGPs, BNG)
+SPHospitals &lt;- spTransform(SPHospitals, BNG)
+SPSchoolsNO2 &lt;- spTransform(SPSchoolsNO2, BNG)
+SPGPsNO2 &lt;- spTransform(SPGPsNO2, BNG)
+SPHospitalsNO2 &lt;- spTransform(SPHospitalsNO2, BNG)
+SPSchoolsPM2.5 &lt;- spTransform(SPSchoolsPM2.5, BNG)
+SPGPsPM2.5 &lt;- spTransform(SPGPsPM2.5, BNG)
+SPHospitalsPM2.5 &lt;- spTransform(SPHospitalsPM2.5, BNG)
+
+# Count the number of points in each MSOA.
+SPPointCluster@data$SchoolCount &lt;- poly.counts(SPSchools, SPPointCluster)
+SPPointCluster@data$GPCount &lt;- poly.counts(SPGPs, SPPointCluster)
+SPPointCluster@data$HospitalCount &lt;- poly.counts(SPHospitals, SPPointCluster)
+SPPointCluster@data$SchoolNO2Count &lt;- poly.counts(SPSchoolsNO2, SPPointCluster)
+SPPointCluster@data$GPNO2Count &lt;- poly.counts(SPGPsNO2, SPPointCluster)
+SPPointCluster@data$HospitalNO2Count &lt;- poly.counts(SPHospitalsNO2, SPPointCluster)
+SPPointCluster@data$SchoolPM2.5Count &lt;- poly.counts(SPSchoolsPM2.5, SPPointCluster)
+SPPointCluster@data$GPPM2.5Count &lt;- poly.counts(SPGPsPM2.5, SPPointCluster)
+SPPointCluster@data$HospitalPM2.5Count &lt;- poly.counts(SPHospitalsPM2.5, SPPointCluster)
+
+# Calculate point density.
+SPPointCluster@data$SchoolDensity &lt;- round(SPPointCluster@data$SchoolCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPDensity &lt;- round(SPPointCluster@data$GPCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalDensity &lt;- round(SPPointCluster@data$HospitalCount/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$SchoolNO2Density &lt;- round(SPPointCluster@data$SchoolNO2Count/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPNO2Density &lt;- round(SPPointCluster@data$GPNO2Count/(poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalNO2Density &lt;- round(SPPointCluster@data$HospitalNO2Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$SchoolPM2.5Density &lt;- round(SPPointCluster@data$SchoolPM2.5Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$GPPM2.5Density &lt;- round(SPPointCluster@data$GPPM2.5Count/ (poly.areas(SPPointCluster)/1000000), digits = 3)
+SPPointCluster@data$HospitalPM2.5Density &lt;- round(SPPointCluster@data$HospitalPM2.5Count / (poly.areas(SPPointCluster)/1000000), digits = 3)
+
+# Conduct global Moran&#39;s I.
+GlbMIAllSchool &lt;- moran.test(SPPointCluster@data$SchoolDensity, SpWeightsMSOA)
+GlbMIAllGP &lt;- moran.test(SPPointCluster@data$GPDensity, SpWeightsMSOA)
+GlbMIAllHospital &lt;- moran.test(SPPointCluster@data$HospitalDensity, SpWeightsMSOA)
+GlbMINO2School &lt;- moran.test(SPPointCluster@data$SchoolNO2Density, SpWeightsMSOA)
+GlbMINO2GP &lt;- moran.test(SPPointCluster@data$GPNO2Density, SpWeightsMSOA)
+GlbMINO2Hospital &lt;- moran.test(SPPointCluster@data$HospitalNO2Density, SpWeightsMSOA)
+GlbMIPM2.5School &lt;- moran.test(SPPointCluster@data$SchoolPM2.5Density, SpWeightsMSOA)
+GlbMIPM2.5GP &lt;- moran.test(SPPointCluster@data$GPPM2.5Density, SpWeightsMSOA)
+GlbMIPM2.5Hospital &lt;- moran.test(SPPointCluster@data$HospitalPM2.5Density, SpWeightsMSOA)
+
+# Conduct local Moran&#39;s I.
+lclMIAllSchool &lt;- round(localmoran(SPPointCluster@data$SchoolDensity, SpWeightsMSOA), digits = 3)
+lclMIAllGP &lt;- round(localmoran(SPPointCluster@data$GPDensity, SpWeightsMSOA), digits = 3)
+lclMIAllHospital &lt;- round(localmoran(SPPointCluster@data$HospitalDensity, SpWeightsMSOA), digits = 3)
+lclMINO2School &lt;- round(localmoran(SPPointCluster@data$SchoolNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2GP &lt;- round(localmoran(SPPointCluster@data$GPNO2Density, SpWeightsMSOA), digits = 3)
+lclMINO2Hospital &lt;- round(localmoran(SPPointCluster@data$HospitalNO2Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5School &lt;- round(localmoran(SPPointCluster@data$SchoolPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5GP &lt;- round(localmoran(SPPointCluster@data$GPPM2.5Density, SpWeightsMSOA), digits = 3)
+lclMIPM2.5Hospital &lt;- round(localmoran(SPPointCluster@data$HospitalPM2.5Density, SpWeightsMSOA), digits = 3)
+
+# Join local Moran&#39;s I Z values to shape file.
+SPPointCluster$lclMIAllSchool &lt;- lclMIAllSchool[,4]
+SPPointCluster$lclMIAllGP &lt;- lclMIAllGP[,4]
+SPPointCluster$lclMIAllHospital &lt;- lclMIAllHospital[,4]
+SPPointCluster$lclMINO2School &lt;- lclMINO2School[,4]
+SPPointCluster$lclMINO2GP &lt;- lclMINO2GP[,4]
+SPPointCluster$lclMINO2Hospital &lt;- lclMINO2Hospital[,4]
+SPPointCluster$lclMIPM2.5School &lt;- lclMIPM2.5School[,4]
+SPPointCluster$lclMIPM2.5GP &lt;- lclMIPM2.5GP[,4]
+SPPointCluster$lclMIPM2.5Hospital &lt;- lclMIPM2.5Hospital[,4]
+
+# Convert SP MSOA data into a data frame.
+SFPointCluster &lt;- st_as_sf(SPPointCluster)
+
+# Transform CRS to WGS
+SFPointCluster &lt;- st_transform(SFPointCluster, WGS84)
+
+# Rename columns
+colnames(SFPointCluster) &lt;- c(&quot;MSOA Code&quot;, &quot;MSOA Name&quot;, &quot;LAD Name&quot;, &quot;LAD Code&quot;, &quot;Mean NO2 Conc.&quot;, &quot;Mean PM2.5 Conc.&quot;, &quot;School (All) Count&quot;, &quot;GP (All) Count&quot;, &quot;Hospital (All) Count&quot;, &quot;School (NO2) Count&quot;, &quot;GP (NO2) Count&quot;, &quot;Hospital (NO2) Count&quot;, &quot;School (PM2.5) Count&quot;, &quot;GP (PM2.5) Count&quot;, &quot;Hospital (PM2.5) Count&quot;, &quot;School (All) Density&quot;, &quot;GP (All) Density&quot;, &quot;Hospital (All) Density&quot;, &quot;School (NO2) Density&quot;, &quot;GP (NO2) Density&quot;, &quot;Hospital (NO2) Density&quot;, &quot;School (PM2.5) Density&quot;, &quot;GP (PM2.5) Density&quot;, &quot;Hospital (PM2.5) Density&quot;, &quot;School (All) Moran&#39;s I&quot;, &quot;GP (All) Moran&#39;s I&quot;, &quot;Hospital (All) Moran&#39;s I&quot;, &quot;School (NO2) Moran&#39;s I&quot;, &quot;GP (NO2) Moran&#39;s I&quot;, &quot;Hospital (NO2) Moran&#39;s I&quot;, &quot;School (PM2.5) Moran&#39;s I&quot;, &quot;GP (PM2.5) Moran&#39;s I&quot;, &quot;Hospital (PM2.5) Moran&#39;s I&quot;, &quot;geometry&quot;)
+
+# Subset Data
+SFPointCluster_SchoolsAll &lt;- SFPointCluster[, c(25, 34)]
+SFPointCluster_GPsAll &lt;- SFPointCluster[, c(26, 34)]
+SFPointCluster_HospitalsAll &lt;- SFPointCluster[, c(27, 34)]
+SFPointCluster_SchoolsNO2 &lt;- SFPointCluster[, c(28, 34)]
+SFPointCluster_GPsNO2 &lt;- SFPointCluster[, c(29, 34)]
+SFPointCluster_HospitalsNO2 &lt;- SFPointCluster[, c(30, 34)]
+SFPointCluster_SchoolsPM2.5 &lt;- SFPointCluster[, c(31, 34)]
+SFPointCluster_GPsPM2.5 &lt;- SFPointCluster[, c(32, 34)]
+SFPointCluster_HospitalsPM2.5 &lt;- SFPointCluster[, c(33, 34)]
+
+# Rename columns.
+colnames(SFPointCluster_SchoolsAll) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_GPsAll) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_HospitalsAll) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_SchoolsNO2) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_GPsNO2) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_HospitalsNO2) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_SchoolsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_GPsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+colnames(SFPointCluster_HospitalsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
+
+# Map Moran&#39;s I.
+All_Schools_MoransI &lt;- tm_shape(SFPointCluster_SchoolsAll) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(a)&quot;, position=c(0,0.85), size=1.5)
+
+All_GPs_MoransI &lt;- tm_shape(SFPointCluster_GPsAll) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0,
+             position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(b)&quot;, position=c(0,0.85), size=1.5)
+
+All_Hospitals_MoransI &lt;- tm_shape(SFPointCluster_HospitalsAll) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0,
+             position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(c)&quot;, position=c(0,0.85), size=1.5)
+
+All_MoransI_Legend &lt;- tm_shape(SFPointCluster_HospitalsAll) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_layout(legend.only = TRUE, legend.position=c(0,0.4),asp=0.1)
+
+
+All_MoransI &lt;- tmap_arrange(All_Schools_MoransI, All_GPs_MoransI, All_Hospitals_MoransI, All_MoransI_Legend, ncol=2, nrow = 2)
+All_MoransI</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_GPsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>NO2_Schools_MoransI &lt;- tm_shape(SFPointCluster_SchoolsNO2) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0, position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(a)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_GPs_MoransI &lt;- tm_shape(SFPointCluster_GPsNO2) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0,
+             position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(b)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_Hospitals_MoransI &lt;- tm_shape(SFPointCluster_HospitalsNO2) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_shape(LAD) +
+  tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 2.0) +
+  tm_shape(MSOA) +
+    tm_polygons(col = NA, alpha = 0, border.col = &quot;black&quot;, lwd = 1.0)+
+  tm_layout(aes.palette = list(seq = &quot;-RdYlBu&quot;),
+            frame = FALSE)+
+  tm_legend(show = FALSE)+
+  tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))+
+  tm_compass(north = 0,
+             position = c(&quot;right&quot;, &quot;top&quot;))+
+  tm_credits(&quot;(c)&quot;, position=c(0,0.85), size=1.5)
+
+NO2_MoransI_Legend &lt;- tm_shape(SFPointCluster_SchoolsNO2) +
+  tm_polygons(col = &quot;Moran&#39;s I&quot;, 
+              palette = PalMi, 
+              breaks = BrksMi,
+              midpoint = 0)+
+  tm_layout(legend.only = TRUE, legend.position=c(0,0.4),asp=0.1)
+
+NO2_MoransI &lt;- tmap_arrange(NO2_Schools_MoransI, NO2_GPs_MoransI, NO2_Hospitals_MoransI, NO2_MoransI_Legend, ncol=2, nrow = 2)
+NO2_MoransI</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_GPsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsNO2 is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
