@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>R Notebook</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 45px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h2 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h3 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h4 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h5 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h6 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">CASA0005 Coursework - Code</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="Index.html">Home</a>
+</li>
+<li>
+  <a href="Packages.html">Packages</a>
+</li>
+<li>
+  <a href="Research-Question-1.html">Research Question 1</a>
+</li>
+<li>
+  <a href="Research-Question-2.html">Research Question 2</a>
+</li>
+<li>
+  <a href="Research-Question-3.html">Research Question 3</a>
+</li>
+<li>
+  <a href="Interactive-Map.html">Interactive Map</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">R Notebook</h1>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>Air pollution within London has improved greatly since the Great Smog of 1952 and the 12000 deaths it caused, in large part due to the subsequent Clean Air Act, prompting an effort to manage the public’s exposure to air pollution through policy and legislation <span class="citation">(Bell and Davis 2001)</span>. However, air pollution remains a constant issue in London’s history with each generation being challenged by a new pollutant, shifting from soot and sulphur dioxide in the 1940s-50s to lead and ozone in the 1960s-80s <span class="citation">(Royal College of Physicians and Royal College of Pediatrics and Child Care 2016)</span>. The two main pollutants that endangers today’s generation are nitrogen dioxide (NO2) and fine particulate matter (PM2.5), which have had well documented impacts on the long-term morbidity and mortality of the population <span class="citation">(COMEAP 2010)</span>. It is thus important to develop an understanding of how these pollutants, those it affects, and its contributing factors are spatially distributed, so policy can adapt to address this issue.</p>
+<p>The concentration of air pollutants that people are exposed to can greatly influence their health and understanding how these concentrations vary spatially is important for identifying areas is particular risk <span class="citation">(COMEAP 2015)</span>. While all exposure is a risk factor, the World Health Organisation (WHO) has published guidelines that aim to aid policy makers in establishing legal limits for legislation to protect the public from significant health impacts <span class="citation">(World Health Organization 2005)</span>. The dynamics of a person’s exposure to air pollution can be divided into two distinct phases, their evening life that is often defined by their home environment, and their day life that is defined by their work or school environment <span class="citation">(Joint Research Centre 2004)</span>. However, while residential exposure can be observed through general concentration measurements, the variation in daytime locations can be extensive and be beyond the scope of this investigation. As such this investigation will focus on locations pertinent to the major groups at risk, namely children, the elderly, and those that are pregnant or have an existing health condition <span class="citation">(Bell, Zanobetti, and Dominici 2013)</span>. These vulnerable groups are likely to spend much of their time at schools, GPs and hospitals, making the exposure in these environments particularly important. Once these spatial patterns are identified, it is important to understand what causes them to occur. Once potential controlling factors are identified, it is possible to focus legislation and policy to address these factors.</p>
+</div>
+<div id="aim-and-research-questions" class="section level1">
+<h1><span class="header-section-number">2</span> Aim and Research Questions</h1>
+<div id="aim" class="section level2">
+<h2><span class="header-section-number">2.1</span> Aim:</h2>
+<p>To identify spatial patterns in NO2 and PM2.5 concentrations within London and identifying possible controlling factors that could explain its distribution.</p>
+</div>
+<div id="research-questions" class="section level2">
+<h2><span class="header-section-number">2.2</span> Research Questions:</h2>
+<ol style="list-style-type: decimal">
+<li><p>What spatial patterns are there for the spatial distribution of NO2 and PM2.5 concentrations are the MSOA scale within London?</p></li>
+<li><p>What spatial patterns are there for the spatial distribution of schools, GPs and hospitals that exceed the WHO air pollution guidelines within London?</p></li>
+<li><p>What controlling factors influence the spatial patterns in NO2 and PM2.5 concentration at the MSOA scale within London?</p></li>
+</ol>
+</div>
+</div>
+<div id="literature-review" class="section level1">
+<h1><span class="header-section-number">3</span> Literature Review</h1>
+<div id="nitrogen-dioxide-no2-and-fine-particulate-matter-2.5µm" class="section level2">
+<h2><span class="header-section-number">3.1</span> Nitrogen Dioxide (NO2) and Fine Particulate Matter (2.5µm)</h2>
+<p>Air pollution has been a fundamental issue for London for much of its history and its management has become a central pillar of policy since the Great Smog of 1952 and the subsequent Clean Air Act <span class="citation">(Polivka 2018)</span>. There has been a constant battle to manage air pollution exposure as new pollutants arise from societal development and policy, with the latest being NO2 and PM2.5 <span class="citation">(NICE 2017)</span>. While it is difficult to quantify the morbidity and mortality costs of these pollutants, the negative effects they cause has been well documented <span class="citation">(Royal College of Physicians and Royal College of Pediatrics and Child Care 2016)</span>. A report commissioned by Transport for London and the Greater London Authority found that over 9000 people died prematurely is 2010 from the effects of air pollution in London and the COMEAP predict that PM2.5 and NO2 cause a combined 40,000 deaths per year in the UK <span class="citation">(Walton et al. 2015; COMEAP 2010)</span>. NO2 and PM2.5 are often products of combustion, be that from combustion engines in vehicles or gas boilers and stoves in homes. The increase in NO2 and PM2.5 in London has largely been attributed to the large increases in vehicles on London’s streets, especially those that run on deasil <span class="citation">(Royal Commission on Environmental Pollution 2007)</span>. As noted by the Mayor of London Sadiq Kahn, it is ultimately a failure of policy <span class="citation">(Greater London Authority 2018)</span>. He as given priority to rectify this issue through his London Environment Strategy, though past attempts have yet to provide conclusive results.</p>
+</div>
+<div id="health-effects-and-vulnerable-groups" class="section level2">
+<h2><span class="header-section-number">3.2</span> Health Effects and Vulnerable Groups</h2>
+<p>As stated before, the impacts of NO2 and PM2.5 on human morbidity and mortality has been widely documented and studied, being attributed to many health impacts <span class="citation">(COMEAP 2009)</span>. While many of these links require more study due to the long-term nature of many of these effects, there is extensive evidence to indicate that they do have large impacts on health <span class="citation">(World Health Organization 2013)</span>. The health effects associated with air pollution is extensive. There is growing evidence that air pollution is associated with impaired lung function, asthma, type 2 diabetes, cognitive deficiency, cardiovascular disease and lung cancer <span class="citation">(Rice et al. 2015; Koenig 1999; Thiering and Heinrich 2015; Power et al. 2016; Rajagopalan, Al-Kindi, and Brook 2018; Raaschou-Nielsen et al. 2011)</span>. Infants and children are of vulnerable, as they are in a state of rapid development, meaning any adverse factors could have a much greater influence during this period <span class="citation">(Schwartz 2004)</span>. The elderly and the chronically ill are likely to be more vulnerable as their existing conditions can potentially expose them to more severe effects of air pollution <span class="citation">(Bell, Zanobetti, and Dominici 2013)</span>. However, the evidence for these trends are less consistent with those of children as there are many different conditions and medication that may affect the results.</p>
+</div>
+<div id="potential-controlling-factors" class="section level2">
+<h2><span class="header-section-number">3.3</span> Potential Controlling Factors</h2>
+<p>NO2 and PM2.5 have several potential controlling factors that influence its spatial distribution, like road density. Deasil vehicles have gained popularity in Europe due to their efficiency and low CO2 emissions, but coming at the cost of increased NO2 emissions <span class="citation">(Cames and Helmers 2013)</span>. Most of this increased traffic is likely to be concentrated on main roads. Another potential factor related to NO2 and PM2.5 concentrations is the deprivation of communities that often have poorer air quality <span class="citation">(Pye, King, and Sturman 2006)</span>. There are several suggested reasons, like hosting polluting industries, having poorer infrastructure and reduced access to open spaces.</p>
+</div>
+</div>
+<div id="methodology" class="section level1">
+<h1><span class="header-section-number">4</span> Methodology</h1>
+<p>The data, code and R packages used in this investigation are available on Github: <a href="https://github.com/SamuelKWLi/CASA0005-Coursework.git" class="uri">https://github.com/SamuelKWLi/CASA0005-Coursework.git</a></p>
+<div id="research-question-1" class="section level2">
+<h2><span class="header-section-number">4.1</span> Research Question 1</h2>
+<p>Figure 1: Flow chart for the method used to answer research question 1 by assessing the spatial autocorrelation of the mean NO2 and PM2.5 data across London.</p>
+<p>The NO2 and PM2.5 concentration data was sourced from the London Atmospheric Emissions Inventory, coming in the form of a 20m by 20m raster containing the 2016 annual mean concentration over Greater London and its surrounding area. This data had to be vectorised in order to apply spatial analysis techniques, so the mean concentration was calculated for each MSOA. The analysis was conducted at the MSOA scale as the sample size was smaller and less computationally intensive than LSOAs and were more consistent when compared to wards. A quantitative analysis of spatial distribution is conducted using Getis Ord G which analyses the data for hotspots.</p>
+</div>
+<div id="research-question-2" class="section level2">
+<h2><span class="header-section-number">4.2</span> Research Question 2</h2>
+<p>Figure 2: Flow chart for the method used to answer research question 2 by assessing the spatial autocorrelation of the point density of schools, GPs and hospitals across London.</p>
+<p>The school data is sourced from the London Schools Atlas and the GP and hospital data came from NHS Services Search website by looking up GPs and hospitals in a 50-mile radius from the centre of London. The data came as a list of postcodes which needed to be turned into point data using the Ordinance Survey Code Points project which allocated each postcode a set of BNG northings and eastings. Point pattern analysis techniques were far too resource intensive to conduct on such a large sample size, so the data was converted into MSOA point densities. Moran’s I spatial autocorrelation analysis could then be applied to this smaller sample size.</p>
+</div>
+<div id="research-question-3" class="section level2">
+<h2><span class="header-section-number">4.3</span> Research Question 3</h2>
+<p>Figure 3: Flow chart for the method used to answer research question 3 by assessing the linear relationship between deprivation, road density and distance from Central London on the concentration of NO2 and PM2.5.</p>
+<p>The deprivation data was sourced from the GLA via the London Datastore and came in the form of a list of scores, ranks and quantiles for indices of deprivation of each LSOA. The general score for the Index of Multiple Deprivation (IMD) was used for this investigation as a general measure of deprivation. The data had to be aggregated into a mean IMD score for each MSOA as it was in the LSOA scale. The road density data was obtained from a vector shapefile of the main road network in London that accompanied the LAEI data. The distance from Central London data was determined by using the MSOA centroids determined for the Moran’s I analysis and calculating the distance to Central London, which was set to be Charing Cross, as is historic convention. Once the multiple linear regression is conducted, its assumptions are tested to assess its statistical robustness. A Geographically Weighted Regression (GWR) model is then applied to assess how the linear relationships vary spatially over London, showing local patterns not observed in the global model.</p>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1><span class="header-section-number">5</span> Results</h1>
+<p>An interactive Leaflet map of the results with more detailed data can be found on Github: <a href="https://samuelkwli.github.io/CASA0005-Coursework/" class="uri">https://samuelkwli.github.io/CASA0005-Coursework/</a></p>
+<div id="research-question-1-1" class="section level2">
+<h2><span class="header-section-number">5.1</span> Research Question 1</h2>
+<p>Figure 4: A map of the mean NO2 concentration for London MSOAs in µg/m3. The WHO guidelines are set at 40 µg/m3 with areas in blue denoting MSOAs below this limit and areas in yellow to red being above this limit.</p>
+<p>From Figure 4, it is possible to see that there appears to be a trend of decreasing NO2 concentration with increasing distance from the city centre. Only areas of inner London exceed the WHO guidelines, with some areas being 50% over safe concentrations</p>
+<p>Figure 5: A map of the mean PM2.5 concentration for London MSOAs in µg/m3. The WHO guidelines are set at 10 µg/m3 with areas in blue denoting MSOAs below this limit and areas in yellow to red being above this limit.</p>
+<p>From Figure 5, it is possible to see that there appears to be a trend of decreasing PM2.5 concentration with increasing distance from the city centre. All of Greater London are exceeding the WHO guidelines, with some areas being 75% above safe concentrations.</p>
+<p>The global Getis Ord G functions by comparing a G value and an expected value. The difference in values for NO2 and PM2.5 are 2.551E-05 and 5.654E-06 respectively, indicating that there is either no clustering or equal clustering of positive and negative values.</p>
+<p>Figure 6: Maps of the local Getis Ord G outputs for NO2 (a) and PM2.5 (b) concentration. The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates cold spots (clusters of low values) and red indicates hot spots (clusters of high values).</p>
+<p>From figures 6, it is apparent that there is statistically significant clustering of high concentrations in the centre and low concentrations in the outskirts of London.</p>
+</div>
+<div id="research-question-2-1" class="section level2">
+<h2><span class="header-section-number">5.2</span> Research Question 2</h2>
+<p>Figure 7: Maps of the local Moran’s I outputs for MSOA point density of all London schools (a), GPs (b) and hospitals (c). The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates areas with negative spatial autocorrelation and red indicates areas with positive spatial autocorrelation.</p>
+<p>The low global Moran’s I value of 0.288 for schools, 0.119 for GPs, and 0.073 for hospitals indicates there is little or no spatial autocorrelation. Figure 7 indicates the local Moran’s I shows little statistically significant clustering. These patterns also apply to locations that exceed the WHO guidelines for PM2.5 as the entirety of London exceeds the 10 µg/m3 recommendation.</p>
+<p>Figure 8: Maps of the local Moran’s I outputs for MSOA point density of all London schools (a), GPs (b) and hospitals (c) that exceed 40 µg/m3. The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates areas with negative spatial autocorrelation and red indicates areas with positive spatial autocorrelation.</p>
+<p>The higher global Moran’s I value of 0.520 for schools, 0.316 for GPs, and 0.148 for hospitals indicates there is more spatial autocorrelation than normal. Figure 8 indicates the local Moran’s I shows more pronounced statistically significant clustering in the centre of London.</p>
+</div>
+<div id="research-question-3-1" class="section level2">
+<h2><span class="header-section-number">5.3</span> Research Question 3</h2>
+<p>Table 1: A table of results for the multiple linear regression of MSOA NO2 concentration and the independent factors.</p>
+<p>Table 2: A table of results for the multiple linear regression of MSOA PM2.5 concentration and the independent factors.</p>
+<p>From tables 1 and 2, it is apparent that both NO2 and PM 2.5 share a statistically significant positive relationship with the IMD score and road density and have a negative relationship with the distance from Central London. The NO2 and PM2.5 models have a good linear fit with low residual standard errors of 1.649 and 0.2451, meaning a low percentage error of 4.154% and 1.763% respectively. The NO2 and PM2.5 models also account for about 90% of the concertation variation, with adjusted R2 values of 0.903 and 0.906.</p>
+<p>Figure 9: Maps of NO2 GWR coefficient outputs for IMD scores (a), road density (b) and distance from Central London (c). Red denotes a negative coefficient (negative relationship) and blue denotes a positive coefficient (positive relationship).</p>
+<p>Figure 10: Maps of PM2.5 GWR coefficient outputs for IMD scores (a), road density (b) and distance from Central London (c). Red denotes a negative coefficient (negative relationship) and blue denotes a positive coefficient (positive relationship).</p>
+<p>The NO2 and PM2.5 GWR models improved the fit as they had higher R2 value of 0.989 and 0.988 respectively. Figure 9 and 10 indicates the IMD score has a generally positive relationship, with a strong negative relationship in the city centre. Road density has a generally positive relationship across the city, with it being strongest in the outskirts. Distance from Central London has a negative relationship, with this relationship being strongest in city centre.</p>
+</div>
+</div>
+<div id="discussion" class="section level1">
+<h1><span class="header-section-number">6</span> Discussion</h1>
+<p>From the results, it is apparent that NO2 pollution is mainly an inner-city issue, where it exceeds the WHO recommended concentration. Meanwhile, PM2.5 is a city-wide issue as the whole of London exceed the WHO guidelines. However, like with NO2, the issue is worst in the inner city. In the case of NO2, London is consistently above its legal limit of 40 µg/m3, necessitating a concerted effort to improve the situation <span class="citation">(European Environment Agency 2017)</span>. However, PM2.5 in London is universally below the legal limit of 25 µg/m3 while still being universally above the recommended limit of 10 µg/m3 <span class="citation">(European Environment Agency 2017)</span>. It is thus apparent that legislation needs to adapt and conform to the health needs of the public, instead of legal and economic expedience <span class="citation">(Royal College of Physicians and Royal College of Pediatrics and Child Care 2016)</span>.</p>
+<p>The most vulnerable groups to the effects of air pollution are not spared from poor air quality, and likely experience the most acute effects of the inequality. Like the findings of other studies by interest groups, this study found that many schools, GPs and hospitals, especially in the inner city are exposed to dangerous levels of NO2 and PM2.5 <span class="citation">(Castres et al. 2017)</span>. However, the measurements used are ambient concentrations, which may not reflect indoors exposure that most people would be experiencing, especially in the case of PM2.5 <span class="citation">(Wichmann et al. 2010)</span>. More research thorough investigation on indoors sources and concertation is needed but it is clear the surrounding environment is unsafe <span class="citation">(British Lung Foundation 2018)</span>.</p>
+<p>In terms of the multiple linear regression model, it is apparent that there are statistically significant relationships between NO2 and PM2.5 concentrations and deprivation, road density and distance from Central London. These findings are considered statistically robust as the assumptions that underpin the linear regression were fulfilled <span class="citation">(Casson and Farmer 2014)</span>. There are linear relationships between the dependent and independent variables, the residuals are normally distributed, there is minimal multicollinearity in the independent variables, there is homoscedasticity, and the independence of errors was addressed using the GWR. All three factors followed the general trend that was expected from the literature review. This was reinforced by the GWR model, which found that the relationships were stronger in the inner city, where priority should be given. The exception to this was deprivation, which followed a general positive relationship except for the wealthy city centre that followed a negative relationship. Past studies by Defra supports these findings, suggesting the relationships becomes more variable at the urban scale <span class="citation">(Pye, King, and Sturman 2006)</span>. The positive relationship with road density suggests that reducing road density through measures, like pedestrianisation, may be an effective way to reduce concentrations <span class="citation">(London Councils 2018)</span>. The negative relationship with distance from central London suggests that the best method of reducing exposure would be to leave the inner city. Using these findings, it is recommended that ‘safe zones’ of reduced NO2 and PM 2.5 concentrations be created around schools, GPs and hospitals, potentially by pedestrianizing roads in the area and creating green spaces <span class="citation">(Defra 2018)</span>. Focus should be given to deprived areas in the inner city and avenues of travel to the cleaner outer city, like green belts, should be provided.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1><span class="header-section-number">7</span> Conclusion</h1>
+<p>In conclusion, this investigation found that whole of London exceeds the WHO guidelines for PM2.5 and most of the inner city exceeds the NO2 limits, with the concentrations being highest in the inner city. These same patterns are observed in the schools, GPs and hospitals that exceed the safe limits, unequally exposing vulnerable groups to dangerous concentrations. Deprivation, road density and distance from Central London all have a statistically significant relationship with this distribution, being strongest in the inner city. Using these findings, it is recommended that pedestrianisation and greenspaces be used to create safe spaces around schools, GPs and hospitals, with focus on deprived areas in the inner city.</p>
+</div>
+<div id="bibliography" class="section level1 unnumbered">
+<h1>Bibliography</h1>
+<div id="refs" class="references">
+<div id="ref-Bell2017">
+<p>Bell, Michelle L, and Devra Lee Davis. 2001. “Reassessment of the Lethal London Fog of 1952 : Novel Indicators of Acute and Chronic Consequences of Acute Exposure to Air Pollution.” <em>Environmental Health Perspectives</em> 109 (3): 389–94. <a href="https://doi.org/10.1289/ehp.01109s3389">https://doi.org/10.1289/ehp.01109s3389</a>.</p>
+</div>
+<div id="ref-Bell2013">
+<p>Bell, Michelle L., Antonella Zanobetti, and Francesca Dominici. 2013. “Evidence on vulnerability and susceptibility to health risks associated with short-term exposure to particulate matter: a systematic review and meta-analysis.” <em>American Journal of Epidemiology</em> 178 (6): 865–76. <a href="https://doi.org/10.1093/aje/kwt090">https://doi.org/10.1093/aje/kwt090</a>.</p>
+</div>
+<div id="ref-BritishLungFoundation2018">
+<p>British Lung Foundation. 2018. “Toxic air at the door of the NHS.” October. British Lung Foundation. <a href="https://cdn.shopify.com/s/files/1/0221/4446/files/PM%7B\_%7DReport%7B\_%7DFINAL%7B\_%7Dweb%7B\_%7D40b0715b-8775-4ee1-a092-2199f9c48a46.pdf?14854756238904833688">https://cdn.shopify.com/s/files/1/0221/4446/files/PM{\_}Report{\_}FINAL{\_}web{\_}40b0715b-8775-4ee1-a092-2199f9c48a46.pdf?14854756238904833688</a>.</p>
+</div>
+<div id="ref-Cames2013">
+<p>Cames, Michel, and Eckard Helmers. 2013. “Critical evaluation of the European diesel car boom - Global comparison, environmental effects and various national strategies.” <em>Environmental Sciences Europe</em> 25 (1): 1–22. <a href="https://doi.org/10.1186/2190-4715-25-15">https://doi.org/10.1186/2190-4715-25-15</a>.</p>
+</div>
+<div id="ref-Casson2014">
+<p>Casson, Robert J., and Lachlan D. M. Farmer. 2014. “Understanding and checking the assumptions of linear regression: A primer for medical researchers.” <em>Clinical and Experimental Ophthalmology</em> 42 (6): 590–96. <a href="https://doi.org/10.1111/ceo.12358">https://doi.org/10.1111/ceo.12358</a>.</p>
+</div>
+<div id="ref-Castres2017">
+<p>Castres, Pauline, David Dajnak, Melissa Lott, and Nick Watts. 2017. “Most London hospitals and clinics exceed air pollution limits.” <em>BMJ</em> 357. <a href="https://doi.org/10.1136/bmj.j2855">https://doi.org/10.1136/bmj.j2855</a>.</p>
+</div>
+<div id="ref-COMEAP2009">
+<p>COMEAP. 2009. “Long-Term Exposure to Air Pollution: Effect on Mortality.” London: COMEAP. <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment%7B\_%7Ddata/file/304667/COMEAP%7B\_%7Dlong%7B\_%7Dterm%7B\_%7Dexposure%7B\_%7Dto%7B\_%7Dair%7B\_%7Dpollution.pdf">https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment{\_}data/file/304667/COMEAP{\_}long{\_}term{\_}exposure{\_}to{\_}air{\_}pollution.pdf</a>.</p>
+</div>
+<div id="ref-COMEAP2010">
+<p>———. 2010. “The Mortality Effects of Long-Term Exposure to Particulate Air Pollution in the United Kingdom.” London: Committee on the Medical Effects of Air Pollutants. <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment%7B\_%7Ddata/file/304641/COMEAP%7B\_%7Dmortality%7B\_%7Deffects%7B\_%7Dof%7B\_%7Dlong%7B\_%7Dterm%7B\_%7Dexposure.pdf">https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment{\_}data/file/304641/COMEAP{\_}mortality{\_}effects{\_}of{\_}long{\_}term{\_}exposure.pdf</a>.</p>
+</div>
+<div id="ref-COMEAP2015">
+<p>———. 2015. “Committee on the Medical Effects of Air Pollutants - Interim Statement on Quantifying the Association of Long-Term Average Concentrations of Nitrogen Dioxide and Mortality.” December. London: Committee on the Medical Effects of Air Pollutants. <a href="https://www.gov.uk/government/uploads/system/uploads/attachment%7B\_%7Ddata/file/485373/COMEAP%7B\_%7DNO2%7B\_%7DMortality%7B\_%7DInterim%7B\_%7DStatement.pdf">https://www.gov.uk/government/uploads/system/uploads/attachment{\_}data/file/485373/COMEAP{\_}NO2{\_}Mortality{\_}Interim{\_}Statement.pdf</a>.</p>
+</div>
+<div id="ref-Defra2018">
+<p>Defra. 2018. “Clean Air Strategy 2018.” London: Department for Environment, Food; Rural Affairs. <a href="https://consult.defra.gov.uk/environmental-quality/clean-air-strategy-consultation/supporting%7B\_%7Ddocuments/Clean%20Air%20Strategy%202018%20Consultation.pdf">https://consult.defra.gov.uk/environmental-quality/clean-air-strategy-consultation/supporting{\_}documents/Clean Air Strategy 2018 Consultation.pdf</a>.</p>
+</div>
+<div id="ref-EuropeanE2009">
+<p>European Environment Agency. 2017. “Air quality standards.” Copenhagen: European Environment Agency. <a href="https://www.eea.europa.eu/themes/air/air-quality-concentrations/air-quality-standards">https://www.eea.europa.eu/themes/air/air-quality-concentrations/air-quality-standards</a>.</p>
+</div>
+<div id="ref-GreaterLondonAuthority2018">
+<p>Greater London Authority. 2018. “London Environment Strategy.” London: Greater London Authority. <a href="https://www.london.gov.uk/sites/default/files/london%7B\_%7Denvironment%7B\_%7Dstrategy%7B\_%7D0.pdf">https://www.london.gov.uk/sites/default/files/london{\_}environment{\_}strategy{\_}0.pdf</a>.</p>
+</div>
+<div id="ref-JointResearchCentre2004">
+<p>Joint Research Centre. 2004. “The INDEX Project: Critical appraisal of the setting and implementation of indoor exposure limits in the EU.” Institute for Health; Consumer Protection Physical; Chemical Exposure Unit. <a href="https://ec.europa.eu/health/ph%7B\_%7Dprojects/2002/pollution/fp%7B\_%7Dpollution%7B\_%7D2002%7B\_%7Dfrep%7B\_%7D02.pdf">https://ec.europa.eu/health/ph{\_}projects/2002/pollution/fp{\_}pollution{\_}2002{\_}frep{\_}02.pdf</a>.</p>
+</div>
+<div id="ref-Koenig1999">
+<p>Koenig, Jane Q. 1999. “Air pollution and asthma.” <em>Journal of Allergy and Clinical Immunology</em> 104 (4): 717–22. <a href="https://doi.org/10.1016/S0091-6749(99)70280-0">https://doi.org/10.1016/S0091-6749(99)70280-0</a>.</p>
+</div>
+<div id="ref-LondonCouncils2018">
+<p>London Councils. 2018. “Demystifying Air Pollution in London full report Demystifying Air Pollution in London.” London: London Councils. <a href="https://www.londoncouncils.gov.uk/sites/default/files/Policy%20themes/Environment/Demystifying%20air%20pollution%20in%20London%20FINAL%20FULL%20REPORT%7B\_%7DIM%7B\_%7D0.pdf">https://www.londoncouncils.gov.uk/sites/default/files/Policy themes/Environment/Demystifying air pollution in London FINAL FULL REPORT{\_}IM{\_}0.pdf</a>.</p>
+</div>
+<div id="ref-NICE2017">
+<p>NICE. 2017. “Air pollution: outdoor air quality and health.” London: National Institute for Health; Care Excellence. <a href="https://www.nice.org.uk/guidance/ng70/resources/air-pollution-outdoor-air-quality-and-health-pdf-1837627509445">https://www.nice.org.uk/guidance/ng70/resources/air-pollution-outdoor-air-quality-and-health-pdf-1837627509445</a>.</p>
+</div>
+<div id="ref-Polivka2018">
+<p>Polivka, Barbara J. 2018. “The Great London Smog of 1952.” <em>American Journal of Nursing</em> 118 (4): 57–61. <a href="https://doi.org/10.1097/01.NAJ.0000532078.72372.c3">https://doi.org/10.1097/01.NAJ.0000532078.72372.c3</a>.</p>
+</div>
+<div id="ref-Power2016">
+<p>Power, Melinda C., Sara D. Adar, Jeff D. Yanosky, and Jennifer Weuve. 2016. “Exposure to air pollution as a potential contributor to cognitive function, cognitive decline, brain imaging, and dementia: A systematic review of epidemiologic research.” <em>NeuroToxicology</em> 56: 235–53. <a href="https://doi.org/10.1016/j.neuro.2016.06.004">https://doi.org/10.1016/j.neuro.2016.06.004</a>.</p>
+</div>
+<div id="ref-Pye2006">
+<p>Pye, S, K King, and G Sturman. 2006. “Air Quality and Social Deprivation in the UK: an environmental inequalities analysis.” London: Department of Environment, Food; Rural. <a href="https://www.camden.gov.uk/documents/20142/18572586/CD1-15.pdf/e5060969-6646-afa0-3d43-24f2b34c3a34">https://www.camden.gov.uk/documents/20142/18572586/CD1-15.pdf/e5060969-6646-afa0-3d43-24f2b34c3a34</a>.</p>
+</div>
+<div id="ref-Raaschou-Nielsen2011">
+<p>Raaschou-Nielsen, Ole, Zorana Jovanovic Andersen, Martin Hvidberg, Steen Solvang Jensen, Matthias Ketzel, Mette Sørensen, Steffen Loft, Kim Overvad, and Anne Tjønneland. 2011. “Lung cancer incidence and long-term exposure to air pollution from traffic.” <em>Environmental Health Perspectives</em> 119 (6): 860–65. <a href="https://doi.org/10.1289/ehp.1002353">https://doi.org/10.1289/ehp.1002353</a>.</p>
+</div>
+<div id="ref-Rajagopalan2018">
+<p>Rajagopalan, Sanjay, Sadeer G. Al-Kindi, and Robert D. Brook. 2018. “Air Pollution and Cardiovascular Disease: JACC State-of-the-Art Review.” <em>Journal of the American College of Cardiology</em> 72 (17): 2054–70. <a href="https://doi.org/10.1016/j.jacc.2018.07.099">https://doi.org/10.1016/j.jacc.2018.07.099</a>.</p>
+</div>
+<div id="ref-Rice2015">
+<p>Rice, Mary B., Petter L. Ljungman, Elissa H. Wilker, Kirsten S. Dorans, Diane R. Gold, Joel Schwartz, Petros Koutrakis, George R. Washko, George T. O’Connor, and Murray A. Mittleman. 2015. “Long-term exposure to traffic emissions and fine particulate matter and lung function decline in the Framingham Heart Study.” <em>American Journal of Respiratory and Critical Care Medicine</em> 191 (6): 656–64. <a href="https://doi.org/10.1164/rccm.201410-1875OC">https://doi.org/10.1164/rccm.201410-1875OC</a>.</p>
+</div>
+<div id="ref-RoyalCollegeofPhysicians2016">
+<p>Royal College of Physicians, and Royal College of Pediatrics and Child Care. 2016. “Every Breath We Take: The Lifelong Impact of Air Pollution.” February. London: Royal College of Physicians; Royal College of Pediatrics; Child Care. <a href="https://www.rcplondon.ac.uk/projects/outputs/every-breath-we-take-lifelong-impact-air-pollution">https://www.rcplondon.ac.uk/projects/outputs/every-breath-we-take-lifelong-impact-air-pollution</a>.</p>
+</div>
+<div id="ref-RoyalCommissiononEnvironmentalPollution2007">
+<p>Royal Commission on Environmental Pollution. 2007. “The Urban Environment.” London: Royal Commission on Environmental Pollution. <a href="https://www.gov.uk/government/uploads/system/uploads/attachment%7B\_%7Ddata/file/228911/7009.pdf">https://www.gov.uk/government/uploads/system/uploads/attachment{\_}data/file/228911/7009.pdf</a>.</p>
+</div>
+<div id="ref-Schwartz2004">
+<p>Schwartz, Joel. 2004. “Air Pollution and Children’s Health.” <em>Pediatrics</em> 113 (4): 1037–43.</p>
+</div>
+<div id="ref-Thiering2015">
+<p>Thiering, Elisabeth, and Joachim Heinrich. 2015. “Epidemiology of air pollution and diabetes.” <em>Trends in Endocrinology and Metabolism</em> 26 (7): 384–94. <a href="https://doi.org/10.1016/j.tem.2015.05.002">https://doi.org/10.1016/j.tem.2015.05.002</a>.</p>
+</div>
+<div id="ref-Walton2015">
+<p>Walton, By Heather, David Dajnak, Sean Beevers, Martin Williams, Paul Watkiss, and Alistair Hunt. 2015. “Understanding the Health Impacts of Air Pollution in London For : Transport for London and the Greater London Authority.” London: King’s College London.</p>
+</div>
+<div id="ref-Wichmann2010">
+<p>Wichmann, J., T. Lind, M. A. M. Nilsson, and T. Bellander. 2010. “PM2.5, soot and NO2 indoor-outdoor relationships at homes, pre-schools and schools in Stockholm, Sweden.” <em>Atmospheric Environment</em> 44: 4536–44. <a href="https://doi.org/10.1016/j.atmosenv.2010.08.023">https://doi.org/10.1016/j.atmosenv.2010.08.023</a>.</p>
+</div>
+<div id="ref-WorldHealthOrganization2005">
+<p>World Health Organization. 2005. “WHO Air quality guidelines for particulate matter, ozone, nitrogen dioxide and sulfur dioxide: Global update 2005.” Copenhagen: World Health Organization. <a href="https://doi.org/10.1016/0004-6981(88)90109-6">https://doi.org/10.1016/0004-6981(88)90109-6</a>.</p>
+</div>
+<div id="ref-WorldHealthOrganization2013">
+<p>———. 2013. “Review of evidence on health aspects of air pollution – REVIHAAP Project.” Copenhagen: World Health Organization. <a href="http://www.euro.who.int/%7B\_%7D%7B\_%7Ddata/assets/pdf%7B\_%7Dfile/0004/193108/REVIHAAP-Final-technical-report-final-version.pdf">http://www.euro.who.int/{\_}{\_}data/assets/pdf{\_}file/0004/193108/REVIHAAP-Final-technical-report-final-version.pdf</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

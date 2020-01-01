@@ -4,7 +4,7 @@ navbar:
   title: "CASA0005 Coursework - Code"
   left:
     - text: "Home"
-      href: Index.html
+      href: index.html
     - text: "Packages"
       href: Packages.html
     - text: "Research Question 1"

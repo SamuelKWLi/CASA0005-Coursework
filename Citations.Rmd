@@ -1,0 +1,123 @@
+---
+title: "Citations"
+output:
+  html_document: 
+    number_sections: yes
+    theme: yeti
+    highlight: textmate
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+editor_options: 
+  chunk_output_type: inline
+bibliography: library.bib
+---
+
+# Introduction
+Air pollution within London has improved greatly since the Great Smog of 1952 and the 12000 deaths it caused, in large part due to the subsequent Clean Air Act, prompting an effort to manage the public’s exposure to air pollution through policy and legislation [@Bell2017]. However, air pollution remains a constant issue in London’s history with each generation being challenged by a new pollutant, shifting from soot and sulphur dioxide in the 1940s-50s to lead and ozone in the 1960s-80s [@RoyalCollegeofPhysicians2016]. The two main pollutants that endangers today’s generation are nitrogen dioxide (NO2) and fine particulate matter (PM2.5), which have had well documented impacts on the long-term morbidity and mortality of the population [@COMEAP2010]. It is thus important to develop an understanding of how these pollutants, those it affects, and its contributing factors are spatially distributed, so policy can adapt to address this issue.
+
+The concentration of air pollutants that people are exposed to can greatly influence their health and understanding how these concentrations vary spatially is important for identifying areas is particular risk [@COMEAP2015]. While all exposure is a risk factor, the World Health Organisation (WHO) has published guidelines that aim to aid policy makers in establishing legal limits for legislation to protect the public from significant health impacts [@WorldHealthOrganization2005]. The dynamics of a person’s exposure to air pollution can be divided into two distinct phases, their evening life that is often defined by their home environment, and their day life that is defined by their work or school environment [@JointResearchCentre2004].  However, while residential exposure can be observed through general concentration measurements, the variation in daytime locations can be extensive and be beyond the scope of this investigation. As such this investigation will focus on locations pertinent to the major groups at risk, namely children, the elderly, and those that are pregnant or have an existing health condition [@Bell2013]. These vulnerable groups are likely to spend much of their time at schools, GPs and hospitals, making the exposure in these environments particularly important. Once these spatial patterns are identified, it is important to understand what causes them to occur. Once potential controlling factors are identified, it is possible to focus legislation and policy to address these factors. 
+
+# Aim and Research Questions
+
+## Aim: 
+To identify spatial patterns in NO2 and PM2.5 concentrations within London and identifying possible controlling factors that could explain its distribution.
+
+## Research Questions:
+1.	What spatial patterns are there for the spatial distribution of NO2 and PM2.5 concentrations are the MSOA scale within London?
+
+2.	What spatial patterns are there for the spatial distribution of schools, GPs and hospitals that exceed the WHO air pollution guidelines within London?
+
+3.	What controlling factors influence the spatial patterns in NO2 and PM2.5 concentration at the MSOA scale within London?
+
+# Literature Review
+
+## Nitrogen Dioxide (NO2) and Fine Particulate Matter (2.5µm)
+
+Air pollution has been a fundamental issue for London for much of its history and its management has become a central pillar of policy since the Great Smog of 1952 and the subsequent Clean Air Act [@Polivka2018]. There has been a constant battle to manage air pollution exposure as new pollutants arise from societal development and policy, with the latest being NO2 and PM2.5 [@NICE2017]. While it is difficult to quantify the morbidity and mortality costs of these pollutants, the negative effects they cause has been well documented [@RoyalCollegeofPhysicians2016]. A report commissioned by Transport for London and the Greater London Authority found that over 9000 people died prematurely is 2010 from the effects of air pollution in London and the COMEAP predict that PM2.5 and NO2 cause a combined 40,000 deaths per year in the UK [@Walton2015; @COMEAP2010]. NO2 and PM2.5 are often products of combustion, be that from combustion engines in vehicles or gas boilers and stoves in homes. The increase in NO2 and PM2.5 in London has largely been attributed to the large increases in vehicles on London’s streets, especially those that run on deasil [@RoyalCommissiononEnvironmentalPollution2007]. As noted by the Mayor of London Sadiq Kahn, it is ultimately a failure of policy [@GreaterLondonAuthority2018]. He as given priority to rectify this issue through his London Environment Strategy, though past attempts have yet to provide conclusive results.
+
+## Health Effects and Vulnerable Groups
+
+As stated before, the impacts of NO2 and PM2.5 on human morbidity and mortality has been widely documented and studied, being attributed to many health impacts [@COMEAP2009]. While many of these links require more study due to the long-term nature of many of these effects, there is extensive evidence to indicate that they do have large impacts on health [@WorldHealthOrganization2013]. The health effects associated with air pollution is extensive. There is growing evidence that air pollution is associated with impaired lung function, asthma, type 2 diabetes, cognitive deficiency, cardiovascular disease and lung cancer [@Rice2015; @Koenig1999; @Thiering2015; @Power2016; @Rajagopalan2018; @Raaschou-Nielsen2011]. Infants and children are of vulnerable, as they are in a state of rapid development, meaning any adverse factors could have a much greater influence during this period [@Schwartz2004]. The elderly and the chronically ill are likely to be more vulnerable as their existing conditions can potentially expose them to more severe effects of air pollution [@Bell2013]. However, the evidence for these trends are less consistent with those of children as there are many different conditions and medication that may affect the results.
+
+## Potential Controlling Factors
+
+NO2 and PM2.5 have several potential controlling factors that influence its spatial distribution, like road density. Deasil vehicles have gained popularity in Europe due to their efficiency and low CO2 emissions, but coming at the cost of increased NO2 emissions [@Cames2013]. Most of this increased traffic is likely to be concentrated on main roads. Another potential factor related to NO2 and PM2.5 concentrations is the deprivation of communities that often have poorer air quality [@Pye2006]. There are several suggested reasons, like hosting polluting industries, having poorer infrastructure and reduced access to open spaces. 
+
+# Methodology
+The data, code and R packages used in this investigation are available on Github: https://github.com/SamuelKWLi/CASA0005-Coursework.git 
+
+## Research Question 1
+ 
+Figure 1: Flow chart for the method used to answer research question 1 by assessing the spatial autocorrelation of the mean NO2 and PM2.5 data across London.
+
+The NO2 and PM2.5 concentration data was sourced from the London Atmospheric Emissions Inventory, coming in the form of a 20m by 20m raster containing the 2016 annual mean concentration over Greater London and its surrounding area. This data had to be vectorised in order to apply spatial analysis techniques, so the mean concentration was calculated for each MSOA. The analysis was conducted at the MSOA scale as the sample size was smaller and less computationally intensive than LSOAs and were more consistent when compared to wards. A quantitative analysis of spatial distribution is conducted using Getis Ord G which analyses the data for hotspots.
+
+## Research Question 2
+ 
+Figure 2: Flow chart for the method used to answer research question 2 by assessing the spatial autocorrelation of the point density of schools, GPs and hospitals across London.
+
+The school data is sourced from the London Schools Atlas and the GP and hospital data came from NHS Services Search website by looking up GPs and hospitals in a 50-mile radius from the centre of London. The data came as a list of postcodes which needed to be turned into point data using the Ordinance Survey Code Points project which allocated each postcode a set of BNG northings and eastings. Point pattern analysis techniques were far too resource intensive to conduct on such a large sample size, so the data was converted into MSOA point densities. Moran’s I spatial autocorrelation analysis could then be applied to this smaller sample size.
+
+## Research Question 3
+ 
+Figure 3: Flow chart for the method used to answer research question 3 by assessing the linear relationship between deprivation, road density and distance from Central London on the concentration of NO2 and PM2.5.
+
+The deprivation data was sourced from the GLA via the London Datastore and came in the form of a list of scores, ranks and quantiles for indices of deprivation of each LSOA. The general score for the Index of Multiple Deprivation (IMD) was used for this investigation as a general measure of deprivation. The data had to be aggregated into a mean IMD score for each MSOA as it was in the LSOA scale. The road density data was obtained from a vector shapefile of the main road network in London that accompanied the LAEI data. The distance from Central London data was determined by using the MSOA centroids determined for the Moran’s I analysis and calculating the distance to Central London, which was set to be Charing Cross, as is historic convention. Once the multiple linear regression is conducted, its assumptions are tested to assess its statistical robustness. A Geographically Weighted Regression (GWR) model is then applied to assess how the linear relationships vary spatially over London, showing local patterns not observed in the global model.
+
+# Results
+An interactive Leaflet map of the results with more detailed data can be found on Github: https://samuelkwli.github.io/CASA0005-Coursework/ 
+
+## Research Question 1
+ 
+Figure 4: A map of the mean NO2 concentration for London MSOAs in µg/m3. The WHO guidelines are set at 40 µg/m3 with areas in blue denoting MSOAs below this limit and areas in yellow to red being above this limit.
+
+From Figure 4, it is possible to see that there appears to be a trend of decreasing NO2 concentration with increasing distance from the city centre. Only areas of inner London exceed the WHO guidelines, with some areas being 50% over safe concentrations
+ 
+Figure 5: A map of the mean PM2.5 concentration for London MSOAs in µg/m3. The WHO guidelines are set at 10 µg/m3 with areas in blue denoting MSOAs below this limit and areas in yellow to red being above this limit.
+
+From Figure 5, it is possible to see that there appears to be a trend of decreasing PM2.5 concentration with increasing distance from the city centre. All of Greater London are exceeding the WHO guidelines, with some areas being 75% above safe concentrations.
+
+The global Getis Ord G functions by comparing a G value and an expected value. The difference in values for NO2 and PM2.5 are 2.551E-05 and 5.654E-06 respectively, indicating that there is either no clustering or equal clustering of positive and negative values.
+ 
+Figure 6: Maps of the local Getis Ord G outputs for NO2 (a) and PM2.5 (b) concentration. The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates cold spots (clusters of low values) and red indicates hot spots (clusters of high values). 
+
+From figures 6, it is apparent that there is statistically significant clustering of high concentrations in the centre and low concentrations in the outskirts of London.
+
+## Research Question 2
+ 
+Figure 7: Maps of the local Moran’s I outputs for MSOA point density of all London schools (a), GPs (b) and hospitals (c). The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates areas with negative spatial autocorrelation and red indicates areas with positive spatial autocorrelation.
+
+The low global Moran’s I value of 0.288 for schools, 0.119 for GPs, and 0.073 for hospitals indicates there is little or no spatial autocorrelation. Figure 7 indicates the local Moran’s I shows little statistically significant clustering. These patterns also apply to locations that exceed the WHO guidelines for PM2.5 as the entirety of London exceeds the 10 µg/m3 recommendation.
+ 
+Figure 8: Maps of the local Moran’s I outputs for MSOA point density of all London schools (a), GPs (b) and hospitals (c) that exceed 40 µg/m3. The breaks indicate standard deviations (SD) away from the mean with those being greater than 2.6 SDs away being significant at the 99% level, 2.0 – 2.6 at the 95% level, and 1.6 – 2.0 at the 90% level. Blue indicates areas with negative spatial autocorrelation and red indicates areas with positive spatial autocorrelation.
+
+The higher global Moran’s I value of 0.520 for schools, 0.316 for GPs, and 0.148 for hospitals indicates there is more spatial autocorrelation than normal. Figure 8 indicates the local Moran’s I shows more pronounced statistically significant clustering in the centre of London. 
+
+## Research Question 3
+
+Table 1: A table of results for the multiple linear regression of MSOA NO2 concentration and the independent factors.
+
+
+Table 2: A table of results for the multiple linear regression of MSOA PM2.5 concentration and the independent factors.
+
+From tables 1 and 2, it is apparent that both NO2 and PM 2.5 share a statistically significant positive relationship with the IMD score and road density and have a negative relationship with the distance from Central London. The NO2 and PM2.5 models have a good linear fit with low residual standard errors of 1.649 and 0.2451, meaning a low percentage error of 4.154% and 1.763% respectively. The NO2 and PM2.5 models also account for about 90% of the concertation variation, with adjusted R2 values of 0.903 and 0.906.
+ 
+Figure 9: Maps of NO2 GWR coefficient outputs for IMD scores (a), road density (b) and distance from Central London (c). Red denotes a negative coefficient (negative relationship) and blue denotes a positive coefficient (positive relationship).
+ 
+Figure 10: Maps of PM2.5 GWR coefficient outputs for IMD scores (a), road density (b) and distance from Central London (c). Red denotes a negative coefficient (negative relationship) and blue denotes a positive coefficient (positive relationship).
+
+The NO2 and PM2.5 GWR models improved the fit as they had higher R2 value of 0.989 and 0.988 respectively. Figure 9 and 10 indicates the IMD score has a generally positive relationship, with a strong negative relationship in the city centre. Road density has a generally positive relationship across the city, with it being strongest in the outskirts. Distance from Central London has a negative relationship, with this relationship being strongest in city centre.
+
+# Discussion
+From the results, it is apparent that NO2 pollution is mainly an inner-city issue, where it exceeds the WHO recommended concentration. Meanwhile, PM2.5 is a city-wide issue as the whole of London exceed the WHO guidelines. However, like with NO2, the issue is worst in the inner city. In the case of NO2, London is consistently above its legal limit of 40 µg/m3, necessitating a concerted effort to improve the situation [@EuropeanE2009]. However, PM2.5 in London is universally below the legal limit of 25 µg/m3 while still being universally above the recommended limit of 10 µg/m3 [@EuropeanE2009]. It is thus apparent that legislation needs to adapt and conform to the health needs of the public, instead of legal and economic expedience [@RoyalCollegeofPhysicians2016].
+
+The most vulnerable groups to the effects of air pollution are not spared from poor air quality, and likely experience the most acute effects of the inequality. Like the findings of other studies by interest groups, this study found that many schools, GPs and hospitals, especially in the inner city are exposed to dangerous levels of NO2 and PM2.5 [@Castres2017]. However, the measurements used are ambient concentrations, which may not reflect indoors exposure that most people would be experiencing, especially in the case of PM2.5 [@Wichmann2010]. More research thorough investigation on indoors sources and concertation is needed but it is clear the surrounding environment is unsafe [@BritishLungFoundation2018].
+
+In terms of the multiple linear regression model, it is apparent that there are statistically significant relationships between NO2 and PM2.5 concentrations and deprivation, road density and distance from Central London. These findings are considered statistically robust as the assumptions that underpin the linear regression were fulfilled [@Casson2014]. There are linear relationships between the dependent and independent variables, the residuals are normally distributed, there is minimal multicollinearity in the independent variables, there is homoscedasticity, and the independence of errors was addressed using the GWR. All three factors followed the general trend that was expected from the literature review. This was reinforced by the GWR model, which found that the relationships were stronger in the inner city, where priority should be given. The exception to this was deprivation, which followed a general positive relationship except for the wealthy city centre that followed a negative relationship. Past studies by Defra supports these findings, suggesting the relationships becomes more variable at the urban scale [@Pye2006]. The positive relationship with road density suggests that reducing road density through measures, like pedestrianisation, may be an effective way to reduce concentrations [@LondonCouncils2018]. The negative relationship with distance from central London suggests that the best method of reducing exposure would be to leave the inner city. Using these findings, it is recommended that ‘safe zones’ of reduced NO2 and PM 2.5 concentrations be created around schools, GPs and hospitals, potentially by pedestrianizing roads in the area and creating green spaces [@Defra2018]. Focus should be given to deprived areas in the inner city and avenues of travel to the cleaner outer city, like green belts, should be provided.
+
+# Conclusion
+In conclusion, this investigation found that whole of London exceeds the WHO guidelines for PM2.5 and most of the inner city exceeds the NO2 limits, with the concentrations being highest in the inner city. These same patterns are observed in the schools, GPs and hospitals that exceed the safe limits, unequally exposing vulnerable groups to dangerous concentrations. Deprivation, road density and distance from Central London all have a statistically significant relationship with this distribution, being strongest in the inner city. Using these findings, it is recommended that pedestrianisation and greenspaces be used to create safe spaces around schools, GPs and hospitals, with focus on deprived areas in the inner city.
+
+# Bibliography
