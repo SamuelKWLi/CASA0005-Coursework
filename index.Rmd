@@ -1,0 +1,22 @@
+---
+title: "Home"
+output: 
+  html_document:
+    theme: yeti
+    smart: true
+    highlight: textmate
+    toc: true
+    number_sections: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options: 
+  chunk_output_type: console
+---
+# Aim: 
+To identify spatial patterns in NO2 and PM2.5 concentrations within London and identifying possible controlling factors that could explain its distribution.
+
+# Research Questions:
+1.	What spatial patterns are there for the spatial distribution of NO2 and PM2.5 concentrations are the MSOA scale within London?
+2.	What spatial patterns are there for the spatial distribution of schools, GPs and hospitals that exceed the WHO air pollution guidelines within London?
+3.	What controlling factors influence the spatial patterns in NO2 and PM2.5 concentration at the MSOA scale within London?
