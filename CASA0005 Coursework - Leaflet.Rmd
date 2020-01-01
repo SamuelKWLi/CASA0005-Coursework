@@ -5,7 +5,7 @@ editor_options:
   chunk_output_type: console
 ---
 ### Popup Tables and Palettes For Area Data
-```{r include=FALSE}
+```{r}
 # Create copies of the MSOA data.
 PopArea <- SFMSOA
 
@@ -23,7 +23,7 @@ PalPM2.5 <- colorBin("RdYlBu", reverse = TRUE, domain = PopArea$`Mean PM2.5 Conc
 ```
 
 ### Popup Tables and Palettes For MSOA Area Cluster Data
-```{r include=FALSE}
+```{r}
 # Create copies of the MSOA data.
 PopAreaCluster <- SFAreaCluster
 
@@ -41,7 +41,7 @@ PalPM2.5Cluster <- colorBin(PalMi, domain = PopAreaCluster$`PM2.5 Getis Ord G`, 
 ```
 
 ### Popup Tables and Palettes For Point Data
-```{r include=FALSE}
+```{r}
 # Create copies of the point data.
 PopLADBry <- SFLAD
 PopMSOABry <- SFMSOA
@@ -90,7 +90,7 @@ PalWHO <- colorFactor(c("Orange", "Red", "Gold"), levels = c("GP", "Hospital", "
 ```
 
 ### Popup Tables and Palettes For Point Cluster Data
-```{r include=FALSE}
+```{r}
 # Create copies of the MSOA data.
 PopPointCluster <- SFPointCluster
 
@@ -121,7 +121,7 @@ PalHospitalsPM2.5Cluster <- colorBin(PalMi, domain = PopPointCluster$`Hospital (
 ```
 
 ### Popup Tables and Palettes For MSOA LR Data
-```{r include=FALSE}
+```{r}
 # Create popup tables.
 PopIMDScore <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD Score"))
 PopRoadDensity <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Road Length (km)"))
@@ -135,7 +135,7 @@ PalDistCLondon <- colorBin("YlOrBr", domain = PopArea$`Dist. from C. London (km)
 ```
 
 ### Popup Tables and Palettes For MSOA GWR Data
-```{r include=FALSE}
+```{r}
 # Create popup tables.
 PopIMDScoreNO2 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "IMD NO2 Coef."))
 PopIMDScorePM2.5 <- popupTable(PopArea, feature.id = FALSE, row.numbers = FALSE, zcol=c("MSOA Name", "Mean PM2.5 Conc.", "IMD PM2.5 Coef."))
@@ -154,7 +154,7 @@ PalDistCLondonPM2.5 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. 
 ```
 
 ### Plot Point Map using leaflet
-```{r echo=FALSE}
+```{r}
 # Map using leaflet.
 MapLeaflet <- leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
