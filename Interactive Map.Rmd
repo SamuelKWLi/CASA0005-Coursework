@@ -14,7 +14,14 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r include=FALSE}
+# Interactive Map
+```{r}
+MapLeaflet
+```
+
+# Code
+## Create Colour Palettes and Popups
+```{r}
 # Create copies of the MSOA data.
 PopArea <- SFMSOA
 
@@ -144,7 +151,8 @@ PalDistCLondonNO2 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. fr
 PalDistCLondonPM2.5 <- colorBin("Reds", reverse = TRUE, domain = PopArea$`Dist. from C. London PM2.5 Coef.`, bins = c(-0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0))
 ```
 
-```{r echo=FALSE}
+## Leaflet Map
+```{r}
 # Map using leaflet.
 MapLeaflet <- leaflet() %>% 
   addTiles(group = "OSM (default)") %>% 
@@ -762,6 +770,5 @@ MapLeaflet <- leaflet() %>%
   addScaleBar(position = "bottomleft", 
               options = scaleBarOptions(metric = TRUE))
   
-MapLeaflet
 ```
 

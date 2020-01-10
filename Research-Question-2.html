@@ -388,8 +388,31 @@ div.tocify {
 </div>
 
 
-<div id="read-in-school-gp-and-hospital-data" class="section level1">
-<h1><span class="header-section-number">1</span> Read in School, GP and Hospital Data</h1>
+<div id="results" class="section level1">
+<h1><span class="header-section-number">1</span> Results</h1>
+<pre class="r"><code>All_MoransI</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_GPsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>NO2_MoransI</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_GPsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_HospitalsNO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFPointCluster_SchoolsNO2 is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+</div>
+<div id="code" class="section level1">
+<h1><span class="header-section-number">2</span> Code</h1>
+<div id="read-in-school-gp-and-hospital-data" class="section level2">
+<h2><span class="header-section-number">2.1</span> Read in School, GP and Hospital Data</h2>
 <pre class="r"><code># Read in code points.
 AllCodePoints &lt;- read_csv(&quot;Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv&quot;,
                        locale = locale(encoding = &quot;latin1&quot;),
@@ -480,8 +503,8 @@ Locations &lt;- Locations[,c(2, 1, 3, 4, 5)]
 # Remove duplicates.
 Locations &lt;- Locations[!duplicated(Locations$Name), ]</code></pre>
 </div>
-<div id="extract-concentrations-for-schools-gps-and-hospitals" class="section level1">
-<h1><span class="header-section-number">2</span> Extract Concentrations for Schools, GPs and Hospitals</h1>
+<div id="extract-concentrations-for-schools-gps-and-hospitals" class="section level2">
+<h2><span class="header-section-number">2.2</span> Extract Concentrations for Schools, GPs and Hospitals</h2>
 <pre class="r"><code># Convert location coordinates into point geometry.
 SFLocations &lt;- st_as_sf(Locations, coords = c(&quot;Eastings&quot;, &quot;Northings&quot;), crs = BNG)
 
@@ -526,8 +549,8 @@ SFGPsPM2.5 &lt;- subset(SFLocationsPM2.5, `Building Type` == &quot;GP&quot;)
 
 SFHospitalsPM2.5 &lt;- subset(SFLocationsPM2.5, `Building Type` == &quot;Hospital&quot;)</code></pre>
 </div>
-<div id="msoa-cluster-data-for-points" class="section level1">
-<h1><span class="header-section-number">3</span> MSOA Cluster Data for Points</h1>
+<div id="msoa-cluster-data-for-points" class="section level2">
+<h2><span class="header-section-number">2.3</span> MSOA Cluster Data for Points</h2>
 <pre class="r"><code># Convert SF objects into SP objects
 SPPointCluster &lt;- as(SFMSOA, &quot;Spatial&quot;)
 SPSchools &lt;- as(SFSchools, &quot;Spatial&quot;)
@@ -636,9 +659,11 @@ colnames(SFPointCluster_GPsNO2) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometr
 colnames(SFPointCluster_HospitalsNO2) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
 colnames(SFPointCluster_SchoolsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
 colnames(SFPointCluster_GPsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
-colnames(SFPointCluster_HospitalsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)
-
-# Map Moran&#39;s I.
+colnames(SFPointCluster_HospitalsPM2.5) &lt;- c(&quot;Moran&#39;s I&quot;, &quot;geometry&quot;)</code></pre>
+</div>
+<div id="map-results" class="section level2">
+<h2><span class="header-section-number">2.4</span> Map Results</h2>
+<pre class="r"><code># Map Moran&#39;s I.
 All_Schools_MoransI &lt;- tm_shape(SFPointCluster_SchoolsAll) +
   tm_polygons(col = &quot;Moran&#39;s I&quot;, 
               palette = PalMi, 
@@ -706,7 +731,7 @@ All_MoransI</code></pre>
 <pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape SFPointCluster_HospitalsAll is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code>NO2_Schools_MoransI &lt;- tm_shape(SFPointCluster_SchoolsNO2) +
   tm_polygons(col = &quot;Moran&#39;s I&quot;, 
               palette = PalMi, 
@@ -773,7 +798,8 @@ NO2_MoransI</code></pre>
 <pre><code>## Warning: The shape SFPointCluster_HospitalsNO2 is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape SFPointCluster_SchoolsNO2 is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p><img src="Research-Question-2_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
 </div>
 
 

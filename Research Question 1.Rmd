@@ -14,7 +14,17 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Read in Concentration Rasters
+# Results
+```{r}
+Mean_NO2_Conc
+
+Mean_PM2.5_Conc
+
+Mean_GetisG
+```
+
+# Code
+## Read in Concentration Rasters
 ```{r}
 # List the full file paths of all the raster files.
 PollutionFiles <- list.files("Data/Air Pollution/LAEI 2016 Concentrations", ".tif", full.names = TRUE)
@@ -39,7 +49,7 @@ PollutionConc <- projectRaster(PollutionConc, crs= WGS84)
 
 ```
 
-# Crop Raster Data
+## Crop Raster Data
 ```{r}
 # Read in the London boundary.
 OutlineLondon <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp")
@@ -62,7 +72,7 @@ MaskPM2.5 <-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
 PollutionLondon <- stack(MaskNO2, MaskPM2.5)
 ```
 
-# Read in Boundaries
+## Read in Boundaries
 ```{r}
 # Read in boundaries as spatial polygons.
 LAD <- st_read("Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp")
@@ -91,7 +101,7 @@ colnames(SFLSOA) <- c("LSOA Name", "LSOA Code", "MSOA Name", "MSOA Code","LAD Na
 
 ```
 
-# NO2 and PM2.5. Mean Concentration
+## NO2 and PM2.5. Mean Concentration
 ```{r}
 # Read in Concentration data.
 ConcLAD <- read_csv("Data/Air Pollution/ConcLAD.csv",
@@ -135,7 +145,7 @@ SFLSOA<-merge(SFLSOA,
              all.x = TRUE)
 ```
 
-# MSOA Cluster Data for Areas
+## MSOA Cluster Data for Areas
 ```{r}
 # Convert SF objects into SP objects
 SPAreaCluster <- as(SFMSOA, "Spatial")
@@ -182,7 +192,10 @@ BrksMi <-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
 
 # Moran's I palette.
 PalMi<- rev(brewer.pal(7, "RdBu"))
+```
 
+## Map Results
+```{r}
 # Map Conc.
 Mean_NO2_Conc <- tm_shape(SFAreaCluster_NO2) +
   tm_polygons(col = "Mean Conc. (µg/m3)", 
@@ -269,3 +282,4 @@ Mean_GetisG_Legend <- tm_shape(SFAreaCluster_PM2.5) +
 Mean_GetisG <- tmap_arrange(Mean_NO2_GetisG, Mean_GetisG_Legend, Mean_PM2.5_GetisG, ncol=2, nrow = 2)
 Mean_GetisG
 ```
+

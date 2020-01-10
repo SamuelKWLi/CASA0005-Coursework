@@ -388,8 +388,30 @@ div.tocify {
 </div>
 
 
-<div id="index-of-multiple-deprivation" class="section level1">
-<h1><span class="header-section-number">1</span> Index of Multiple Deprivation</h1>
+<div id="results" class="section level1">
+<h1><span class="header-section-number">1</span> Results</h1>
+<pre class="r"><code>NO2_Coef</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>PM2.5_Coef</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid
+
+## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+</div>
+<div id="code" class="section level1">
+<h1><span class="header-section-number">2</span> Code</h1>
+<div id="index-of-multiple-deprivation" class="section level2">
+<h2><span class="header-section-number">2.1</span> Index of Multiple Deprivation</h2>
 <pre class="r"><code># Read in indices of deprivation data.
 IDData &lt;- read_csv(&quot;Data/Boundaries and Census/ID 2019 for London.csv&quot;,
                        locale = locale(encoding = &quot;latin1&quot;),
@@ -446,8 +468,8 @@ SFLSOA&lt;-merge(SFLSOA,
              no.dups = TRUE,
              all.x = TRUE)</code></pre>
 </div>
-<div id="road-density" class="section level1">
-<h1><span class="header-section-number">2</span> Road Density</h1>
+<div id="road-density" class="section level2">
+<h2><span class="header-section-number">2.2</span> Road Density</h2>
 <pre class="r"><code># Load road shapefile.
 Roads &lt;- st_read(&quot;Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp&quot;)</code></pre>
 <pre><code>## Reading layer `LAEI_MajorRoadNetwork_Link&#39; from data source `C:\Users\sammy\Desktop\Work\UCL\CASA0005 Geographic Information Systems and Science\Coursework\CASA0005 Coursework\Data\Air Pollution\LAEI 2016 Supporting Information\LAEI_MajorRoadNetwork_Link.shp&#39; using driver `ESRI Shapefile&#39;
@@ -498,8 +520,8 @@ SFMSOA&lt;-merge(SFMSOA,
              no.dups = TRUE,
              all.x = TRUE)</code></pre>
 </div>
-<div id="distance-from-central-london-charing-cross" class="section level1">
-<h1><span class="header-section-number">3</span> Distance from Central London (Charing Cross)</h1>
+<div id="distance-from-central-london-charing-cross" class="section level2">
+<h2><span class="header-section-number">2.3</span> Distance from Central London (Charing Cross)</h2>
 <pre class="r"><code># Create Postcode vector with Charing Cross postcode.
 Postcode &lt;- &quot;WC2N5DU&quot;
 
@@ -542,8 +564,8 @@ SFMSOA&lt;-merge(SFMSOA,
              no.dups = TRUE,
              all.x = TRUE)</code></pre>
 </div>
-<div id="linear-regression-model" class="section level1">
-<h1><span class="header-section-number">4</span> Linear Regression Model</h1>
+<div id="linear-regression-model" class="section level2">
+<h2><span class="header-section-number">2.4</span> Linear Regression Model</h2>
 <pre class="r"><code># Conduct linear regression.
 LRNO2 &lt;- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
 LRPM2.5 &lt;- lm(`Mean PM2.5 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
@@ -597,51 +619,51 @@ summary(LRNO2)</code></pre>
 LRResultsNO2 &lt;- tidy(LRNO2)
 LRResultsPM2.5 &lt;- tidy(LRPM2.5)</code></pre>
 </div>
-<div id="linear-regression---assumption-1" class="section level1">
-<h1><span class="header-section-number">5</span> Linear Regression - Assumption 1</h1>
+<div id="linear-regression---assumption-1" class="section level2">
+<h2><span class="header-section-number">2.5</span> Linear Regression - Assumption 1</h2>
 <pre class="r"><code># Plot histogram on variables.
 ggplot(SFMSOA, aes(x=`Mean NO2 Conc.`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>ggplot(SFMSOA, aes(x=`Mean PM2.5 Conc.`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 0.1) + 
   geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
 <pre class="r"><code>ggplot(SFMSOA, aes(x=`IMD Score`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-3.png" width="672" /></p>
 <pre class="r"><code>ggplot(SFMSOA, aes(x=`Road Density (km/km2)`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-4.png" width="672" /></p>
 <pre class="r"><code>ggplot(SFMSOA, aes(x=`Dist. from C. London (km)`)) + 
   geom_histogram(aes(y = ..density..),binwidth = 1) + 
   geom_density(colour=&quot;red&quot;, size=1, adjust=1)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-5.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-5.png" width="672" /></p>
 <pre class="r"><code># Plot Scatter plot
 qplot(x = `Mean NO2 Conc.`, y = `IMD Score`, data = SFMSOA)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-6.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-6.png" width="672" /></p>
 <pre class="r"><code>qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-7.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-7.png" width="672" /></p>
 <pre class="r"><code>qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-5-8.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-8.png" width="672" /></p>
 </div>
-<div id="linear-regression---assumption-2" class="section level1">
-<h1><span class="header-section-number">6</span> Linear Regression - Assumption 2</h1>
+<div id="linear-regression---assumption-2" class="section level2">
+<h2><span class="header-section-number">2.6</span> Linear Regression - Assumption 2</h2>
 <pre class="r"><code># Plot linear regression model residuals in a histogram.
 qplot(LRNO2$residuals) + geom_histogram() </code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code>qplot(LRPM2.5$residuals) + geom_histogram() </code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
 </div>
-<div id="linear-regression---assumption-3" class="section level1">
-<h1><span class="header-section-number">7</span> Linear Regression - Assumption 3</h1>
+<div id="linear-regression---assumption-3" class="section level2">
+<h2><span class="header-section-number">2.7</span> Linear Regression - Assumption 3</h2>
 <pre class="r"><code># Remove geometry of SFMSOA.
 CorMSOA &lt;- st_set_geometry(SFMSOA,NULL)
 
@@ -653,7 +675,7 @@ CorMSOA &lt;- cor(CorMSOA, use=&quot;complete.obs&quot;, method=&quot;pearson&qu
 
 # Plot correlation matrix.
 corrplot(CorMSOA, type = &quot;lower&quot;)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code># Calculate VIF.
 vif(LRNO2)</code></pre>
 <pre><code>##                 `IMD Score`     `Road Density (km/km2)` `Dist. from C. London (km)` 
@@ -662,16 +684,16 @@ vif(LRNO2)</code></pre>
 <pre><code>##                 `IMD Score`     `Road Density (km/km2)` `Dist. from C. London (km)` 
 ##                    1.079822                    1.411485                    1.445274</code></pre>
 </div>
-<div id="linear-regression---assumption-4" class="section level1">
-<h1><span class="header-section-number">8</span> Linear Regression - Assumption 4</h1>
+<div id="linear-regression---assumption-4" class="section level2">
+<h2><span class="header-section-number">2.8</span> Linear Regression - Assumption 4</h2>
 <pre class="r"><code># Plot model diagnostics.
 plot(LRNO2)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-1.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-2.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-3.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-4.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-2.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-3.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-4.png" width="672" /></p>
 <pre class="r"><code>plot(LRPM2.5)</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-5.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-6.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-7.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-8-8.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-5.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-6.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-7.png" width="672" /><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-8.png" width="672" /></p>
 </div>
-<div id="linear-regression---assumption-5" class="section level1">
-<h1><span class="header-section-number">9</span> Linear Regression - Assumption 5</h1>
+<div id="linear-regression---assumption-5" class="section level2">
+<h2><span class="header-section-number">2.9</span> Linear Regression - Assumption 5</h2>
 <pre class="r"><code># Merge model residuals to shapefile.
 SFMSOA$`LRNO2 Residuals` &lt;- LRNO2$residuals
 SFMSOA$`LRPM2.5 Residuals` &lt;- LRPM2.5$residuals
@@ -681,12 +703,12 @@ tm_shape(SFMSOA) +
   tm_polygons(&quot;LRNO2 Residuals&quot;, palette = &quot;RdYlBu&quot;)</code></pre>
 <pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Variable &quot;LRNO2 Residuals&quot; contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <pre class="r"><code>tm_shape(SFMSOA) +
   tm_polygons(&quot;LRPM2.5 Residuals&quot;, palette = &quot;RdYlBu&quot;)</code></pre>
 <pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Variable &quot;LRPM2.5 Residuals&quot; contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
 <pre class="r"><code># Convert SF objects to SP objects.
 SPMSOA &lt;- as(SFMSOA, &quot;Spatial&quot;)
 
@@ -716,8 +738,8 @@ moran.test(SPMSOA@data$LRNO2.Residuals, SpWeightsMSOA)</code></pre>
 ## Moran I statistic       Expectation          Variance 
 ##      0.6329460582     -0.0010183299      0.0003502281</code></pre>
 </div>
-<div id="gwr" class="section level1">
-<h1><span class="header-section-number">10</span> GWR</h1>
+<div id="gwr" class="section level2">
+<h2><span class="header-section-number">2.10</span> GWR</h2>
 <pre class="r"><code># Calculate kernel bandwidths.
 GWRbandwidthNO2 &lt;- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)</code></pre>
 <pre><code>## Adaptive q: 0.381966 CV score: 2159.029 
@@ -771,9 +793,11 @@ SFMSOA$`Dist. from C. London NO2 Coef.`&lt;- round(GWRNO2Results$X.Dist..from.C.
 
 SFMSOA$`IMD PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
 SFMSOA$`Road Density PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.Road.Density..km.km2.., digits = 3)
-SFMSOA$`Dist. from C. London PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
-
-# Map coefficients.
+SFMSOA$`Dist. from C. London PM2.5 Coef.`&lt;- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)</code></pre>
+</div>
+<div id="map-results" class="section level2">
+<h2><span class="header-section-number">2.11</span> Map Results</h2>
+<pre class="r"><code># Map coefficients.
 NO2_IMD_Coef &lt;- tm_shape(SFMSOA) +
   tm_polygons(col = &quot;IMD NO2 Coef.&quot;, 
               palette = &quot;RdBu&quot;,
@@ -827,7 +851,7 @@ NO2_Coef</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <pre class="r"><code>PM2.5_IMD_Coef &lt;- tm_shape(SFMSOA) +
   tm_polygons(col = &quot;IMD PM2.5 Coef.&quot;, 
               palette = &quot;RdBu&quot;,
@@ -883,7 +907,8 @@ PM2.5_Coef</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape SFMSOA is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p><img src="Research-Question-3_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+</div>
 </div>
 
 

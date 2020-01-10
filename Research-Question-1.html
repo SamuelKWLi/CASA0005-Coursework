@@ -388,8 +388,31 @@ div.tocify {
 </div>
 
 
-<div id="read-in-concentration-rasters" class="section level1">
-<h1><span class="header-section-number">1</span> Read in Concentration Rasters</h1>
+<div id="results" class="section level1">
+<h1><span class="header-section-number">1</span> Results</h1>
+<pre class="r"><code>Mean_NO2_Conc</code></pre>
+<pre><code>## Warning: The shape SFAreaCluster_NO2 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>Mean_PM2.5_Conc</code></pre>
+<pre><code>## Warning: The shape SFAreaCluster_PM2.5 is invalid. See sf::st_is_valid
+
+## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code>Mean_GetisG</code></pre>
+<pre><code>## Warning: The shape SFAreaCluster_NO2 is invalid. See sf::st_is_valid
+
+## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape SFAreaCluster_PM2.5 is invalid. See sf::st_is_valid
+
+## Warning: The shape SFAreaCluster_PM2.5 is invalid. See sf::st_is_valid</code></pre>
+<pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+</div>
+<div id="code" class="section level1">
+<h1><span class="header-section-number">2</span> Code</h1>
+<div id="read-in-concentration-rasters" class="section level2">
+<h2><span class="header-section-number">2.1</span> Read in Concentration Rasters</h2>
 <pre class="r"><code># List the full file paths of all the raster files.
 PollutionFiles &lt;- list.files(&quot;Data/Air Pollution/LAEI 2016 Concentrations&quot;, &quot;.tif&quot;, full.names = TRUE)
 
@@ -411,8 +434,8 @@ WGS84 = &quot;+init=epsg:4326&quot;
 # Reproject raster stack into BNG.
 PollutionConc &lt;- projectRaster(PollutionConc, crs= WGS84)</code></pre>
 </div>
-<div id="crop-raster-data" class="section level1">
-<h1><span class="header-section-number">2</span> Crop Raster Data</h1>
+<div id="crop-raster-data" class="section level2">
+<h2><span class="header-section-number">2.2</span> Crop Raster Data</h2>
 <pre class="r"><code># Read in the London boundary.
 OutlineLondon &lt;- st_read(&quot;Data/Boundaries and Census/statistical-gis-boundaries-london/London_Boundary.shp&quot;)</code></pre>
 <pre><code>## Reading layer `London_Boundary&#39; from data source `C:\Users\sammy\Desktop\Work\UCL\CASA0005 Geographic Information Systems and Science\Coursework\CASA0005 Coursework\Data\Boundaries and Census\statistical-gis-boundaries-london\London_Boundary.shp&#39; using driver `ESRI Shapefile&#39;
@@ -439,8 +462,8 @@ MaskPM2.5 &lt;-  mask(PollutionConc[[2]], OutlineLondon, na.rm=TRUE)
 # Stack the masked rasters.
 PollutionLondon &lt;- stack(MaskNO2, MaskPM2.5)</code></pre>
 </div>
-<div id="read-in-boundaries" class="section level1">
-<h1><span class="header-section-number">3</span> Read in Boundaries</h1>
+<div id="read-in-boundaries" class="section level2">
+<h2><span class="header-section-number">2.3</span> Read in Boundaries</h2>
 <pre class="r"><code># Read in boundaries as spatial polygons.
 LAD &lt;- st_read(&quot;Data/Boundaries and Census/statistical-gis-boundaries-london/London_Borough_Excluding_MHW.shp&quot;)</code></pre>
 <pre><code>## Reading layer `London_Borough_Excluding_MHW&#39; from data source `C:\Users\sammy\Desktop\Work\UCL\CASA0005 Geographic Information Systems and Science\Coursework\CASA0005 Coursework\Data\Boundaries and Census\statistical-gis-boundaries-london\London_Borough_Excluding_MHW.shp&#39; using driver `ESRI Shapefile&#39;
@@ -486,8 +509,8 @@ colnames(SFLAD) &lt;- c(&quot;LAD Name&quot;, &quot;LAD Code&quot;, &quot;geomet
 colnames(SFMSOA) &lt;- c(&quot;MSOA Name&quot;, &quot;MSOA Code&quot;, &quot;LAD Name&quot;, &quot;LAD Code&quot;, &quot;geometry&quot;)
 colnames(SFLSOA) &lt;- c(&quot;LSOA Name&quot;, &quot;LSOA Code&quot;, &quot;MSOA Name&quot;, &quot;MSOA Code&quot;,&quot;LAD Name&quot;, &quot;LAD Code&quot;, &quot;geometry&quot;)</code></pre>
 </div>
-<div id="no2-and-pm2.5.-mean-concentration" class="section level1">
-<h1><span class="header-section-number">4</span> NO2 and PM2.5. Mean Concentration</h1>
+<div id="no2-and-pm2.5.-mean-concentration" class="section level2">
+<h2><span class="header-section-number">2.4</span> NO2 and PM2.5. Mean Concentration</h2>
 <pre class="r"><code># Read in Concentration data.
 ConcLAD &lt;- read_csv(&quot;Data/Air Pollution/ConcLAD.csv&quot;,
                        locale = locale(encoding = &quot;latin1&quot;),
@@ -555,19 +578,19 @@ SFLSOA&lt;-merge(SFLSOA,
              no.dups = TRUE,
              all.x = TRUE)</code></pre>
 </div>
-<div id="msoa-cluster-data-for-areas" class="section level1">
-<h1><span class="header-section-number">5</span> MSOA Cluster Data for Areas</h1>
+<div id="msoa-cluster-data-for-areas" class="section level2">
+<h2><span class="header-section-number">2.5</span> MSOA Cluster Data for Areas</h2>
 <pre class="r"><code># Convert SF objects into SP objects
 SPAreaCluster &lt;- as(SFMSOA, &quot;Spatial&quot;)
 
 # Determine centroids for MSOAs
 CentroidMSOA &lt;- coordinates(SPAreaCluster)
 plot(CentroidMSOA)</code></pre>
-<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code># Create neighbour list using queen&#39;s case neighbours.
 NNListMSOA &lt;- poly2nb(SFMSOA, queen=T)
 plot(NNListMSOA, coordinates(CentroidMSOA), col=&quot;red&quot;)</code></pre>
-<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
 <pre class="r"><code># Create spatial weights object.
 SpWeightsMSOA &lt;- nb2listw(NNListMSOA, style=&quot;C&quot;)
 
@@ -601,9 +624,11 @@ colnames(SFAreaCluster_PM2.5) &lt;- c(&quot;MSOA Name&quot;, &quot;Mean Conc. (�
 BrksMi &lt;-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
 
 # Moran&#39;s I palette.
-PalMi&lt;- rev(brewer.pal(7, &quot;RdBu&quot;))
-
-# Map Conc.
+PalMi&lt;- rev(brewer.pal(7, &quot;RdBu&quot;))</code></pre>
+</div>
+<div id="map-results" class="section level2">
+<h2><span class="header-section-number">2.6</span> Map Results</h2>
+<pre class="r"><code># Map Conc.
 Mean_NO2_Conc &lt;- tm_shape(SFAreaCluster_NO2) +
   tm_polygons(col = &quot;Mean Conc. (µg/m3)&quot;, 
               palette = &quot;seq&quot;, 
@@ -625,7 +650,7 @@ Mean_NO2_Conc &lt;- tm_shape(SFAreaCluster_NO2) +
 Mean_NO2_Conc</code></pre>
 <pre><code>## Warning: The shape SFAreaCluster_NO2 is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code>Mean_PM2.5_Conc &lt;- tm_shape(SFAreaCluster_PM2.5) +
   tm_polygons(col = &quot;Mean Conc. (µg/m3)&quot;, 
               palette = &quot;seq&quot;, 
@@ -648,7 +673,7 @@ Mean_PM2.5_Conc</code></pre>
 <pre><code>## Warning: The shape SFAreaCluster_PM2.5 is invalid. See sf::st_is_valid
 
 ## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
 <pre class="r"><code># Map Getis G.
 Mean_NO2_GetisG &lt;- tm_shape(SFAreaCluster_NO2) +
   tm_polygons(col = &quot;Getis Ord G&quot;, 
@@ -700,7 +725,8 @@ Mean_GetisG</code></pre>
 
 ## Warning: The shape SFAreaCluster_PM2.5 is invalid. See sf::st_is_valid</code></pre>
 <pre><code>## Warning: The shape MSOA is invalid. See sf::st_is_valid</code></pre>
-<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-5-5.png" width="672" /></p>
+<p><img src="Research-Question-1_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+</div>
 </div>
 
 

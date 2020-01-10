@@ -14,7 +14,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Read in School, GP and Hospital Data
+# Results
+```{r}
+All_MoransI
+
+NO2_MoransI
+```
+
+# Code
+## Read in School, GP and Hospital Data
 ```{r}
 # Read in code points.
 AllCodePoints <- read_csv("Data/Schools and Health/OS Point Codes/Data/AllCodePoints.csv",
@@ -67,7 +75,7 @@ Locations <- Locations[!duplicated(Locations$Name), ]
 
 ```
 
-# Extract Concentrations for Schools, GPs and Hospitals
+## Extract Concentrations for Schools, GPs and Hospitals
 ```{r}
 # Convert location coordinates into point geometry.
 SFLocations <- st_as_sf(Locations, coords = c("Eastings", "Northings"), crs = BNG)
@@ -113,7 +121,7 @@ SFGPsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "GP")
 SFHospitalsPM2.5 <- subset(SFLocationsPM2.5, `Building Type` == "Hospital")
 ```
 
-# MSOA Cluster Data for Points
+## MSOA Cluster Data for Points
 ```{r}
 # Convert SF objects into SP objects
 SPPointCluster <- as(SFMSOA, "Spatial")
@@ -224,7 +232,10 @@ colnames(SFPointCluster_HospitalsNO2) <- c("Moran's I", "geometry")
 colnames(SFPointCluster_SchoolsPM2.5) <- c("Moran's I", "geometry")
 colnames(SFPointCluster_GPsPM2.5) <- c("Moran's I", "geometry")
 colnames(SFPointCluster_HospitalsPM2.5) <- c("Moran's I", "geometry")
+```
 
+## Map Results
+```{r}
 # Map Moran's I.
 All_Schools_MoransI <- tm_shape(SFPointCluster_SchoolsAll) +
   tm_polygons(col = "Moran's I", 
@@ -346,5 +357,5 @@ NO2_MoransI_Legend <- tm_shape(SFPointCluster_SchoolsNO2) +
 
 NO2_MoransI <- tmap_arrange(NO2_Schools_MoransI, NO2_GPs_MoransI, NO2_Hospitals_MoransI, NO2_MoransI_Legend, ncol=2, nrow = 2)
 NO2_MoransI
-
 ```
+

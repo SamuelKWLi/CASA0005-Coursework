@@ -13,7 +13,16 @@ output:
 editor_options: 
   chunk_output_type: console
 ---
-# Index of Multiple Deprivation 
+
+# Results
+```{r}
+NO2_Coef
+
+PM2.5_Coef
+```
+
+# Code
+## Index of Multiple Deprivation 
 ```{r}
 # Read in indices of deprivation data.
 IDData <- read_csv("Data/Boundaries and Census/ID 2019 for London.csv",
@@ -63,7 +72,7 @@ SFLSOA<-merge(SFLSOA,
              all.x = TRUE)
 ```
 
-# Road Density
+## Road Density
 ```{r}
 # Load road shapefile.
 Roads <- st_read("Data/Air Pollution/LAEI 2016 Supporting Information/LAEI_MajorRoadNetwork_Link.shp")
@@ -110,7 +119,7 @@ SFMSOA<-merge(SFMSOA,
              all.x = TRUE)
 ```
 
-# Distance from Central London (Charing Cross)
+## Distance from Central London (Charing Cross)
 ```{r}
 # Create Postcode vector with Charing Cross postcode.
 Postcode <- "WC2N5DU"
@@ -155,7 +164,7 @@ SFMSOA<-merge(SFMSOA,
              all.x = TRUE)
 ```
 
-# Linear Regression Model
+## Linear Regression Model
 ```{r}
 # Conduct linear regression.
 LRNO2 <- lm(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` + `Dist. from C. London (km)`, data = SFMSOA)
@@ -171,7 +180,7 @@ LRResultsPM2.5 <- tidy(LRPM2.5)
 
 ```
 
-# Linear Regression - Assumption 1
+## Linear Regression - Assumption 1
 ```{r}
 # Plot histogram on variables.
 ggplot(SFMSOA, aes(x=`Mean NO2 Conc.`)) + 
@@ -196,14 +205,14 @@ qplot(x = `Mean NO2 Conc.`, y = `Road Density (km/km2)`, data = SFMSOA)
 qplot(x = `Mean NO2 Conc.`, y = `Dist. from C. London (km)`, data = SFMSOA)
 ```
 
-# Linear Regression - Assumption 2
+## Linear Regression - Assumption 2
 ```{r}
 # Plot linear regression model residuals in a histogram.
 qplot(LRNO2$residuals) + geom_histogram() 
 qplot(LRPM2.5$residuals) + geom_histogram() 
 ```
 
-# Linear Regression - Assumption 3
+## Linear Regression - Assumption 3
 ```{r}
 # Remove geometry of SFMSOA.
 CorMSOA <- st_set_geometry(SFMSOA,NULL)
@@ -222,7 +231,7 @@ vif(LRNO2)
 vif(LRPM2.5)
 ```
 
-# Linear Regression - Assumption 4
+## Linear Regression - Assumption 4
 ```{r}
 # Plot model diagnostics.
 plot(LRNO2)
@@ -230,7 +239,7 @@ plot(LRPM2.5)
 
 ```
 
-# Linear Regression - Assumption 5
+## Linear Regression - Assumption 5
 ```{r}
 # Merge model residuals to shapefile.
 SFMSOA$`LRNO2 Residuals` <- LRNO2$residuals
@@ -251,7 +260,7 @@ moran.test(SPMSOA@data$LRPM2.5.Residuals, SpWeightsMSOA)
 
 ```
 
-# GWR
+## GWR
 ```{r}
 # Calculate kernel bandwidths.
 GWRbandwidthNO2 <- gwr.sel(`Mean NO2 Conc.` ~ `IMD Score` + `Road Density (km/km2)` +`Dist. from C. London (km)`, data = SFMSOA, coords=CentroidMSOA, adapt=T)
@@ -273,7 +282,10 @@ SFMSOA$`Dist. from C. London NO2 Coef.`<- round(GWRNO2Results$X.Dist..from.C..Lo
 SFMSOA$`IMD PM2.5 Coef.`<- round(GWRPM2.5Results$X.IMD.Score., digits = 3)
 SFMSOA$`Road Density PM2.5 Coef.`<- round(GWRPM2.5Results$X.Road.Density..km.km2.., digits = 3)
 SFMSOA$`Dist. from C. London PM2.5 Coef.`<- round(GWRPM2.5Results$X.Dist..from.C..London..km.., digits = 3)
+```
 
+## Map Results
+```{r}
 # Map coefficients.
 NO2_IMD_Coef <- tm_shape(SFMSOA) +
   tm_polygons(col = "IMD NO2 Coef.", 
@@ -371,5 +383,5 @@ PM2.5_DfCL_Coef <- tm_shape(SFMSOA) +
 
 PM2.5_Coef <- tmap_arrange(PM2.5_IMD_Coef, PM2.5_RD_Coef, PM2.5_DfCL_Coef, ncol=1, nrow = 3)
 PM2.5_Coef
-
 ```
+
