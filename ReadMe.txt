@@ -7,5 +7,5 @@ How to use interactive map:
 Additional layers can be turned on and off using the icon on the top right corner of the map. 
 Additional information can often be found in popups by clicking on the points and polygon on the map. 
 Individual points can be seen by zooming into the map. 
-Zoom level can be controlled using the + and – icons on the top right corner of the map. 
-The view can be reverted to its original zoom and location using the globe icon to the right of the map, below the zoom icons.
+Zoom level can be controlled using the + and – icons on the top left corner of the map. 
+The view can be reverted to its original zoom and location using the globe icon to the left of the map, below the zoom icons.
