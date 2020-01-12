@@ -1,0 +1,79 @@
+BAMMlikelihood          Calculate 'BAMM' likelihood
+BAMMtools               BAMMtools
+BAMMtools-data          BAMMtools datasets
+addBAMMlegend           Add a color legend to a phylo-rate plot
+addBAMMshifts           Add 'BAMM'-inferred rate shifts to a phylogeny
+                        plot
+assignColorBreaks       Map macroevolutionary rates to colors
+cohorts                 Visualize macroevolutionary cohorts
+computeBayesFactors     Compute Bayes Factors
+credibleShiftSet        Credible set of macroevolutionary rate shift
+                        configurations from 'BAMM' results
+cumulativeShiftProbsTree
+                        Branch-specific rate shift probabilities
+distinctShiftConfigurations
+                        Identify distinct rate shift configurations
+dtRates                 Calculate macroevolutionary rate changes on a
+                        phylogeny from 'BAMM' output
+generateControlFile     Generate control file for 'BAMM'
+getBestShiftConfiguration
+                        Get the best (sampled) rate shift configuration
+                        from a 'BAMM' analysis
+getBranchShiftPriors    Compute prior odds of a rate shift on each
+                        branch of a phylogeny from BAMM output
+getCladeRates           Compute clade-specific mean rates
+getCohortMatrix         Compute the pairwise correlation in rate
+                        regimes between all tips in a 'bammdata' object
+getEventData            Create 'bammdata' object from MCMC output
+getJenksBreaks          Jenks natural breaks classification
+getMarginalBranchRateMatrix
+                        Compute mean branch rates for 'bammdata' object
+getMeanBranchLengthTree
+                        Compute phylogeny with branch lengths equal to
+                        corresponding macroevolutionary rate estimates
+getRateThroughTimeMatrix
+                        Generate rate-through-time matrix from
+                        'bammdata' object
+getShiftNodesFromIndex
+                        Identify nodes associated with rate shifts from
+                        'bammdata' object
+getTipRates             Compute tip-specific macroevolutionary rates
+                        from 'bammdata' object
+getmrca                 Find most recent common ancestors
+marginalOddsRatioBranches
+                        Ratio of (marginal) posterior-to-prior
+                        probabilities on individual branches
+maximumShiftCredibility
+                        Estimate maximum shift credibility
+                        configuration
+plot.bammdata           Plot 'BAMM'-estimated macroevolutionary rates
+                        on a phylogeny
+plot.bammshifts         Plot distinct rate shift configurations on a
+                        phylogeny
+plot.credibleshiftset   Plot credible set of rate shift configurations
+                        from 'BAMM' analysis
+plotPrior               Plot the prior and posterior distribution of
+                        shifts
+plotRateThroughTime     Plot rates through time
+ratesHistogram          Histogram of 'BAMM' rate frequencies
+richColors              Rich color palette
+samplingProbs           Creates clade-specific sampling fractions
+setBAMMpriors           Set BAMM Priors
+speciesByRatesMatrix    Compute species-specific rate through time
+                        trajectories
+stepBF                  Identify the optimal number of shifts using
+                        Bayes factors
+subsetEventData         Subset a 'bammdata' object
+subtreeBAMM             Pulls out a subtree from 'bammdata' object
+summary.bammdata        Summary of rate shift results from 'BAMM'
+                        analysis
+summary.credibleshiftset
+                        Summary of credible set of shift configurations
+                        from a 'BAMM' analysis
+testTimeVariableBranches
+                        Evaluate evidence for temporal rate variation
+                        across tree
+traitDependentBAMM      STRAPP: STructured Rate Permutations on
+                        Phylogenies
+transparentColor        Define colors with transparency
+writeEventData          Write a 'bammdata' object to disk

@@ -1,0 +1,26 @@
+GISTools-package        GISTools
+add.alpha               Add transparency to a hex-defined colour
+add.masking             Draw a mask around a Grid Based Image
+auto.shading            auto.shading
+choro.legend            choro.legend
+choropleth              choropleth
+ft2miles                Distance Units Conversion
+generalize.polys        generalize.polys
+georgia                 Georgia Social and Economic Data by County
+jitter.points           Bootstrap and Kernel Bootstrap from Points
+kde.points              Kernel Density Estimates
+level.plot              Level plot for gridded data
+map.scale               map.scale
+newhaven                New Haven, Connecticut: Crime data with
+                        contextual information
+north.arrow             Add a north arrow to a map
+phenology               Phenology data for North American lilacs
+poly.areas              Area of Each Polygon
+poly.counts             Number of Points in Each Polygon
+poly.labels             Number of Points in Each Polygon
+poly.outer              Create a masking polygon to block out graphics
+                        outside a region.
+quantileCuts            Cut functions
+shading                 Shading
+tornados                US Tornado Touchdown Data
+vulgaris                Phenology data for North American lilacs

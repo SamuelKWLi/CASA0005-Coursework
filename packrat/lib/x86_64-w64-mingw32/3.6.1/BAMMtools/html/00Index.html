@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: Analysis and Visualization of Macroevolutionary Dynamics on
+Phylogenetic Trees</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+<h1> Analysis and Visualization of Macroevolutionary Dynamics on
+Phylogenetic Trees
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;BAMMtools&rsquo; version 2.1.6</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="BAMMtools.html">BAMMtools-package</a></td>
+<td>BAMMtools</td></tr>
+<tr><td style="width: 25%;"><a href="addBAMMlegend.html">addBAMMlegend</a></td>
+<td>Add a color legend to a phylo-rate plot</td></tr>
+<tr><td style="width: 25%;"><a href="addBAMMshifts.html">addBAMMshifts</a></td>
+<td>Add 'BAMM'-inferred rate shifts to a phylogeny plot</td></tr>
+<tr><td style="width: 25%;"><a href="assignColorBreaks.html">assignColorBreaks</a></td>
+<td>Map macroevolutionary rates to colors</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMlikelihood.html">BAMMlikelihood</a></td>
+<td>Calculate 'BAMM' likelihood</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools.html">BAMMtools</a></td>
+<td>BAMMtools</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">BAMMtools-data</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="cohorts.html">cohorts</a></td>
+<td>Visualize macroevolutionary cohorts</td></tr>
+<tr><td style="width: 25%;"><a href="computeBayesFactors.html">computeBayesFactors</a></td>
+<td>Compute Bayes Factors</td></tr>
+<tr><td style="width: 25%;"><a href="credibleShiftSet.html">credibleShiftSet</a></td>
+<td>Credible set of macroevolutionary rate shift configurations from 'BAMM' results</td></tr>
+<tr><td style="width: 25%;"><a href="ShiftProbsTree.html">cumulativeShiftProbsTree</a></td>
+<td>Branch-specific rate shift probabilities</td></tr>
+<tr><td style="width: 25%;"><a href="distinctShiftConfigurations.html">distinctShiftConfigurations</a></td>
+<td>Identify distinct rate shift configurations</td></tr>
+<tr><td style="width: 25%;"><a href="dtRates.html">dtRates</a></td>
+<td>Calculate macroevolutionary rate changes on a phylogeny from 'BAMM' output</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">events.fishes</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">events.primates</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">events.whales</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">fishes</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="generateControlFile.html">generateControlFile</a></td>
+<td>Generate control file for 'BAMM'</td></tr>
+<tr><td style="width: 25%;"><a href="getBestShiftConfiguration.html">getBestShiftConfiguration</a></td>
+<td>Get the best (sampled) rate shift configuration from a 'BAMM' analysis</td></tr>
+<tr><td style="width: 25%;"><a href="getBranchShiftPriors.html">getBranchShiftPriors</a></td>
+<td>Compute prior odds of a rate shift on each branch of a phylogeny from BAMM output</td></tr>
+<tr><td style="width: 25%;"><a href="getCladeRates.html">getCladeRates</a></td>
+<td>Compute clade-specific mean rates</td></tr>
+<tr><td style="width: 25%;"><a href="getCohortMatrix.html">getCohortMatrix</a></td>
+<td>Compute the pairwise correlation in rate regimes between all tips in a 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="getEventData.html">getEventData</a></td>
+<td>Create 'bammdata' object from MCMC output</td></tr>
+<tr><td style="width: 25%;"><a href="getJenksBreaks.html">getJenksBreaks</a></td>
+<td>Jenks natural breaks classification</td></tr>
+<tr><td style="width: 25%;"><a href="getMarginalBranchRateMatrix.html">getMarginalBranchRateMatrix</a></td>
+<td>Compute mean branch rates for 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="getMeanBranchLengthTree.html">getMeanBranchLengthTree</a></td>
+<td>Compute phylogeny with branch lengths equal to corresponding macroevolutionary rate estimates</td></tr>
+<tr><td style="width: 25%;"><a href="getmrca.html">getmrca</a></td>
+<td>Find most recent common ancestors</td></tr>
+<tr><td style="width: 25%;"><a href="getRateThroughTimeMatrix.html">getRateThroughTimeMatrix</a></td>
+<td>Generate rate-through-time matrix from 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="getShiftNodesFromIndex.html">getShiftNodesFromIndex</a></td>
+<td>Identify nodes associated with rate shifts from 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="getTipRates.html">getTipRates</a></td>
+<td>Compute tip-specific macroevolutionary rates from 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="marginalOddsRatioBranches.html">marginalOddsRatioBranches</a></td>
+<td>Ratio of (marginal) posterior-to-prior probabilities on individual branches</td></tr>
+<tr><td style="width: 25%;"><a href="ShiftProbsTree.html">marginalShiftProbsTree</a></td>
+<td>Branch-specific rate shift probabilities</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">mass.primates</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="maximumShiftCredibility.html">maximumShiftCredibility</a></td>
+<td>Estimate maximum shift credibility configuration</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">mcmc.primates</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">mcmc.whales</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="plot.bammdata.html">plot.bammdata</a></td>
+<td>Plot 'BAMM'-estimated macroevolutionary rates on a phylogeny</td></tr>
+<tr><td style="width: 25%;"><a href="plot.bammshifts.html">plot.bammshifts</a></td>
+<td>Plot distinct rate shift configurations on a phylogeny</td></tr>
+<tr><td style="width: 25%;"><a href="plot.credibleshiftset.html">plot.credibleshiftset</a></td>
+<td>Plot credible set of rate shift configurations from 'BAMM' analysis</td></tr>
+<tr><td style="width: 25%;"><a href="plotPrior.html">plotPrior</a></td>
+<td>Plot the prior and posterior distribution of shifts</td></tr>
+<tr><td style="width: 25%;"><a href="plotRateThroughTime.html">plotRateThroughTime</a></td>
+<td>Plot rates through time</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">primates</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="summary.credibleshiftset.html">print.credibleshiftset</a></td>
+<td>Summary of credible set of shift configurations from a 'BAMM' analysis</td></tr>
+<tr><td style="width: 25%;"><a href="ratesHistogram.html">ratesHistogram</a></td>
+<td>Histogram of 'BAMM' rate frequencies</td></tr>
+<tr><td style="width: 25%;"><a href="richColors.html">richColors</a></td>
+<td>Rich color palette</td></tr>
+<tr><td style="width: 25%;"><a href="samplingProbs.html">samplingProbs</a></td>
+<td>Creates clade-specific sampling fractions</td></tr>
+<tr><td style="width: 25%;"><a href="setBAMMpriors.html">setBAMMpriors</a></td>
+<td>Set BAMM Priors</td></tr>
+<tr><td style="width: 25%;"><a href="speciesByRatesMatrix.html">speciesByRatesMatrix</a></td>
+<td>Compute species-specific rate through time trajectories</td></tr>
+<tr><td style="width: 25%;"><a href="stepBF.html">stepBF</a></td>
+<td>Identify the optimal number of shifts using Bayes factors</td></tr>
+<tr><td style="width: 25%;"><a href="traitDependentBAMM.html">strapp</a></td>
+<td>STRAPP: STructured Rate Permutations on Phylogenies</td></tr>
+<tr><td style="width: 25%;"><a href="subsetEventData.html">subsetEventData</a></td>
+<td>Subset a 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="subtreeBAMM.html">subtreeBAMM</a></td>
+<td>Pulls out a subtree from 'bammdata' object</td></tr>
+<tr><td style="width: 25%;"><a href="summary.bammdata.html">summary.bammdata</a></td>
+<td>Summary of rate shift results from 'BAMM' analysis</td></tr>
+<tr><td style="width: 25%;"><a href="summary.credibleshiftset.html">summary.credibleshiftset</a></td>
+<td>Summary of credible set of shift configurations from a 'BAMM' analysis</td></tr>
+<tr><td style="width: 25%;"><a href="testTimeVariableBranches.html">testTimeVariableBranches</a></td>
+<td>Evaluate evidence for temporal rate variation across tree</td></tr>
+<tr><td style="width: 25%;"><a href="traitDependentBAMM.html">traitDependentBAMM</a></td>
+<td>STRAPP: STructured Rate Permutations on Phylogenies</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">traits.fishes</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="transparentColor.html">transparentColor</a></td>
+<td>Define colors with transparency</td></tr>
+<tr><td style="width: 25%;"><a href="BAMMtools-data.html">whales</a></td>
+<td>BAMMtools datasets</td></tr>
+<tr><td style="width: 25%;"><a href="writeEventData.html">writeEventData</a></td>
+<td>Write a 'bammdata' object to disk</td></tr>
+</table>
+</body></html>
